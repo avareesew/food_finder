@@ -50,7 +50,7 @@ Scavenger is a mobile-first web platform that solves the "Dark Data" problem: th
 - ✅ Technical architecture defined
 - ✅ Git repository initialized and pushed to GitHub
 
-### What We're Building (MVP - 2-3 Weeks)
+### What We're Building (7-Week MVP Sprint, Core Development in Weeks 2-4)
 1. **Flyer Upload & AI Extraction**
    - Photo → Gemini 2.0 Flash API → Structured data
    - Human-in-the-loop confirmation (prevents errors)
@@ -144,26 +144,40 @@ See `aiDocs/architecture.md` for complete technical architecture and setup instr
 
 ## 🗓️ Timeline
 
-### Phase 0: Planning (Complete)
+### Phase 0: Setup & Validation (Week 1) - Complete
 - ✅ Market research
 - ✅ PRD & MVP spec
 - ✅ Technical architecture
 - ✅ Git setup
+- ✅ Detailed implementation roadmaps
 
-### Phase 1: MVP Build (Weeks 1-3)
-- Week 1: Project setup, design mockups, seed data
-- Week 2: Frontend (feed + upload form)
-- Week 3: Gemini API integration, deploy, test
+### Phase 1: Core Development (Weeks 2-4)
+- Week 2: Design phase + Upload & AI extraction flow
+- Week 3: Real-time feed implementation
+- Week 4: Status management + UI polish
+- **Checkpoint:** Core "flyer → feed → gone" pipeline works end-to-end
 
-### Phase 2: Alpha Test (Weeks 4-5)
+**Note:** "Core development" is Weeks 2-4 within the full 7-week MVP sprint. Total time to public launch is 7 weeks including setup, testing, and iteration.
+
+### Phase 2: Alpha Testing (Week 5)
 - Recruit 5-10 alpha testers
 - Manual seed data (team posts real events)
 - Collect feedback, fix critical bugs
+- **Critical Metric:** 70%+ of alpha testers say "yes, I would use this regularly"
+- **Checkpoint:** Did we hit 70% satisfaction? What needs fixing?
 
-### Phase 3: Public Launch (Week 6+)
-- Launch to BYU students (social media, ward groups)
+### Phase 3: Beta & Polish (Week 6)
+- Fix alpha issues
+- Expand to 30-50 users
+- Recruit 3-5 design partner clubs
+- Platform stability and UX improvements
+- **Checkpoint:** Is the platform stable and ready for public launch?
+
+### Phase 4: Public Launch (Week 7)
+- Launch to all BYU students (social media, ward groups)
 - Monitor usage, iterate on feedback
-- Recruit design partner clubs
+- Hit MVP success metrics (30+ posts, 150+ visitors, 25% repeat, <5% ghost chase, 5+ organic)
+- **Checkpoint:** Did we achieve product-market fit signals?
 
 ---
 
@@ -225,6 +239,12 @@ project-root/
 - **Market Research:** `ai/guides/food-finder-market-research.md`
 - **API Docs:** `ai/guides/` (verified Gemini, Firebase, Next.js documentation)
 - **GitHub:** https://github.com/avareesew/food_finder
+
+---
+## Behavior
+
+-  Whenever creating plan docs and roadmap docs, always save them in ai/roadmaps. prefix the name with the date. add a note that we need to avoid over-engineering, cruft, and leagcy compatibility features in this clean code project
+- Whenever finishing with implementing a plan / roadmap doc pair, make sure hte roadmap is up to date (tasks checked off, etc.) Then move the docs to ai/roadmaps/complete. Then update ai/changelog.md accordingly. 
 
 ---
 

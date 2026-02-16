@@ -1,8 +1,8 @@
 # System Architecture: Scavenger Platform
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Last Updated:** February 16, 2026  
-**Status:** Pre-Development / APIs Verified  
+**Status:** Pre-Development / Implementation-Ready  
 **All APIs confirmed with real documentation via Context7**
 
 ---
@@ -55,6 +55,87 @@ Scavenger is a serverless, mobile-first web application that uses AI-powered vis
 
 ---
 
+## File Structure & Components
+
+### Project Organization
+
+```
+scavenger-app/
+├── app/
+│   ├── page.tsx                    // Feed view (homepage)
+│   ├── post/
+│   │   └── page.tsx                // Upload flow page
+│   ├── event/[id]/
+│   │   └── page.tsx                // Event detail view
+│   ├── edit/[id]/
+│   │   └── page.tsx                // Edit/status management page
+│   └── api/
+│       ├── extract-flyer/
+│       │   └── route.ts            // Gemini AI extraction endpoint
+│       └── posts/
+│           └── route.ts            // CRUD operations for posts
+├── components/
+│   ├── EventCard.tsx               // Feed item displaying event summary
+│   ├── UploadForm.tsx              // Camera + file picker interface
+│   ├── ConfirmationForm.tsx        // AI data verification form
+│   ├── LoadingState.tsx            // Skeleton cards with pulse animation
+│   └── ErrorBoundary.tsx           // Error handling wrapper
+├── lib/
+│   ├── firebase.ts                 // Firebase initialization & exports
+│   ├── uploadImage.ts              // Firebase Storage upload utility
+│   ├── createPost.ts               // Firestore post creation
+│   ├── getPosts.ts                 // Firestore query utilities
+│   └── formatEventTime.ts          // Date/time formatting with date-fns
+├── public/                         // Static assets
+└── .env.local                      // Environment variables (not committed)
+```
+
+### Component Hierarchy
+
+```
+Feed (app/page.tsx)
+├── Header ("Scavenger 🍕")
+├── Explainer (how it works, 3 steps)
+├── LoadingState (skeleton cards while fetching) OR
+├── EventCard[] (mapped from posts array)
+│   ├── Event name (heading)
+│   ├── Location icon + building & room
+│   ├── Time icon + relative time ("In 30 min", "Happening now")
+│   ├── Food icon + description
+│   ├── Estimated portions (if available)
+│   ├── Status badge ("🔴 Happening Now", "⏰ In 30 min")
+│   └── Thumbnail image (optional)
+└── FloatingButton ("Post Food" - bottom right, fixed position)
+```
+
+---
+
+## Implementation Patterns
+
+### State Management
+- Real-time Firestore listener with cleanup using `useEffect` and `onSnapshot`
+- React hooks for local state management
+- No complex state management library needed for MVP
+
+### Error Handling
+- User-friendly error messages for common failures
+- Technical errors logged to console for debugging
+- Retry options provided on all errors
+- Graceful degradation for network issues
+
+### Loading States
+- Skeleton cards with pulse animation (3-5 cards)
+- Match actual card layout to prevent layout shift
+- Show immediately while data loads
+
+### Form Validation
+- Image validation: JPEG/PNG only, max 10MB
+- Required fields: event name, building, room, date, food description
+- Date/time validation: must be in future, end time after start time
+- Real-time validation feedback
+
+---
+
 ## Technology Stack
 
 ### Frontend
@@ -72,34 +153,11 @@ Scavenger is a serverless, mobile-first web application that uses AI-powered vis
 - No complex state management needed for MVP
 - **✅ Verified:** All patterns work with Next.js 14 App Router
 
-**Key Features Used:**
-```typescript
-// Verified from official docs
-
-// API Route: app/api/upload/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-
-export async function POST(request: NextRequest) {
-  const formData = await request.formData();
-  const image = formData.get('image') as File;
-  // Process image...
-  return NextResponse.json({ success: true });
-}
-
-// Server Component (default)
-export default async function Page() {
-  // Can directly query database here!
-  return <div>...</div>;
-}
-
-// Client Component
-'use client';
-import { useState } from 'react';
-export default function Interactive() {
-  const [state, setState] = useState(0);
-  return <button onClick={() => setState(s => s + 1)}>{state}</button>;
-}
-```
+**Key Features:**
+- API Routes for backend logic (`app/api/*/route.ts`)
+- Server Components (default) for data fetching
+- Client Components (`'use client'`) for interactivity
+- Built-in Image optimization
 
 ---
 
@@ -129,29 +187,11 @@ export default function Interactive() {
 - Built-in offline support (future mobile app)
 - **✅ Verified:** All query patterns work as documented
 
-**Key Features Used:**
-```javascript
-// Verified from official docs
-import { getFirestore, collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
-
-const db = getFirestore(app);
-
-// Real-time listener (auto-updates all clients!)
-const unsubscribe = onSnapshot(
-  query(
-    collection(db, 'posts'),
-    where('status', '==', 'available'),
-    orderBy('dateTime.start', 'asc')
-  ),
-  (snapshot) => {
-    snapshot.docChanges().forEach(change => {
-      if (change.type === 'added') {
-        // New post appeared!
-      }
-    });
-  }
-);
-```
+**Key Features:**
+- Real-time listeners automatically push updates to all clients
+- Composite indexes for complex queries
+- Server-side timestamps for consistency
+- Automatic retry and offline support
 
 ---
 
@@ -168,24 +208,19 @@ const unsubscribe = onSnapshot(
 - Native support for multimodal (image + text) prompts
 - **✅ Verified:** JSON schema extraction works exactly as needed
 
-**Key Features Used:**
-```javascript
-// Verified from official docs
-import { GoogleGenAI, createUserContent, createPartFromBase64 } from '@google/generative-ai';
+**Key Features:**
+- Accepts base64-encoded images
+- JSON schema output for structured extraction
+- Configurable response format
+- BYU-specific prompt optimization with building codes
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const response = await ai.models.generateContent({
-  model: "gemini-2.0-flash",
-  contents: createUserContent([
-    "Extract event details",
-    createPartFromBase64(imageBase64, "image/jpeg")
-  ]),
-  config: {
-    responseMimeType: "application/json",
-    responseSchema: { /* our Post schema */ }
-  }
-});
-```
+**BYU Building Codes Recognized:**
+- TMCB (Tanner Building)
+- MARB (Maeser Building)  
+- WSC (Wilkinson Student Center)
+- Talmage Building
+- JFSB (Joseph F. Smith Building)
+- ESC (Engineering & Computer Science Building)
 
 ---
 
@@ -200,16 +235,10 @@ const response = await ai.models.generateContent({
 - Free tier: 5GB storage, 1GB/day download
 - **✅ Verified:** Upload and download URLs work as documented
 
-**Key Features Used:**
-```javascript
-// Verified from official docs
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
-const storageRef = ref(storage, `flyers/${postId}/${file.name}`);
-await uploadBytes(storageRef, file);
-const downloadURL = await getDownloadURL(storageRef);
-// Store downloadURL in Firestore document
-```
+**Features:**
+- Unique file paths per post: `flyers/{postId}/{filename}`
+- Public download URLs
+- Automatic CDN distribution
 
 ---
 
@@ -381,6 +410,60 @@ interface Post {
 
 ---
 
+## API Implementation Details
+
+### `/api/extract-flyer` Route
+
+**File:** `app/api/extract-flyer/route.ts`
+
+**Functionality:**
+- Accepts multipart/form-data with image file
+- Rate limiting: 5 uploads/IP/hour (in-memory map for MVP)
+- Image validation: JPEG/PNG only, max 10MB
+- Converts image to base64
+- Calls Gemini API with BYU-specific prompt and JSON schema
+- Returns structured JSON extraction
+
+**Error Codes:**
+- 400: No image provided or invalid format
+- 413: File too large (>10MB)
+- 429: Rate limit exceeded (5/hour/IP)
+- 500: Gemini API error
+
+**Gemini Prompt Strategy:**
+- Instructs AI to extract event name, location, date/time, food details
+- Includes BYU building code recognition (TMCB, MARB, WSC, Talmage, JFSB, ESC)
+- Returns only valid JSON
+- Uses null for unclear fields
+
+**JSON Schema:**
+- Defines Post structure with required fields
+- Ensures consistent data format
+- Validates location (building + room), dateTime (start + end), food description
+
+### Data Flow: Upload to Feed
+
+**Complete Pipeline:**
+1. User uploads image → `UploadForm.tsx`
+2. Image sent to `/api/extract-flyer`
+   - Rate limit check → Image validation → Base64 conversion → Gemini processes
+3. User confirms/edits data → `ConfirmationForm.tsx`
+4. Image uploaded to Firebase Storage → Returns download URL
+5. Post created in Firestore → Generates UUID edit key → Returns postId + editKey
+6. Real-time listener triggers on all clients → New post appears instantly (<100ms)
+7. Edit key saved to localStorage → User can mark as "gone" later
+
+### Real-Time Status Update Flow
+
+**Status Change Pipeline:**
+1. User clicks "Mark as Gone" → `app/edit/[id]/page.tsx`
+2. Verify edit key matches → Query Firestore for `uploaderEditKey`
+3. Update status in Firestore → `status: 'gone'` + `updatedAt: serverTimestamp()`
+4. Real-time listener triggers on all clients → Post disappears from feed (<100ms)
+5. Success message shown → "Post marked as gone"
+
+---
+
 ## Security Considerations
 
 ### MVP (Phase 1)
@@ -396,6 +479,105 @@ interface Post {
 - Implement CAPTCHA on upload form
 - Add content moderation (flag inappropriate posts)
 - HTTPS only (enforced by Vercel)
+
+**⚠️ Security Note:** MVP uses `allow write: if true` for Firestore rules to enable rapid development. This is a **temporary security risk** mitigated by:
+- Rate limiting in API routes (5 uploads/IP/hour)
+- Manual monitoring during alpha/beta
+- Plan to lock down to server-only writes in Phase 2
+
+---
+
+## Mobile-First UI/UX Implementation
+
+### Design Principles
+
+**Responsive Breakpoints:**
+- Primary target: 375px (iPhone SE)
+- Secondary: 414px (iPhone Pro), 390px (standard)
+- Tailwind breakpoints: sm (640px), md (768px), lg (1024px)
+
+**Touch-Optimized UI:**
+- Minimum tap target: 44px × 44px (iOS guideline)
+- Large, easy-to-tap buttons
+- High contrast for outdoor viewing
+- Font size minimum: 16px (prevents iOS zoom)
+
+**Accessibility (WCAG 2.1 AA):**
+- All images have alt text
+- Buttons have aria-labels
+- Form inputs have visible or aria labels
+- Color contrast ≥ 4.5:1
+- Keyboard navigation works (Tab key)
+- Focus states visible (outline on :focus)
+- Screen reader tested (VoiceOver)
+
+### Status Indicators
+
+**Visual Badges for Event Timing:**
+- **Happening Now:** Green badge, 🔴 emoji
+- **Starting Soon (<1 hour):** Yellow badge, ⏰ emoji, "In X min"
+- **Today:** Blue badge, 📅 emoji, "Today at h:mm a"
+- **Tomorrow:** Purple badge, 📅 emoji, "Tomorrow at h:mm a"
+- **Future:** Gray badge, 📅 emoji, full date/time
+
+**Implementation:** Uses `date-fns` for relative time formatting
+
+---
+
+## Performance Targets & Testing
+
+### MVP Performance Metrics
+
+**Target Response Times:**
+| Metric | Target | How to Measure |
+|--------|--------|----------------|
+| Feed load time | <2 seconds | Chrome DevTools Network tab |
+| AI extraction | <3 seconds | API route timing |
+| Real-time sync | <100ms | Firestore update to UI change |
+| Image upload | <5 seconds | Typical 2MB photo |
+| Page transition | <100ms | React navigation |
+
+**Testing Methodology:**
+- Chrome DevTools → Network tab
+- Simulate 3G connection (mobile throttling)
+- Test on actual devices (iPhone Safari, Android Chrome)
+- Measure FCP, LCP, CLS
+
+### Gemini Accuracy Testing
+
+**Week 1 Validation Process:**
+1. **Collect:** 20-30 real BYU flyers from campus (TMCB, Wilkinson, Talmage, Library)
+2. **Label:** Create ground truth JSON with manual extraction
+3. **Test:** Run automated test script against Gemini API
+4. **Measure:** Calculate per-field accuracy (event name, building, room, date, time, food)
+
+**Accuracy Thresholds:**
+- **80%+ accuracy** → Proceed with AI-primary flow
+- **70-79% accuracy** → Add "Please verify" warning
+- **<70% accuracy** → Pivot to manual entry as primary
+
+**Field Matching Criteria:**
+- Event name: Exact match (case-insensitive)
+- Building: Case-insensitive match
+- Room: Exact match
+- Date: Format-flexible
+- Time: Within 15-minute tolerance
+- Food: Semantic match (e.g., "pizza" ≈ "large pizza")
+
+### Mobile Testing Checklist
+
+**Week 4: Pre-Alpha Testing**
+
+**Devices:**
+- iPhone (Safari) - iOS 16+
+- Android (Chrome) - Android 11+
+- Screen sizes: 375px, 390px, 414px
+
+**Test Cases:**
+- Upload flow (camera opens, photo captures, gallery upload, preview)
+- Feed browsing (scroll performance, real-time updates, pull-to-refresh)
+- Navigation (tap card → detail, back button, deep links)
+- Offline behavior (error message, retry button, no crash)
 
 ---
 
@@ -676,6 +858,92 @@ npm run dev
 - Firebase/Firestore: `ai/guides/firebase-firestore-docs.md`
 - Next.js 14: `ai/guides/nextjs-14-docs.md`
 - Full verification: `ai/guides/api-verification-summary.md`
+
+---
+
+## Phase 2+ Architecture Evolution
+
+### Automated Data Cleanup (Cloud Functions)
+
+**Firebase Cloud Function for Expired Post Deletion:**
+- Runs daily at 2 AM Mountain Time
+- Deletes posts where end time was >24 hours ago
+- Batch deletion (max 500 per batch)
+- Logs deletion count for monitoring
+
+### Authentication Integration (Phase 2)
+
+**Optional Firebase Auth:**
+- Anonymous sign-in (no user data collected, reduces spam)
+- Updated Firestore rules: require authentication for writes
+- Post schema adds optional `authorId` field (Firebase Auth UID)
+- Maintains backward compatibility with MVP edit keys
+- Update/delete requires ownership OR valid edit key
+
+### Slack Bot Integration
+
+**Architecture:**
+- Separate Slack Bolt app deployed on Vercel
+- Shared Firestore database with web app
+- Slash command: `/scavenger post [event details]`
+- Listens to channel messages with flyer images
+- Uses same Gemini extraction pipeline
+- Creates posts directly in Firestore → Web app updates automatically
+
+### Multi-Campus Scaling
+
+**Data Model Options:**
+
+**Option A: Campus field in posts (simpler)**
+- Add `campusId` field to each post ('byu', 'uvu', 'utah', etc.)
+- Query filters by campus
+- Easier initial implementation
+
+**Option B: Separate collections (better isolation)**
+- Structure: `/campuses/{campusId}/posts/{postId}`
+- Allows independent security rules per campus
+- Better scaling (sharding)
+- Campus-specific features
+
+**Campus Configuration:**
+- Campus-specific building codes
+- Timezone handling per location
+- Custom branding per campus
+
+### Email Parser Service
+
+**Architecture:**
+- Email forwarded to scavenger@yourdomain.com
+- SendGrid/Mailgun webhook to Firebase Cloud Function
+- Parse email body for event details
+- Extract attachments (flyer images) to Firebase Storage
+- Gemini extraction on images
+- Create post in Firestore → Web app updates automatically
+
+### Performance Optimizations (Post-PMF)
+
+**Redis Cache Layer:**
+- Cache frequently accessed posts (5-minute TTL)
+- Reduces Firestore reads for popular campuses
+- Implemented when scaling beyond single campus
+
+**Image Optimization:**
+- Next.js Image component (built-in optimization)
+- Automatic WebP serving
+- Lazy loading
+- Responsive image sizes
+
+### Monitoring & Observability (Production)
+
+**Sentry Error Tracking:**
+- Capture exceptions with context
+- Performance monitoring (10% sampling)
+- Environment-specific tracking
+
+**Custom Analytics Events:**
+- Track: post_created, event_card_clicked, upload_started
+- Properties: campus, building, source
+- Supports Google Analytics, Segment, Mixpanel
 
 ---
 

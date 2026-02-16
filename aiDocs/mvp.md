@@ -4,7 +4,7 @@
 **Version:** 1.0 - Demo Build  
 **Date:** February 16, 2026  
 **Purpose:** Working prototype to demonstrate core concept and validate technical feasibility  
-**Timeline:** 2-3 weeks (or faster if scoped aggressively)
+**Timeline:** 2-3 weeks for core development (Weeks 2-4 of 7-week MVP sprint)
 
 ---
 

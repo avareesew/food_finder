@@ -518,6 +518,8 @@ The following features are **not** included in the 7-week MVP but may be added i
 
 | Metric | Target | Why It Matters |
 |--------|--------|----------------|
+| **Posts per Week** | **30+** | **Proves supply-side activation (Week 7 target)** |
+| **Unique Visitors** | **150+** | **Proves demand-side awareness (Week 7 target)** |
 | **Weekly Repeat Users** | 25%+ | Proves product value (North Star) |
 | **Organic Posts** | 5+ | Proves users are evangelizing |
 | **"Ghost Chase" Rate** | <5% | Proves data accuracy/trust |
@@ -587,6 +589,11 @@ The following features are **not** included in the 7-week MVP but may be added i
 - [ ] Manual seed data (team posts 10-15 real events)
 - [ ] Bug fixes from alpha feedback
 - [ ] Analytics integration (GA4)
+
+**Alpha Success Threshold (Critical Decision Gate):**
+- **70%+ of alpha testers must respond "yes" to "Would you use this regularly?"**
+- This is the critical product-market fit signal to proceed to beta
+- If <70%, revisit core assumptions before expanding to public launch
 
 **Validation Checkpoint:** Do alpha testers find food successfully? What breaks?
 
