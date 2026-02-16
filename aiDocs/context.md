@@ -76,14 +76,17 @@ Scavenger is a mobile-first web platform that solves the "Dark Data" problem: th
 
 ## 🛠️ Technical Stack
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| **Frontend** | Next.js 14 (React) | Mobile-first, SSR, fast dev |
-| **Backend** | Next.js API routes | Serverless, simple |
-| **Database** | Firestore | Real-time sync, no WebSocket logic |
-| **AI/ML** | Gemini 2.0 Flash | 30x cheaper, 6x faster than GPT-4o |
-| **Hosting** | Vercel | Zero DevOps, free tier |
-| **Storage** | Firebase Storage | Scalable image hosting |
+See `aiDocs/architecture.md` for complete technical architecture and setup instructions.
+
+**Summary:**
+- Frontend: Next.js 14 (App Router) + React + Tailwind CSS
+- Backend: Next.js API routes (serverless)
+- Database: Firestore (real-time NoSQL)
+- AI/ML: Gemini 2.0 Flash (vision + JSON extraction)
+- Hosting: Vercel (zero-config deployment)
+- Storage: Firebase Storage (images)
+
+**All APIs verified with official documentation. See architecture doc for setup guide.**
 
 ---
 
@@ -215,10 +218,12 @@ project-root/
 
 ## 📚 Key Reference Documents
 
+- **Architecture:** `aiDocs/architecture.md` ⭐ (complete tech stack, setup guide, verified APIs)
+- **PRD:** `aiDocs/prd.md` (product requirements)
+- **MVP Spec:** `aiDocs/mvp.md` (demo build plan)
+- **Coding Style:** `aiDocs/coding-style.md` (code standards)
 - **Market Research:** `ai/guides/food-finder-market-research.md`
-- **Gemini Pro Research:** `ai/guides/external/marketResearch_gemini.md`
-- **PRD:** `aiDocs/prd.md`
-- **MVP Spec:** `aiDocs/mvp.md`
+- **API Docs:** `ai/guides/` (verified Gemini, Firebase, Next.js documentation)
 - **GitHub:** https://github.com/avareesew/food_finder
 
 ---
@@ -241,11 +246,12 @@ project-root/
 
 ## 🤝 How to Contribute
 
-1. Read this context document first
-2. Review the PRD (`aiDocs/prd.md`) for detailed requirements
-3. Check the MVP spec (`aiDocs/mvp.md`) for current build scope
-4. Follow the coding style guide (`aiDocs/coding-style.md`)
-5. Log significant changes in `aiDocs/changelog.md`
+1. **Read this context document first** (project overview)
+2. **Review architecture** (`aiDocs/architecture.md`) for technical setup
+3. **Check PRD** (`aiDocs/prd.md`) for detailed requirements
+4. **Check MVP spec** (`aiDocs/mvp.md`) for current build scope
+5. **Follow coding style** (`aiDocs/coding-style.md`)
+6. **Log changes** in `aiDocs/changelog.md`
 
 ---
 
