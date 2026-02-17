@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* 
+  Resetting defaults to ensure Tailwind utilties work as expected 
+  without hidden CSS variable overrides from the starter template.
+*/
+body {
+  @apply bg-gray-50 text-gray-900 antialiased;
+}
