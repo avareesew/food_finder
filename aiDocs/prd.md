@@ -170,6 +170,46 @@
 
 ---
 
+## Customer Focus & Differentiation
+
+We keep the personas from earlier in the document (Hungry Hustler, Club Recruiter, Eco-Conscious RA) front and center whenever we make decisions. Their shared desire for low-friction, anonymous discovery is why we avoid logins, keep the flow mobile-first, and keep transparency at the forefront.
+
+| Alternative | Why it exists today | Differentiation |
+|-------------|--------------------|-----------------|
+| **Too Good To Go** | Commercial surplus marketplace with paid “magic bags.” | Scavenger is free, campus-specific, AI-curated, and built for students, not restaurants. We highlight real-time, student-to-student supply without any payment barrier. |
+| **Campus Food Pantries** | Institution-run pantries with fixed hours/formal distribution. | Scavenger surfaces spontaneous offerings 24/7 with anonymous browsing and zero stigma, so students don’t feel like they are “applying” for help. |
+| **Word-of-mouth / Group Chats** | Organic but limited reach and inconsistent information. | Centralized feed, searchable history, and AI-scraped flyers mean every student sees the same reliable data in real time, eliminating reliance on “knowing someone.” |
+
+### Due Diligence & Validation
+- Took inventory of BYU flyer landscape (existing Phase 0 work) and planned Phase 2 flyer documentation so we can monitor how often clubs produce food.
+- Grounded the problem in institutional stats (41% food insecurity) and legal shield (FDIA) to prove there is both need and compliance.
+- Next steps: run 5 short interviews / falsifiability checks with the personas (documented in `aiDocs/changelog.md`) to confirm demand/pain and adapt CTA messaging based on direct quotes.
+
+---
+
+## Success & Failure Criteria
+
+### Success Indicators
+- **Weekly repeat usage ≥ 25%:** Measured via cookieless analytics (cookie/session counts) or Feed views tied to the same device within the same week.
+- **30+ posts per week:** Tracked via Firestore write counts + dashboard.
+- **<5% ghost-chase rate:** Collected through short surveys or a “Was this still available?” button showing up after events and counting confirmations.
+- **5+ organic posts:** Identified by uploader metadata (anonymous vs “team”) in Firestore documents.
+
+### Failure Indicators
+- **<10 posts/week by Week 5:** Signal that supply-side activation is stalled. Trigger: send targeted outreach to clubs, run incentive experiment.
+- **>10% ghost-chase rate:** Indicates extraction errors or trust gap. Trigger: tighten human verification feedback loop, add “report inaccurate” path.
+- **Low repeat usage (<15%) after Week 4:** Prompt for UI grounding (closer to next building, richer CTA) or partner with Resident Advisors to promote.
+
+### Pivot Plans
+- **If success looks like traction:** Expand to multiple buildings, add Slack/email ingestion automations, and build basic gamification to keep club organizers engaged.
+- **If failure persists:** Narrow focus to specific clubs or dorms, add timed push/pull notifications (SMS/email), and run targeted incentives (pizza + swag) to prove demand before scaling.
+
+### Measurement & Review Cadence
+- Review success/failure metrics weekly in sync meetings and log observations in `aiDocs/changelog.md`.
+- Tie every metric review to a documented action (e.g., “Week 4 repeat usage review → improved CTA and captured in roadmap task commit abc123”).
+
+---
+
 ## Core Features (MVP - P0)
 
 ### 1. **Flyer Ingestion: AI-Powered Photo Upload**

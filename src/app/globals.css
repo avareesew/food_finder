@@ -6,6 +6,11 @@
   }
 }
 
+:root {
+  --font-poppins: 'Poppins', 'Inter', 'system-ui', -apple-system, sans-serif;
+  --font-dm-serif: 'DM Serif Display', 'Georgia', 'serif';
+}
+
 /* 
   Resetting defaults to ensure Tailwind utilties work as expected 
   without hidden CSS variable overrides from the starter template.

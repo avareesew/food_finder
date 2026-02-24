@@ -171,7 +171,7 @@ export default function EventDetailPage() {
                     {/* Action Bar */}
                     <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
                         <PrimaryButton className="flex-1 py-5 text-lg shadow-2xl shadow-brand-orange/20 hover:shadow-brand-orange/30">
-                            I'm Going! 🏃‍♂️
+                            I&rsquo;m Going! 🏃‍♂️
                         </PrimaryButton>
                         <button className="flex-none h-16 w-16 rounded-2xl bg-white border border-gray-100 text-gray-400 hover:text-[#FF5A1F] hover:border-[#FF5A1F] flex items-center justify-center transition-all shadow-sm hover:shadow-lg">
                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -112,6 +112,13 @@ See `aiDocs/architecture.md` for complete technical architecture and setup instr
 
 ---
 
+## 🔍 Reproducible Testing & Structured Logs
+
+- Run `scripts/test.sh` locally to lint and build while automatically piping the structured output into `logs/test-<timestamp>.log`. The logger helper in `src/lib/logger.ts` ensures API routes and UI interactions emit parseable events.
+- Store the log path and key observations in `aiDocs/changelog.md` so Casey can trace a test → log → fix cycle for uploads/feeds.
+
+---
+
 ## 🧭 Strategic Positioning
 
 **We are NOT:**

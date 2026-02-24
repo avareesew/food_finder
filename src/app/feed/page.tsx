@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { getRecentFlyers, Flyer } from '@/services/flyers';
 import EventCard from '@/components/ui/EventCard';
 import EmptyState from '@/components/ui/EmptyState';
-import Link from 'next/link';
+import { logger } from '@/lib/logger';
+import { Timestamp } from 'firebase/firestore';
 
 export default function FeedPage() {
     const [flyers, setFlyers] = useState<Flyer[]>([]);
@@ -12,17 +13,22 @@ export default function FeedPage() {
 
     useEffect(() => {
         async function fetchFlyers() {
+            logger.info('feed-fetch-start');
             try {
                 const data = await getRecentFlyers(20);
+                logger.info('feed-fetch-success', { resultCount: data.length });
                 if (data.length === 0) {
                     // Mock Data for UI Demonstration
+                    const now = Timestamp.fromMillis(Date.now());
+                    const oneHourAgo = Timestamp.fromMillis(Date.now() - 3600000);
+                    const twoHoursAgo = Timestamp.fromMillis(Date.now() - 7200000);
                     setFlyers([
                         {
                             id: 'mock-1',
                             originalFilename: 'Free Pizza @ TMCB',
                             status: 'available',
                             downloadURL: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80',
-                            createdAt: { seconds: Date.now() / 1000, nanoseconds: 0 } as any,
+                            createdAt: now,
                             storagePath: ''
                         },
                         {
@@ -30,7 +36,7 @@ export default function FeedPage() {
                             originalFilename: 'Bagels in JFSB Lobby',
                             status: 'gone',
                             downloadURL: 'https://images.unsplash.com/photo-1585478684894-a366c82f44da?auto=format&fit=crop&w=400&q=80',
-                            createdAt: { seconds: (Date.now() - 3600000) / 1000, nanoseconds: 0 } as any,
+                            createdAt: oneHourAgo,
                             storagePath: ''
                         },
                         {
@@ -38,7 +44,7 @@ export default function FeedPage() {
                             originalFilename: 'Leftover Catering - WSC 3220',
                             status: 'available',
                             downloadURL: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80',
-                            createdAt: { seconds: (Date.now() - 7200000) / 1000, nanoseconds: 0 } as any,
+                            createdAt: twoHoursAgo,
                             storagePath: ''
                         }
                     ]);
@@ -46,7 +52,9 @@ export default function FeedPage() {
                     setFlyers(data);
                 }
             } catch (err) {
-                console.error(err);
+                logger.error('feed-fetch-failure', {
+                    message: err instanceof Error ? err.message : 'Unknown error',
+                });
             } finally {
                 setLoading(false);
             }

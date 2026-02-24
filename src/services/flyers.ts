@@ -11,6 +11,7 @@ import {
     doc,
     Timestamp
 } from 'firebase/firestore';
+import { logger } from '@/lib/logger';
 
 export interface Flyer {
     id?: string;
@@ -29,13 +30,21 @@ const FLYERS_COLLECTION = 'flyers';
  */
 export async function createFlyer(data: Omit<Flyer, 'id' | 'createdAt'>) {
     try {
+        logger.info('create-flyer-start', {
+            originalFilename: data.originalFilename,
+        });
         const docRef = await addDoc(collection(db, FLYERS_COLLECTION), {
             ...data,
             createdAt: serverTimestamp(),
         });
+        logger.info('create-flyer-success', {
+            flyerId: docRef.id,
+        });
         return docRef.id;
     } catch (error) {
-        console.error('Error adding flyer document:', error);
+        logger.error('create-flyer-failure', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+        });
         throw error;
     }
 }
@@ -45,6 +54,7 @@ export async function createFlyer(data: Omit<Flyer, 'id' | 'createdAt'>) {
  */
 export async function getRecentFlyers(limitCount = 10) {
     try {
+        logger.info('get-recent-flyers-start', { limitCount });
         const q = query(
             collection(db, FLYERS_COLLECTION),
             orderBy('createdAt', 'desc'),
@@ -57,7 +67,9 @@ export async function getRecentFlyers(limitCount = 10) {
             ...doc.data()
         })) as Flyer[];
     } catch (error) {
-        console.error('Error fetching flyers:', error);
+        logger.error('get-recent-flyers-failure', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+        });
         throw error;
     }
 }
@@ -99,16 +111,21 @@ export async function getFlyer(id: string): Promise<Flyer | null> {
 
     // Real Firestore Data
     try {
+        logger.info('get-flyer-start', { id });
         const docRef = doc(db, FLYERS_COLLECTION, id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
+            logger.info('get-flyer-success', { id });
             return { id: docSnap.id, ...docSnap.data() } as Flyer;
         } else {
+            logger.warn('get-flyer-missing', { id });
             return null;
         }
     } catch (error) {
-        console.error('Error fetching flyer:', error);
+        logger.error('get-flyer-failure', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+        });
         throw error;
     }
 }

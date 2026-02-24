@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'react';
 import { getRecentFlyers, Flyer } from '@/services/flyers';
 import PrimaryButton from './ui/PrimaryButton';
+import { logger } from '@/lib/logger';
 
 export default function UploadForm() {
     const [file, setFile] = useState<File | null>(null);
@@ -18,11 +19,15 @@ export default function UploadForm() {
     }, []);
 
     const fetchRecentFlyers = async () => {
+        logger.info('fetch-recent-flyers-start');
         try {
             const flyers = await getRecentFlyers();
             setRecentFlyers(flyers);
+            logger.info('fetch-recent-flyers-success', { count: flyers.length });
         } catch (error) {
-            console.error('Failed to fetch recent flyers', error);
+            logger.error('fetch-recent-flyers-failure', {
+                message: error instanceof Error ? error.message : 'Unknown error',
+            });
         }
     };
 
@@ -45,6 +50,7 @@ export default function UploadForm() {
         setStatus('idle');
         setMessage('');
 
+        logger.info('upload-submit-start', { fileName: file.name });
         const formData = new FormData();
         formData.append('file', file);
 
@@ -63,12 +69,22 @@ export default function UploadForm() {
                 setPreview(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
                 fetchRecentFlyers();
+                logger.info('upload-submit-success', {
+                    fileName: file.name,
+                    flyerId: result.flyerId,
+                });
             } else {
                 setStatus('error');
                 setMessage(result.error || 'Upload failed');
+                logger.warn('upload-submit-failed', {
+                    status: response.status,
+                    message: result.error,
+                });
             }
         } catch (error) {
-            console.error('Upload Error:', error);
+            logger.error('upload-submit-error', {
+                message: error instanceof Error ? error.message : 'Unknown error',
+            });
             setStatus('error');
             setMessage('An unexpected error occurred');
         } finally {

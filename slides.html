@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scavenger Midterm Presentation</title>
+  <style>
+    :root {
+      font-family: 'Poppins', system-ui, sans-serif;
+      color: #111329;
+      background: #fdfbf7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #fdfbf7;
+      color: #111329;
+    }
+    .deck {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: 100vh;
+    }
+    section {
+      scroll-snap-align: start;
+    }
+    .slide {
+      width: 100vw;
+      min-height: 100vh;
+      padding: 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: radial-gradient(circle at top right, rgba(255, 151, 119, 0.18), transparent 45%), #fdfbf7;
+      border-bottom: 1px solid rgba(17, 19, 41, 0.08);
+    }
+    h1, h2, h3 {
+      margin: 0 0 0.8rem;
+      font-weight: 600;
+      color: #111329;
+    }
+    .brand-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1rem;
+    }
+    .tagline {
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ff5a1f;
+    }
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .card {
+      background: #fff;
+      border: 1px solid rgba(17, 19, 41, 0.12);
+      border-radius: 1.4rem;
+      padding: 2rem;
+      box-shadow: 0 25px 45px rgba(11, 17, 34, 0.08);
+      min-height: 190px;
+    }
+    .card h3 {
+      margin-bottom: 0.4rem;
+      font-size: 1.1rem;
+    }
+    .metric {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #ff5a1f;
+      margin-top: 0.5rem;
+    }
+    .muted {
+      color: rgba(17, 19, 41, 0.65);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .list {
+      margin: 0.8rem 0 0;
+      padding-left: 1.2rem;
+    }
+    .list li {
+      margin-bottom: 0.35rem;
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: rgba(17, 19, 41, 0.6);
+      margin-top: 2rem;
+    }
+    .divider {
+      width: 140px;
+      height: 4px;
+      background: linear-gradient(90deg, #ff8a65, #ff5a1f);
+      border-radius: 999px;
+      margin-bottom: 2rem;
+    }
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 90, 31, 0.12);
+      color: #ff5a1f;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+    }
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .status-box {
+      border: 1px solid rgba(17, 19, 41, 0.1);
+      border-radius: 1rem;
+      padding: 1.2rem;
+      background: rgba(255,255,255,0.95);
+    }
+    dl {
+      margin: 0;
+    }
+    dt {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      font-size: 0.95rem;
+    }
+    dd {
+      margin: 0;
+      margin-left: 0.4rem;
+      color: rgba(17, 19, 41, 0.7);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <section class="slide">
+      <div class="brand-bar">
+        <div>
+          <div class="tagline">Scavenger / BYU Capstone</div>
+          <h1>Campus Food Finder</h1>
+        </div>
+        <div class="status-chip">15 min pitch</div>
+      </div>
+      <p class="muted">
+        Mission: make invisible campus food discoverable in real-time. We are pitching the process — how the PRD, roadmaps, AI tooling, logging, and customer discovery created momentum for this MVP.
+      </p>
+      <div class="divider"></div>
+      <div class="grid">
+        <div class="card">
+          <h3>Agenda</h3>
+          <ul class="list">
+            <li>Process philosophy + documents</li>
+            <li>Casey: technical process + logs</li>
+            <li>Jason: system design, validation, customers</li>
+            <li>Demo support + next steps</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Rubric Snapshot</h3>
+          <p class="muted">Casey 45% (technical process), Jason 45% (product/system design), Guest grader 10% (presentation/storytelling).</p>
+          <div class="status-chip" style="margin-top:1rem;">Process is the product</div>
+        </div>
+      </div>
+      <div class="footer">
+        <span>Documents: aiDocs/prd.md, aiDocs/context.md</span>
+        <span>Logs: logs/test-20260223-210144.log</span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>Process Philosophy</h2>
+      <div class="divider"></div>
+      <div class="card">
+        <h3>Document-Driven Development</h3>
+        <p class="muted">PRD anchors problem, personas, MVP goals, and validation metrics. Context + architecture docs define mission + tech. Changelog captures every pivot.</p>
+        <ul class="list">
+          <li>PRD → plan → roadmap → implementation pipeline recorded in aiDocs and ai/roadmaps.</li>
+          <li>Changelog tracks customer interviews + testing artifacts (see aiDocs/changelog.md entries).</li>
+          <li>AI folder protected by .gitignore; logger ensures AI-assisted workflows surface meaningful logs.</li>
+        </ul>
+      </div>
+      <div class="card" style="margin-top:2rem;">
+        <h3>Process Proof</h3>
+        <div class="grid">
+          <div class="card" style="padding:1.2rem;">
+            <div class="metric">3 Phases</div>
+            <p class="muted">Phase 2: flyer upload; Phase 3: interactive landing; Phase 4: feed + detail + shared components tracked in ai/roadmaps/phase-2-through-4-checklist.md</p>
+          </div>
+          <div class="card" style="padding:1.2rem;">
+            <div class="metric">Structured Logs</div>
+            <p class="muted">API/UI logging + `scripts/test.sh` generating logs/test-*.log demonstrate test → log → fix cycles referenced in changelog.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>Casey’s Technical Process (45%)</h2>
+      <div class="divider"></div>
+      <div class="grid">
+        <div class="card">
+          <h3>PRD & Document Hygiene</h3>
+          <p class="muted">Product spec includes personas, competitive analysis, success metrics, pivot plans.</p>
+          <ul class="list">
+            <li>Every feature traceable to aiDocs/prd.md sections.</li>
+            <li>Context doc timestamps status + MVP progress.</li>
+            <li>Changelog entries chronicle updates and evidence of AI-assisted iteration.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>AI Infrastructure</h3>
+          <p class="muted">Next.js + Firebase + Gemini stack documented in aiDocs/architecture.md with MCP mindset.</p>
+          <ul class="list">
+            <li>Logger (`src/lib/logger.ts`) used by upload API and feed UI for structured event data.</li>
+            <li>CLI test script produces `logs/test-*.log` for reproducible runs (scripts/test.sh).</li>
+            <li>Git workflow respects ai/ folder gitignore; environment secrets never committed.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>Phase-by-Phase Implementation</h3>
+          <p class="muted">Checklist keeps Phase 2–4 deliverables visible; git history aligned with incremental commits (see roadmap tracker).</p>
+          <ul class="list">
+            <li>Phase 2: capture flyer + store metadata.</li>
+            <li>Phase 3: premium landing + microinteractions.</li>
+            <li>Phase 4: UI redesign + shared layout (feed/upload/event detail).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Logging & Debugging</h3>
+          <p class="muted">Structured logger emits JSON entries plus CLI pipeline writes logs for Casey to inspect.</p>
+          <ul class="list">
+            <li>`scripts/test.sh` runs lint + `next build --webpack` → logs stored in `logs/test-<timestamp>.log`.</li>
+            <li>Changelog references Turbopack failure logs and success run for audit.</li>
+            <li>AI-assisted fix: removed next/font downloads and defined fonts locally after ENOTFOUND issues.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>Jason’s Product/System Design (45%)</h2>
+      <div class="divider"></div>
+      <div class="card">
+        <h3>System Understanding</h3>
+        <p class="muted">Browser → Vercel (Next.js) → Firebase Storage/Firestore + Gemini 2.0 Flash. Architecture doc maps each component.</p>
+        <dl>
+          <dt>Flyer Upload → AI extraction</dt>
+          <dd>Gemini 2.0 Flash structured JSON then saved to Firestore.</dd>
+          <dt>Feed + Detail Views</dt>
+          <dd>Realtime Firestore listeners update cards; structured logs track fetch lifecycle.</dd>
+        </dl>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>Problem Identification</h3>
+          <p class="muted">41% food insecurity + dark data; alternatives (Too Good To Go, pantries, group chats) fail on cost/stigma/reach.</p>
+          <ul class="list">
+            <li>MVP problem proven with BYU stats, legal shield, and planned falsifiability checks.</li>
+            <li>Competitive differentiation documented in PRD table (Too Good To Go, pantries, word-of-mouth).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Customer Focus</h3>
+          <p class="muted">Three personas (Hungry Hustler, Club Recruiter, Eco RA) guide feature decisions.</p>
+          <dl>
+            <dt>Hungry Hustler</dt>
+            <dd>Needs anonymous, mobile-first discovery.</dd>
+            <dt>Club Recruiter</dt>
+            <dd>Needs quick posting + legal clarity.</dd>
+            <dt>Eco RA</dt>
+            <dd>Needs sustainability storytelling + measurable impact.</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>Success & Failure Planning</h3>
+          <p class="muted">Success measured by weekly repeat usage, posts, ghost-chase rate, organic posts.</p>
+          <ul class="list">
+            <li>Failure triggers: <10 posts/week after Week 5, >10% ghost rate, <15% repeat usage.</li>
+            <li>Pivots: narrow focus (clubs/dorms), add Slack/email ingestion, gamify supply side.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Customer Interaction</h3>
+          <p class="muted">Plan for five interviews/falsifiability checks logged in changelog.</p>
+          <ul class="list">
+            <li>RA Marcus, club recruiter Sarah, sustainability advocate, hungry students survey, random student incentive check.</li>
+            <li>Insights will adjust CTA messaging, roadmap items, and success criteria.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>Guest Grader / Presentation Quality (10%)</h2>
+      <div class="divider"></div>
+      <div class="grid">
+        <div class="card">
+          <h3>Storytelling Flow</h3>
+          <p class="muted">Title → process philosophy → rubric evidence → system story → next steps.</p>
+          <ul class="list">
+            <li>Process narrative tied to docs prevents “product-only” story.</li>
+            <li>System diagram + architecture references provide context.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Visual Quality</h3>
+          <p class="muted">Deck uses the same rounded, warm aesthetic as the app; cards, hero surfaces, and chips match UI palette.</p>
+          <ul class="list">
+            <li>Consistency ensures slides feel like an extension of the product.</li>
+            <li>Agenda + status chips make information digestible for executives.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="margin-top:2rem;">
+        <h3>Demo Support</h3>
+        <p class="muted">Base MVP demo: flyer upload → feed → event detail, referencing aiDocs/mvp.md.</p>
+        <p class="muted">Team ensures each member can explain their contribution and lessons learned.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <h2>Closing & Next Steps</h2>
+      <div class="divider"></div>
+      <div class="card">
+        <h3>Team Roles for Presentation</h3>
+        <ul class="list">
+          <li>Product lead: customer narrative, success metrics, pivot rationale.</li>
+          <li>Tech lead: architecture, logger, CLI/test logs, roadmap checkpoints.</li>
+          <li>Designer/dev: UI walkthrough + demo path.</li>
+        </ul>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>Next Milestones</h3>
+          <ul class="list">
+            <li>Capture the planned customer interviews/falsifiability checks in changelog.</li>
+            <li>Mark roadmap tracker entries with completion dates + commit hashes.</li>
+            <li>Before demos, run `scripts/test.sh` and cite the latest log.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Metrics & Evidence</h3>
+          <div class="status-grid">
+            <div class="status-box">
+              <strong>Evidence</strong>
+              <p class="muted">aiDocs/prd.md, aiDocs/context.md, aiDocs/changelog.md</p>
+            </div>
+            <div class="status-box">
+              <strong>Logs</strong>
+              <p class="muted">logs/test-20260223-210144.log (lint/build success)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <span>Deck references: aiDocs/prd.md, aiDocs/architecture.md, ai/docs/context.md, logs/test-20260223-210144.log</span>
+        <span>Story anchored in documented process.</span>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

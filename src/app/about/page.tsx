@@ -16,7 +16,7 @@ export default function AboutPage() {
                         <span className="text-brand-orange">discoverable.</span>
                     </h1>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                        41% of students experience food insecurity, yet thousands of pounds of catering goes to waste every day. We're closing that gap with AI.
+                        41% of students experience food insecurity, yet thousands of pounds of catering goes to waste every day. We&rsquo;re closing that gap with AI.
                     </p>
                 </div>
             </section>
@@ -40,7 +40,7 @@ export default function AboutPage() {
                         </div>
                         <h3 className="text-2xl font-serif font-bold text-gray-900 mb-4 relative z-10">The Hunger</h3>
                         <p className="text-gray-600 text-lg leading-relaxed relative z-10">
-                            Meanwhile, thousands of students are skipping meals or running on empty because they can't afford decent food. It's an information problem, not a supply problem.
+                            Meanwhile, thousands of students are skipping meals or running on empty because they can&rsquo;t afford decent food. It&rsquo;s an information problem, not a supply problem.
                         </p>
                     </div>
                 </div>
@@ -95,7 +95,7 @@ export default function AboutPage() {
                             Community-Led.
                         </h2>
                         <p className="text-gray-700 text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
-                            We believe finding food shouldn't feel like applying for aid. It should feel like a scavenger hunt. By normalizing sharing, we build a stronger, more sustainable campus.
+                            We believe finding food shouldn&rsquo;t feel like applying for aid. It should feel like a scavenger hunt. By normalizing sharing, we build a stronger, more sustainable campus.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link href="/feed">

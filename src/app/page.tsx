@@ -29,7 +29,7 @@ export default function Home() {
             Eat Smarter <span className="inline-block relative">🍕<span className="absolute -bottom-2 w-full h-3 bg-brand-orange/20 rounded-full -z-10 skew-x-12 transform"></span></span>
           </h1>
           <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-10 leading-relaxed font-normal">
-            Discover the best free food events, leftover catering, and club meetings with surplus snacks on campus. We've got the good stuff, mapped out for you.
+            Discover the best free food events, leftover catering, and club meetings with surplus snacks on campus. We&rsquo;ve got the good stuff, mapped out for you.
           </p>
 
           {/* Search / CTA */}
@@ -136,7 +136,7 @@ export default function Home() {
             {/* Testimonial 1: The Hungry Student */}
             <div className="bg-brand-canvas p-6 rounded-2xl border border-transparent hover:border-brand-orange/20 transition-colors">
               <p className="text-gray-600 text-sm leading-relaxed mb-6 font-medium">
-                "Honestly, this saved me during finals week. I found free pizza in the JFSB and a bagel spread in the library just by checking the feed. No more sketchy vending machine dinners."
+                &ldquo;Honestly, this saved me during finals week. I found free pizza in the JFSB and a bagel spread in the library just by checking the feed. No more sketchy vending machine dinners.&rdquo;
               </p>
               <div className="flex items-center gap-1 text-orange-500 mb-4 text-sm">
                 ★★★★★ <span className="text-gray-800 font-bold ml-1">5.0</span>
@@ -155,7 +155,7 @@ export default function Home() {
             {/* Testimonial 2: The Club Organizer */}
             <div className="bg-brand-canvas p-6 rounded-2xl border border-transparent hover:border-brand-orange/20 transition-colors">
               <p className="text-gray-600 text-sm leading-relaxed mb-6 font-medium">
-                "We used to throw away so much food after our events. Now I just snap a photo, post it here, and 20 students show up within minutes. It's barely any extra work."
+                &ldquo;We used to throw away so much food after our events. Now I just snap a photo, post it here, and 20 students show up within minutes. It&rsquo;s barely any extra work.&rdquo;
               </p>
               <div className="flex items-center gap-1 text-orange-500 mb-4 text-sm">
                 ★★★★★ <span className="text-gray-800 font-bold ml-1">4.9</span>
@@ -174,7 +174,7 @@ export default function Home() {
             {/* Testimonial 3: The RA */}
             <div className="bg-brand-canvas p-6 rounded-2xl border border-transparent hover:border-brand-orange/20 transition-colors">
               <p className="text-gray-600 text-sm leading-relaxed mb-6 font-medium">
-                "As an RA, I love this for sustainability. It turns a wasteful problem into a community solution. My residents check Scavenger before they even think about ordering DoorDash."
+                &ldquo;As an RA, I love this for sustainability. It turns a wasteful problem into a community solution. My residents check Scavenger before they even think about ordering DoorDash.&rdquo;
               </p>
               <div className="flex items-center gap-1 text-orange-500 mb-4 text-sm">
                 ★★★★★ <span className="text-gray-800 font-bold ml-1">4.8</span>

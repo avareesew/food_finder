@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import PrimaryButton from './ui/PrimaryButton';
 
 export default function Navbar() {
     return (

@@ -8,7 +8,7 @@ export default function UploadPage() {
                     Upload a Flyer
                 </h1>
                 <p className="mt-4 text-lg text-gray-600 max-w-xl mx-auto">
-                    Snap a photo of any free food flyer you see on campus. We'll extract the details automatically.
+                    Snap a photo of any free food flyer you see on campus. We&rsquo;ll extract the details automatically.
                 </p>
             </div>
             <UploadForm />
