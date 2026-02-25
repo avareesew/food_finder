@@ -3,7 +3,7 @@ import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 
 export const metadata: Metadata = {
-  title: 'Camups Food Finder',
+  title: 'Campus Food Finder',
   description: 'Find free food on campus in real-time.',
 };
 
