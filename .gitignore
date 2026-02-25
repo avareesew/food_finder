@@ -66,3 +66,9 @@ ehthumbs.db
 *.temp
 *.pem
 .cache/
+
+# Local MVP data storage (not for prod/serverless)
+data/uploads/
+
+# Locally stored flyer images (served from Next.js public/)
+public/uploads/

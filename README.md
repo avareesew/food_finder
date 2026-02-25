@@ -65,12 +65,41 @@ project-root/
 npm install
 
 # Set up environment
-cp .env.example .env.local
+cp env.example .env.local
 # Add your API keys
 
 # Run dev server
 npm run dev
 ```
+
+---
+
+## Local MVP extraction (writes results to `data/events.json`)
+
+If you want to validate the end-to-end AI extraction flow **before Firebase**, use:
+
+- `POST /api/local/extract` → returns extracted event JSON and appends it to `data/events.json`.
+
+### Setup
+
+1. Ensure `.env.local` contains:
+   - `OPENAI_API_KEY=...`
+   - `NEXT_PUBLIC_BACKEND_MODE=local`
+
+2. Start the dev server:
+
+```bash
+npm run dev
+```
+
+### Test with curl
+
+```bash
+curl -sS -X POST "http://localhost:3000/api/local/extract" \
+  -F "file=@/absolute/path/to/flyer.jpg" | jq
+```
+
+**Note:** This returns JSON only. When we switch to Firebase later, we’ll store the same shape in Firestore.
 
 ---
 

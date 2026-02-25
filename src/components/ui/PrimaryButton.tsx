@@ -18,8 +18,8 @@ export default function PrimaryButton({
 
     const variants = {
         primary: "bg-[#FF5A1F] text-white shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 hover:bg-[#E64A19] hover:-translate-y-0.5 active:translate-y-0",
-        secondary: "bg-[#FFF0E5] text-[#FF5A1F] hover:bg-[#FFDBCC]",
-        outline: "bg-white border-2 border-gray-100 text-gray-600 hover:border-[#FF5A1F] hover:text-[#FF5A1F]"
+        secondary: "bg-[#FFF0E5] text-[#FF5A1F] hover:bg-[#FFDBCC] dark:bg-gray-900 dark:text-[#FF5A1F] dark:hover:bg-gray-800",
+        outline: "bg-white border-2 border-gray-100 text-gray-600 hover:border-[#FF5A1F] hover:text-[#FF5A1F] dark:bg-gray-900 dark:border-gray-800 dark:text-gray-200 dark:hover:border-[#FF5A1F] dark:hover:text-[#FF5A1F]"
     };
 
     return (

@@ -1,72 +1,77 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { storage } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { createFlyer } from '@/services/flyers';
-import { logger } from '@/lib/logger';
+import { uploadFlyer } from '@/backend/flyers/uploadFlyer';
+import { saveUpload, appendEvent } from '@/backend/local/eventsStore';
+import { extractFlyerWithOpenAI } from '@/backend/openai/extractFlyer';
 
 export async function POST(request: NextRequest) {
-    logger.info('upload-request-start', {
-        url: request.url,
-        method: request.method,
-    });
     try {
         const formData = await request.formData();
         const file = formData.get('file') as File;
 
         if (!file) {
-            logger.warn('upload-no-file', { url: request.url });
             return NextResponse.json(
                 { error: 'No file provided' },
                 { status: 400 }
             );
         }
 
-        // 1. Upload to Firebase Storage
-        const timestamp = Date.now();
-        // Sanitize filename
-        const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const storagePath = `flyers/${timestamp}_${safeFilename}`;
-        const storageRef = ref(storage, storagePath);
+        /**
+         * Local-first fallback:
+         * If Firebase Storage isn't configured (no bucket), use local disk + OpenAI extraction.
+         *
+         * This keeps the existing UI working even before Firebase is set up.
+         */
+        const firebaseBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+        if (!firebaseBucket) {
+            const arrayBuffer = await file.arrayBuffer();
+            const bytes = new Uint8Array(arrayBuffer);
 
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = new Uint8Array(arrayBuffer);
+            const { relPath } = await saveUpload({ filename: file.name, bytes });
+            const { extraction, rawModelOutput } = await extractFlyerWithOpenAI({
+                imageBytes: bytes,
+                mimeType: file.type || 'image/jpeg',
+                campusTimezone: 'America/Denver',
+            });
 
-        const uploadResult = await uploadBytes(storageRef, buffer, {
-            contentType: file.type,
-        });
+            const record = await appendEvent({
+                id: `local_${Date.now()}`,
+                createdAtIso: new Date().toISOString(),
+                imagePath: relPath,
+                extraction,
+                rawModelOutput,
+            });
 
-        const downloadURL = await getDownloadURL(uploadResult.ref);
+            return NextResponse.json({
+                success: true,
+                mode: 'local',
+                record,
+                message: 'Flyer processed and saved to data/events.json',
+            });
+        }
 
-        // 2. Create Firestore Record
-        const flyerId = await createFlyer({
-            originalFilename: file.name,
-            storagePath: storagePath,
-            downloadURL: downloadURL,
-            status: 'uploaded',
-            uploader: 'anonymous', // MVP
-            // createdAt is handled by serverTimestamp() in the helper
-        });
-
-        logger.info('upload-success', {
-            flyerId,
-            storagePath,
-            uploader: 'anonymous',
-        });
+        const { flyerId, downloadURL } = await uploadFlyer({ file });
 
         return NextResponse.json({
             success: true,
+            mode: 'firebase',
             flyerId,
             downloadURL,
             message: 'Upload successful'
         });
 
     } catch (error) {
-        logger.error('upload-error', {
-            message: error instanceof Error ? error.message : 'Unknown error',
-        });
+        console.error('Upload error:', error);
+        const msg = error instanceof Error ? error.message : 'Unknown error';
+        const isMissingEnv = msg.startsWith('Missing required environment variable:');
         return NextResponse.json(
-            { error: 'Upload failed', details: error instanceof Error ? error.message : 'Unknown error' },
-            { status: 500 }
+            {
+                error: isMissingEnv ? msg : 'Upload failed',
+                details: msg,
+                hint: isMissingEnv
+                    ? 'Create .env.local and set OPENAI_API_KEY (for local mode) or NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET (for firebase mode).'
+                    : undefined
+            },
+            { status: isMissingEnv ? 400 : 500 }
         );
     }
 }

@@ -1,3 +1,5 @@
+@config "../../tailwind.config.ts";
+@custom-variant dark (&:where(.dark, .dark *));
 @import "tailwindcss";
 
 @layer utilities {
@@ -16,5 +18,5 @@
   without hidden CSS variable overrides from the starter template.
 */
 body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+  @apply bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-50;
 }

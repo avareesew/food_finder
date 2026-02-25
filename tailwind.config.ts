@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+    darkMode: 'class',
     content: [
         "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -16,7 +17,8 @@ const config: Config = {
                 },
                 brand: {
                     orange: '#FF5A1F',
-                    canvas: '#FDFBF7', // HotPlate Beige
+                    // Deeper warm canvas for better light-mode contrast (less bright)
+                    canvas: '#E7D8C6',
                     black: '#1A1A1A',
                     gray: '#8C8C8C',
                 },

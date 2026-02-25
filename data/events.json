@@ -1,0 +1,193 @@
+[
+  {
+    "id": "extract_1771367288699",
+    "createdAtIso": "2026-02-17T22:28:08.699Z",
+    "source": {
+      "originalFilename": "MIBS x Policy Project.PNG",
+      "mimeType": "image/png",
+      "sizeBytes": 256216
+    },
+    "event": {
+      "title": "MIBS Community Service Night",
+      "date": "2026-02-11",
+      "startTime": "19:00",
+      "endTime": "20:30",
+      "place": "TNRB 710",
+      "food": "treats",
+      "foodCategory": "refreshments",
+      "details": "Come join MIBS and The Policy Project in serving Utah families in your community.",
+      "other": {
+        "host": "MIBS",
+        "campus": "BYU"
+      }
+    },
+    "rawModelOutput": "{\n  \"title\": \"MIBS Community Service Night\",\n  \"date\": \"2026-02-11\",\n  \"startTime\": \"19:00\",\n  \"endTime\": \"20:30\",\n  \"place\": \"TNRB 710\",\n  \"food\": \"treats\",\n  \"foodCategory\": \"refreshments\",\n  \"details\": \"Come join MIBS and The Policy Project in serving Utah families in your community.\",\n  \"other\": {\n    \"host\": \"MIBS\",\n    \"campus\": \"BYU\"\n  }\n}"
+  },
+  {
+    "id": "extract_1771404579693",
+    "createdAtIso": "2026-02-18T08:49:39.693Z",
+    "source": {
+      "originalFilename": "MIBS x Policy Project.PNG",
+      "mimeType": "image/png",
+      "sizeBytes": 256216
+    },
+    "event": {
+      "title": "MIBS Community Service Night",
+      "date": "2026-02-11",
+      "startTime": "19:00",
+      "endTime": "20:30",
+      "place": "TNRB 710",
+      "food": "treats",
+      "foodCategory": "refreshments",
+      "details": "Come join MIBS and The Policy Project in serving Utah families in your community.",
+      "other": {
+        "host": "MIBS",
+        "campus": "BYU"
+      }
+    },
+    "rawModelOutput": "{\n  \"title\": \"MIBS Community Service Night\",\n  \"date\": \"2026-02-11\",\n  \"startTime\": \"19:00\",\n  \"endTime\": \"20:30\",\n  \"place\": \"TNRB 710\",\n  \"food\": \"treats\",\n  \"foodCategory\": \"refreshments\",\n  \"details\": \"Come join MIBS and The Policy Project in serving Utah families in your community.\",\n  \"other\": {\n    \"host\": \"MIBS\",\n    \"campus\": \"BYU\"\n  }\n}"
+  },
+  {
+    "id": "extract_1771404812530",
+    "createdAtIso": "2026-02-18T08:53:32.530Z",
+    "source": {
+      "originalFilename": "26 Stories of Life_8.5 x 11 - NEW HS 3.PNG",
+      "mimeType": "image/png",
+      "sizeBytes": 2350321
+    },
+    "event": {
+      "title": "Stories of Life",
+      "host": "BYU Marriott School of Business",
+      "campus": "BYU",
+      "date": "2026-02-26",
+      "startTime": "19:00",
+      "endTime": null,
+      "place": "BYU Music Building Concert Hall",
+      "food": "dessert reception",
+      "foodCategory": "dessert",
+      "details": "A Black History Month celebration featuring Blessing Offor & BYU Rhythm N’ Soul Collective.",
+      "other": null
+    },
+    "rawModelOutput": "{\n  \"title\": \"Stories of Life\",\n  \"host\": \"BYU Marriott School of Business\",\n  \"campus\": \"BYU\",\n  \"date\": \"2026-02-26\",\n  \"startTime\": \"19:00\",\n  \"endTime\": null,\n  \"place\": \"BYU Music Building Concert Hall\",\n  \"food\": \"dessert reception\",\n  \"foodCategory\": \"dessert\",\n  \"details\": \"A Black History Month celebration featuring Blessing Offor & BYU Rhythm N’ Soul Collective.\",\n  \"other\": null\n}"
+  },
+  {
+    "id": "extract_1771405534078",
+    "createdAtIso": "2026-02-18T09:05:34.078Z",
+    "source": {
+      "originalFilename": "MIBS x Policy Project.PNG",
+      "mimeType": "image/png",
+      "sizeBytes": 256216
+    },
+    "imageUrl": "/uploads/1771405529515_MIBS_x_Policy_Project.PNG",
+    "event": {
+      "title": "MIBS Community Service Night",
+      "host": "MIBS",
+      "campus": null,
+      "date": "2026-02-11",
+      "startTime": "19:00",
+      "endTime": "20:30",
+      "place": "TNRB 710",
+      "food": "treats",
+      "foodCategory": "refreshments",
+      "details": "Come join MIBS and The Policy Project in serving Utah families in your community.",
+      "other": null
+    },
+    "rawModelOutput": "{\n  \"title\": \"MIBS Community Service Night\",\n  \"host\": \"MIBS\",\n  \"campus\": null,\n  \"date\": \"2026-02-11\",\n  \"startTime\": \"19:00\",\n  \"endTime\": \"20:30\",\n  \"place\": \"TNRB 710\",\n  \"food\": \"treats\",\n  \"foodCategory\": \"refreshments\",\n  \"details\": \"Come join MIBS and The Policy Project in serving Utah families in your community.\",\n  \"other\": null\n}"
+  },
+  {
+    "id": "extract_1771405560941",
+    "createdAtIso": "2026-02-18T09:06:00.941Z",
+    "source": {
+      "originalFilename": "26 Stories of Life_8.5 x 11 - NEW HS 3.PNG",
+      "mimeType": "image/png",
+      "sizeBytes": 2350321
+    },
+    "imageUrl": "/uploads/1771405554486_26_Stories_of_Life_8.5_x_11_-_NEW_HS_3.PNG",
+    "event": {
+      "title": "Stories of Life",
+      "host": "BYU Marriott School of Business",
+      "campus": "BYU",
+      "date": "2026-02-26",
+      "startTime": "19:00",
+      "endTime": null,
+      "place": "BYU Music Building Concert Hall",
+      "food": "dessert",
+      "foodCategory": "dessert",
+      "details": "A Black History Month celebration featuring Blessing Offor & BYU Rhythm N’ Soul Collective.",
+      "other": null
+    },
+    "rawModelOutput": "{\n  \"title\": \"Stories of Life\",\n  \"host\": \"BYU Marriott School of Business\",\n  \"campus\": \"BYU\",\n  \"date\": \"2026-02-26\",\n  \"startTime\": \"19:00\",\n  \"endTime\": null,\n  \"place\": \"BYU Music Building Concert Hall\",\n  \"food\": \"dessert\",\n  \"foodCategory\": \"dessert\",\n  \"details\": \"A Black History Month celebration featuring Blessing Offor & BYU Rhythm N’ Soul Collective.\",\n  \"other\": null\n}"
+  },
+  {
+    "id": "extract_1771405585866",
+    "createdAtIso": "2026-02-18T09:06:25.866Z",
+    "source": {
+      "originalFilename": "Opening Social.png",
+      "mimeType": "image/png",
+      "sizeBytes": 5631912
+    },
+    "imageUrl": "/uploads/1771405580173_Opening_Social.png",
+    "event": {
+      "title": "Opening Skate Night",
+      "host": "AIS",
+      "campus": null,
+      "date": "2026-01-21",
+      "startTime": "21:00",
+      "endTime": "23:00",
+      "place": "Orem Classic Skate, 250 S State Street, Orem, UT",
+      "food": "Free food",
+      "foodCategory": "other",
+      "details": "Free food and entrance will be sponsored by SOLVD.cloud.",
+      "other": null
+    },
+    "rawModelOutput": "{\n  \"title\": \"Opening Skate Night\",\n  \"host\": \"AIS\",\n  \"campus\": null,\n  \"date\": \"2026-01-21\",\n  \"startTime\": \"21:00\",\n  \"endTime\": \"23:00\",\n  \"place\": \"Orem Classic Skate, 250 S State Street, Orem, UT\",\n  \"food\": \"Free food\",\n  \"foodCategory\": \"other\",\n  \"details\": \"Free food and entrance will be sponsored by SOLVD.cloud.\",\n  \"other\": null\n}"
+  },
+  {
+    "id": "extract_1771406809858",
+    "createdAtIso": "2026-02-18T09:26:49.858Z",
+    "source": {
+      "originalFilename": "IS Professional Conference 2026 (1).png",
+      "mimeType": "image/png",
+      "sizeBytes": 122865
+    },
+    "imageUrl": "/uploads/1771406804718_IS_Professional_Conference_2026__1_.png",
+    "event": {
+      "title": "IS Professional Conference",
+      "host": "Department of Information Systems",
+      "campus": "BYU",
+      "date": "2026-02-20",
+      "startTime": "13:00",
+      "endTime": "17:00",
+      "place": "Tanner Building",
+      "food": "Light food and beverages",
+      "foodCategory": "refreshments",
+      "details": "Connect, learn, and get inspired at the third annual IS Professional Conference! Enjoy a keynote speaker, breakout sessions, Octavian panel, and capstone judging.",
+      "other": null
+    },
+    "rawModelOutput": "{\n  \"title\": \"IS Professional Conference\",\n  \"host\": \"Department of Information Systems\",\n  \"campus\": \"BYU\",\n  \"date\": \"2026-02-20\",\n  \"startTime\": \"13:00\",\n  \"endTime\": \"17:00\",\n  \"place\": \"Tanner Building\",\n  \"food\": \"Light food and beverages\",\n  \"foodCategory\": \"refreshments\",\n  \"details\": \"Connect, learn, and get inspired at the third annual IS Professional Conference! Enjoy a keynote speaker, breakout sessions, Octavian panel, and capstone judging.\",\n  \"other\": null\n}"
+  },
+  {
+    "id": "extract_1771406854479",
+    "createdAtIso": "2026-02-18T09:27:34.479Z",
+    "source": {
+      "originalFilename": "chill_out-take-2_720_720.png",
+      "mimeType": "image/png",
+      "sizeBytes": 159377
+    },
+    "imageUrl": "/uploads/1771406849940_chill_out-take-2_720_720.png",
+    "event": {
+      "title": "\"CHILL OUT\" Closing Social",
+      "host": "AIS",
+      "campus": null,
+      "date": "2025-12-05",
+      "startTime": "17:00",
+      "endTime": "19:00",
+      "place": "Location TBD",
+      "food": "Christmas Dinner for the first 200 people",
+      "foodCategory": "meal",
+      "details": "Hot Chocolate Bar, Service Project, and Games.",
+      "other": null
+    },
+    "rawModelOutput": "{\n  \"title\": \"\\\"CHILL OUT\\\" Closing Social\",\n  \"host\": \"AIS\",\n  \"campus\": null,\n  \"date\": \"2023-12-05\",\n  \"startTime\": \"17:00\",\n  \"endTime\": \"19:00\",\n  \"place\": \"Location TBD\",\n  \"food\": \"Christmas Dinner for the first 200 people\",\n  \"foodCategory\": \"meal\",\n  \"details\": \"Hot Chocolate Bar, Service Project, and Games.\",\n  \"other\": null\n}"
+  }
+]
