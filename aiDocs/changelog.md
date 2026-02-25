@@ -14,7 +14,30 @@
 - Expanded `aiDocs/prd.md` with Customer Focus, Differentiation, and Success/Failure Criteria sections to show Jason our due diligence, metrics, and pivot plans.
 - Drafted the customer interaction plan (below) so we can capture at least five touchpoints or falsification experiments and log the learnings in the changelog once complete.
 
-### Customer Touchpoints (Planned)
+### Customer Discovery
+
+#### ✅ Completed — Interview 1: Kendall Castellaw (2026-02-24)
+**Past Finance Society President · Marriott School (Tanner Building)**
+Full notes: `ai/notes/week1-club-interviews.md`
+
+Key findings:
+- **🚨 Tanner Building is flyer-free by policy.** Marriott School prohibits physical flyer distribution except for large school-wide events. Clubs in Tanner use digital screens, Instagram, and newsletters instead. Puts the “70%+ of events have physical flyers” assumption at risk for the Marriott cluster.
+- **Supply-side motivation is nuanced.** Food is funded by member dues, so the instinct is to serve members first. The effective pitch is event *exposure and recruitment* (“get people in the door”), not waste reduction.
+- **Liability is a non-issue.** Confirmed: no concerns raised. Validates FDIA framing is sufficient.
+- **Food events are frequent.** Every Finance Society event had food; ~80% was company-sponsored.
+
+#### ✅ Completed — Interview 2: Carson Fellows (2026-02-25)
+**Current Management Consulting Club President**
+Full notes: `ai/notes/week1-club-interviews.md`
+
+Key findings:
+- **Non-Tanner clubs do use flyers/email with food callouts.** Carson mentions announcing food on flyers and in emails — partially rehabilitates the flyer-scanning assumption for buildings outside Marriott School.
+- **Leftover supply is lower than expected.** Management Consulting intentionally orders less than needed; rarely has leftovers. Both interviews now converge on low/unreliable leftover supply. Feed may need to surface food-available-during-event posts, not just post-event scraps.
+- **Recruitment framing confirmed across two independent interviews.** “If it got more people to go to the club, then maybe” — same motivation as Kendall. Waste reduction framing does not resonate; club growth does.
+- **Liability: zero concerns** — second independent confirmation. FDIA positioning is sufficient.
+- **Low spontaneous posting motivation.** “Wouldn’t go out of their way to post it.” Friction reduction is critical — posting must be near-effortless or supply side won’t participate.
+
+#### Planned Touchpoints (Remaining)
 - Interview/ride-along with RA Marcus (Heritage Halls) to validate sustainability messaging and interest in raising floors’ awareness.
 - Chat with club recruiter Sarah (Marketing Club) to see how leftover catering is currently handled and confirm the legal/procedural blockers.
 - Survey 5+ hungry students in the JFSB or library (Hungry Hustler persona) about their current food discovery channels and willingness to use a feed.

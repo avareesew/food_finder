@@ -1,6 +1,8 @@
-# AI Working Space (local artifacts)
-ai/
+# Cursor rules (local)
 .cursorrules
+
+# Midterm presentation artifacts
+midterm/
 
 # Dependencies
 node_modules/
