@@ -1,6 +1,9 @@
 # Cursor rules (local)
 .cursorrules
 
+# AI working artifacts (roadmaps, guides, notes — per aiDocs/context.md)
+ai/
+
 # Midterm presentation artifacts
 midterm/
 
