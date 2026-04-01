@@ -1,20 +1,20 @@
-# Scavenger: Campus Food Finder - Project Context
+# Food Finder: Campus Food Discovery Platform - Project Context
 
-**Last Updated:** February 16, 2026  
-**Project Status:** Planning/Pre-Development  
-**Current Phase:** MVP Definition & Technical Setup
+**Last Updated:** April 1, 2026
+**Project Status:** Active Development — Phase 1 Substantially Complete
+**Current Phase:** Preparing for Alpha Testing (Phase 2)
 
 ---
 
-## 🎯 Project Mission
+## Project Mission
 
 **Make invisible campus food discoverable in real-time.**
 
-Scavenger is a mobile-first web platform that solves the "Dark Data" problem: thousands of pounds of free food from club events, department meetings, and campus activities go to waste daily because students don't know it exists. We use AI-powered flyer parsing (Gemini 2.0 Flash) to make ephemeral food events searchable and discoverable.
+Food Finder is a mobile-first web platform that solves the "Dark Data" problem: free food from club events, department meetings, and campus activities goes to waste because students don't know it exists. We use AI-powered flyer parsing to make ephemeral food events searchable and discoverable.
 
 ---
 
-## 🏫 Target Market
+## Target Market
 
 - **Primary:** BYU Campus (pilot, ~33,000 students)
 - **Secondary:** Multi-campus expansion after PMF validation
@@ -22,7 +22,7 @@ Scavenger is a mobile-first web platform that solves the "Dark Data" problem: th
 
 ---
 
-## 💡 Core Value Proposition
+## Core Value Proposition
 
 ### For Students (Demand Side)
 - Never miss free food on campus
@@ -41,66 +41,70 @@ Scavenger is a mobile-first web platform that solves the "Dark Data" problem: th
 
 ---
 
-## 🚀 Product Status
+## Product Status (as of April 1, 2026)
 
-### What We Have
-- ✅ Market research (41% food insecurity rate, legal framework, competitive analysis)
-- ✅ PRD (Product Requirements Document)
-- ✅ MVP specification (demo-focused build)
-- ✅ Technical architecture defined
-- ✅ Git repository initialized and pushed to GitHub
+### What's Built and Working
+- **Flyer Upload & AI Extraction** — Full pipeline: photo → OpenAI gpt-4o-mini extraction → validation → Firestore storage
+- **Gemini 2.0 Flash** available as secondary extraction path via `/api/flyers/[flyerId]/extract`
+- **Feed Page** — Grid of event cards with responsive layout, mock data fallback
+- **Event Detail View** — Full event page with flyer image, status badges, location, host, food details
+- **Event Detail Modal** — Inline modal for quick event preview
+- **Home Page** — Hero section, weekly event calendar, discover preview, campus map CTA, testimonials
+- **Explore Page** — Campus buildings explorer with interactive grid and week navigation
+- **About Page** — Mission, problem statement, how it works, values
+- **Upload Page** — Drag-and-drop upload with extraction results and recent uploads list
+- **Dark Mode** — Toggle with persistent theme
+- **Campus Building Data** — BYU building database with lat/lng, aliases, building code matching
+- **Dual Backend Mode** — Firebase (production) and local filesystem (development) via `NEXT_PUBLIC_BACKEND_MODE`
+- **Extraction Validation** — Auto-rejects flyers missing date, time, or place
+- **Event Timing Utilities** — Campus timezone handling, date coercion, expiry detection, 12h formatting
 
-### What We're Building (7-Week MVP Sprint, Core Development in Weeks 2-4)
-1. **Flyer Upload & AI Extraction**
-   - Photo → Gemini 2.0 Flash API → Structured data
-   - Human-in-the-loop confirmation (prevents errors)
-   
-2. **Real-Time Feed**
-   - Mobile-first web interface
-   - Chronological list of food events this week
-   - Location, time, food type displayed clearly
+### What's NOT Built Yet (Needed Before Alpha)
+- **"Mark as Gone" UI** — Status field exists in data model but no user-facing toggle
+- **Real-time sync** — Using `getDocs` polling, not `onSnapshot` listeners
+- **Confirmation/Edit Form** — Users can't edit AI-extracted data before submission
+- **Vercel deployment** — Not confirmed live in production
 
-3. **Demo-Ready Prototype**
-   - Prove the concept works
-   - Validate technical feasibility
-   - Show to 5+ people for feedback
-
-### What's Next (Phase 2)
+### What's Next (Phase 2+)
+- Alpha testing with 5-10 real users
 - "Gone" button for status updates
+- Real-time Firestore listeners
+- User edit form for AI extractions
 - Slack bot integration (automated ingestion)
 - Email forwarding parser
-- Gamification for data integrity
-- Multi-building filtering
 
 ---
 
-## 🛠️ Technical Stack
+## Technical Stack (Actual)
 
-See `aiDocs/architecture.md` for complete technical architecture and setup instructions.
+See `aiDocs/architecture.md` for complete technical architecture.
 
-**Summary:**
-- Frontend: Next.js 14 (App Router) + React + Tailwind CSS
-- Backend: Next.js API routes (serverless)
-- Database: Firestore (real-time NoSQL)
-- AI/ML: Gemini 2.0 Flash (vision + JSON extraction)
-- Hosting: Vercel (zero-config deployment)
-- Storage: Firebase Storage (images)
-
-**All APIs verified with official documentation. See architecture doc for setup guide.**
+| Layer | Technology | Version |
+|-------|-----------|---------|
+| **Framework** | Next.js (App Router) | 16.1.6 |
+| **UI** | React + Tailwind CSS | React 19, Tailwind 4 |
+| **Database** | Firestore (Firebase) | firebase 12.9.0 |
+| **Server SDK** | Firebase Admin | 13.7.0 |
+| **AI (Primary)** | OpenAI gpt-4o-mini | Responses API (raw fetch) |
+| **AI (Secondary)** | Gemini 2.0 Flash | @google/generative-ai 0.24.1 |
+| **Maps** | Leaflet | 1.9.4 |
+| **Dates** | date-fns | 4.1.0 |
+| **Hosting** | Vercel (planned) | — |
+| **Storage** | Firebase Storage (prod) / local filesystem (dev) | — |
 
 ---
 
-## 🎨 Design Principles
+## Design Principles
 
 1. **Mobile-First:** 80%+ of users will browse on phones
 2. **Zero Friction:** No accounts, no login, no applications
 3. **Stigma-Free:** Treat browsing like Instagram, not applying for aid
-4. **Accuracy Over Speed:** Human verification prevents "ghost chases"
+4. **Accuracy Over Speed:** Validation pipeline prevents "ghost chases"
 5. **Trust Through Transparency:** Legal disclaimers, clear ToS
 
 ---
 
-## 📊 Success Metrics (MVP - Week 7)
+## Success Metrics (MVP - Week 7)
 
 | Metric | Target | Why It Matters |
 |--------|--------|----------------|
@@ -112,14 +116,14 @@ See `aiDocs/architecture.md` for complete technical architecture and setup instr
 
 ---
 
-## 🔍 Reproducible Testing & Structured Logs
+## Reproducible Testing & Structured Logs
 
 - Run `scripts/test.sh` locally to lint and build while automatically piping the structured output into `logs/test-<timestamp>.log`. The logger helper in `src/lib/logger.ts` ensures API routes and UI interactions emit parseable events.
-- Store the log path and key observations in `aiDocs/changelog.md` so Casey can trace a test → log → fix cycle for uploads/feeds.
+- Store the log path and key observations in `aiDocs/changelog.md` so team can trace a test → log → fix cycle for uploads/feeds.
 
 ---
 
-## 🧭 Strategic Positioning
+## Strategic Positioning
 
 **We are NOT:**
 - A food pantry (we're not institutional charity)
@@ -132,13 +136,13 @@ See `aiDocs/architecture.md` for complete technical architecture and setup instr
 - **A waste-reduction tool** — helping orgs meet sustainability goals
 
 **Competitive Moat:**
-- Gemini 2.0 Flash AI (30x cost advantage)
+- Dual AI extraction (OpenAI + Gemini) with validation pipeline
 - 2023 FDIA legal shield (liability protection)
 - BYU cultural fit (service-oriented, high trust)
 
 ---
 
-## 👥 Team & Roles
+## Team & Roles
 
 **Core Team:** BYU Student Team (3 people)
 - Product Lead: Ava Williams
@@ -149,140 +153,158 @@ See `aiDocs/architecture.md` for complete technical architecture and setup instr
 
 ---
 
-## 🗓️ Timeline
+## Timeline & Progress
 
-### Phase 0: Setup & Validation (Week 1) - Complete
-- ✅ Market research
-- ✅ PRD & MVP spec
-- ✅ Technical architecture
-- ✅ Git setup
-- ✅ Detailed implementation roadmaps
+### Phase 0: Setup & Validation (Week 1) — COMPLETE
+- Market research, PRD, MVP spec, architecture
+- Firebase + Next.js initialized
+- 2 club president interviews (Kendall Castellaw, Carson Fellows)
+- AI extraction validated (OpenAI gpt-4o-mini)
 
-### Phase 1: Core Development (Weeks 2-4)
-- Week 2: Design phase + Upload & AI extraction flow
-- Week 3: Real-time feed implementation
-- Week 4: Status management + UI polish
-- **Checkpoint:** Core "flyer → feed → gone" pipeline works end-to-end
+### Phase 1: Core Development (Weeks 2-4) — SUBSTANTIALLY COMPLETE
+- Upload + AI extraction pipeline: DONE
+- Feed + event cards + detail views: DONE
+- Home page, explore page, about page: DONE (beyond original scope)
+- Dark mode, campus maps, weekly calendar: DONE (beyond original scope)
+- "Mark as gone" UI: NOT DONE
+- Real-time `onSnapshot`: NOT DONE
+- Confirmation/edit form: NOT DONE
 
-**Note:** "Core development" is Weeks 2-4 within the full 7-week MVP sprint. Total time to public launch is 7 weeks including setup, testing, and iteration.
-
-### Phase 2: Alpha Testing (Week 5)
+### Phase 2: Alpha Testing (Week 5) — NOT STARTED
 - Recruit 5-10 alpha testers
-- Manual seed data (team posts real events)
-- Collect feedback, fix critical bugs
-- **Critical Metric:** 70%+ of alpha testers say "yes, I would use this regularly"
-- **Checkpoint:** Did we hit 70% satisfaction? What needs fixing?
+- Deploy to production
+- Seed 10-15 real events
+- Collect feedback
 
-### Phase 3: Beta & Polish (Week 6)
-- Fix alpha issues
-- Expand to 30-50 users
-- Recruit 3-5 design partner clubs
-- Platform stability and UX improvements
-- **Checkpoint:** Is the platform stable and ready for public launch?
-
-### Phase 4: Public Launch (Week 7)
-- Launch to all BYU students (social media, ward groups)
-- Monitor usage, iterate on feedback
-- Hit MVP success metrics (30+ posts, 150+ visitors, 25% repeat, <5% ghost chase, 5+ organic)
-- **Checkpoint:** Did we achieve product-market fit signals?
+### Phase 3: Beta & Polish (Week 6) — NOT STARTED
+### Phase 4: Public Launch (Week 7) — NOT STARTED
 
 ---
 
-## 🔒 Key Assumptions to Validate
+## Assumptions Validated
 
-1. **BYU clubs print physical flyers** (70%+ of events)
-   - Validation: Walk campus Week 1, count flyers, interview clubs
-   
-2. **Students will browse without logging in**
-   - Validation: Alpha test feedback
-   
-3. **Gemini 2.0 Flash accuracy on BYU flyers** (80%+ correct)
-   - Validation: Test with 20-30 real flyers Week 1
-   
-4. **Organizers will mark food as "Gone"**
-   - Validation: Track button usage in alpha
+1. **BYU clubs print physical flyers** — PARTIALLY VALIDATED
+   - Tanner/Marriott Building prohibits flyers by policy
+   - Non-Tanner clubs do use flyers and email with food callouts
+   - Feed should focus on "food at upcoming events," not just leftovers
 
----
+2. **Students will browse without logging in** — ASSUMED (pending alpha validation)
 
-## 🚨 Key Risks & Mitigations
+3. **AI extraction accuracy** — VALIDATED
+   - OpenAI gpt-4o-mini works well with structured JSON extraction
+   - Validation pipeline catches missing date/time/place
+   - Date coercion handles AI mistakes (wrong year, varied formats)
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| AI extraction errors | High | Human verification step before posting |
-| Stale data ("ghost chases") | High | "Gone" button + auto-expiration |
-| Low supply-side adoption | High | Manual seed data + 3-5 design partner clubs |
-| Swarm effect (over-attendance) | Medium | "Estimated portions" field + sustainability messaging |
+4. **Organizers will mark food as "Gone"** — UNTESTED (UI not built yet)
 
 ---
 
-## 📁 Repository Structure
+## Key Risks & Mitigations
+
+| Risk | Impact | Mitigation | Status |
+|------|--------|------------|--------|
+| AI extraction errors | High | Validation pipeline auto-rejects bad extractions; need user edit form | Partially mitigated |
+| Stale data ("ghost chases") | High | Need "Mark as gone" UI + auto-expiration | Open risk |
+| Low supply-side adoption | High | Manual seed data + recruitment framing (not waste reduction) | Monitoring |
+| Swarm effect (over-attendance) | Medium | "Estimated portions" field + sustainability messaging | Low priority |
+
+---
+
+## Repository Structure (Actual)
 
 ```
-project-root/
-├── aiDocs/                # TRACKED: Product documentation
-│   ├── context.md         # This file - project overview
-│   ├── prd.md             # Product Requirements Document
-│   ├── mvp.md             # MVP Demo Specification
-│   ├── architecture.md    # System architecture details
-│   ├── coding-style.md    # Code style guide
-│   └── changelog.md       # Concise change history
-├── ai/                    # GITIGNORED: Working artifacts
-│   ├── guides/            # Library docs, research output
-│   ├── roadmaps/          # Task checklists, plans
-│   └── notes/             # Brainstorming
-├── src/                   # Application code (TBD)
-├── public/                # Static assets (TBD)
-└── scripts/               # CLI scripts
+food_finder/
+├── aiDocs/                    # TRACKED: Product documentation
+│   ├── context.md             # This file - project overview
+│   ├── prd.md                 # Product Requirements Document
+│   ├── mvp.md                 # MVP Demo Specification
+│   ├── architecture.md        # System architecture details
+│   ├── coding-style.md        # Code style guide
+│   └── changelog.md           # Concise change history
+├── ai/                        # GITIGNORED: Working artifacts
+│   ├── guides/                # Library docs, research output
+│   ├── roadmaps/              # Task checklists, plans, tracker
+│   └── notes/                 # Interviews, brainstorming
+├── src/
+│   ├── app/                   # Next.js App Router pages + API routes
+│   │   ├── page.tsx           # Home (hero, calendar, discover preview)
+│   │   ├── feed/page.tsx      # Event feed (card grid)
+│   │   ├── upload/page.tsx    # Flyer upload
+│   │   ├── events/[id]/       # Event detail view
+│   │   ├── explore/page.tsx   # Campus buildings explorer
+│   │   ├── about/page.tsx     # About/mission page
+│   │   └── api/               # API routes
+│   │       ├── events/        # Published events CRUD
+│   │       ├── flyers/        # Flyer metadata + extraction
+│   │       ├── upload/        # File upload + processing
+│   │       └── local/         # Local dev mode endpoints
+│   ├── backend/               # Server-side logic
+│   │   ├── openai/            # OpenAI extraction (primary)
+│   │   ├── gemini/            # Gemini extraction (secondary)
+│   │   ├── flyers/            # Flyer processing pipeline
+│   │   └── local/             # Local filesystem storage
+│   ├── components/            # React components
+│   │   ├── ui/                # EventCard, LocalEventCard, EventDetailModal, etc.
+│   │   ├── home/              # WeeklyEventCalendar
+│   │   ├── layout/            # Navbar
+│   │   └── ...                # CampusMap, UploadForm, ThemeToggle, etc.
+│   ├── lib/                   # Utilities (firebase, eventTiming, validation, etc.)
+│   ├── hooks/                 # React hooks (useHtmlDarkClass)
+│   ├── data/                  # Static data (byuBuildings)
+│   └── services/              # Firestore service layer (flyers)
+├── data/                      # Local mode storage (events.json, uploads/)
+├── public/                    # Static assets + cached images
+└── scripts/                   # CLI scripts (test.sh)
 ```
 
 ---
 
-## 📚 Key Reference Documents
+## Key Reference Documents
 
-- **Architecture:** `aiDocs/architecture.md` ⭐ (complete tech stack, setup guide, verified APIs)
+- **Architecture:** `aiDocs/architecture.md` (tech stack, API endpoints, data models)
 - **PRD:** `aiDocs/prd.md` (product requirements)
 - **MVP Spec:** `aiDocs/mvp.md` (demo build plan)
 - **Coding Style:** `aiDocs/coding-style.md` (code standards)
+- **Roadmap Tracker:** `ai/roadmaps/roadmap-tracker.md` (progress tracking)
 - **Market Research:** `ai/guides/food-finder-market-research.md`
-- **API Docs:** `ai/guides/` (verified Gemini, Firebase, Next.js documentation)
 - **GitHub:** https://github.com/avareesew/food_finder
 
 ---
 ## Behavior
 
 -  Whenever creating plan docs and roadmap docs, always save them in ai/roadmaps. prefix the name with the date. add a note that we need to avoid over-engineering, cruft, and leagcy compatibility features in this clean code project
-- Whenever finishing with implementing a plan / roadmap doc pair, make sure hte roadmap is up to date (tasks checked off, etc.) Then move the docs to ai/roadmaps/complete. Then update ai/changelog.md accordingly. 
+- Whenever finishing with implementing a plan / roadmap doc pair, make sure hte roadmap is up to date (tasks checked off, etc.) Then move the docs to ai/roadmaps/complete. Then update ai/changelog.md accordingly.
 
 ---
 
-## 🎓 Key Learnings (Market Research)
+## Key Learnings
 
+### Market Research
 1. **41% of college students experience food insecurity** (8M+ students nationally)
-2. **Gemini 2.0 Flash is 30x cheaper** than GPT-4o for document parsing
-3. **2023 Food Donation Improvement Act** removes liability for student-to-student sharing
-4. **Stigma is the #1 barrier** to food pantry utilization (40% at Belmont)
-5. **Gamification can reduce waste by 45%** (data integrity strategy)
+2. **2023 Food Donation Improvement Act** removes liability for student-to-student sharing
+3. **Stigma is the #1 barrier** to food pantry utilization (40% at Belmont)
+
+### Customer Discovery
+1. **Recruitment framing > waste reduction** — clubs want more attendees, not guilt relief
+2. **Liability is a non-issue** — confirmed independently by two club presidents
+3. **Leftover supply is lower than expected** — feed should surface during-event food, not just scraps
+4. **Flyer density varies by building** — Tanner is flyer-free; other buildings still use them
+
+### Technical
+1. **OpenAI gpt-4o-mini works well** as primary extractor; Gemini available as backup
+2. **Dual backend mode** (Firebase vs local) is valuable for dev velocity
+3. **AI date output is messy** — needed coercion for wrong years, varied formats
+4. **Building matching needs fuzzy logic** — AI outputs free-text locations, not building codes
 
 ---
 
-## 💬 Elevator Pitch (30 Seconds)
+## Elevator Pitch (30 Seconds)
 
-> "You know how free food gets posted on flyers around campus, but you never see them? Scavenger uses AI to read those flyers automatically and shows you a real-time feed of every free meal happening this week. It's like Instagram, but for free pizza. We're solving the fact that 41% of students are food insecure while thousands of pounds of perfectly good leftovers get thrown away daily."
-
----
-
-## 🤝 How to Contribute
-
-1. **Read this context document first** (project overview)
-2. **Review architecture** (`aiDocs/architecture.md`) for technical setup
-3. **Check PRD** (`aiDocs/prd.md`) for detailed requirements
-4. **Check MVP spec** (`aiDocs/mvp.md`) for current build scope
-5. **Follow coding style** (`aiDocs/coding-style.md`)
-6. **Log changes** in `aiDocs/changelog.md`
+> "You know how free food gets posted on flyers around campus, but you never see them? Food Finder uses AI to read those flyers automatically and shows you a real-time feed of every free meal happening this week. It's like Instagram, but for free pizza. We're solving the fact that 41% of students are food insecure while thousands of pounds of perfectly good leftovers get thrown away daily."
 
 ---
 
-## 📞 Contact & Resources
+## Contact & Resources
 
 - **Product Lead:** Ava Williams
 - **GitHub Repo:** https://github.com/avareesew/food_finder

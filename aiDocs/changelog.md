@@ -7,6 +7,19 @@
 
 ## [Unreleased]
 
+### Documentation Alignment (2026-04-01)
+- **Retroactive audit:** Reconciled all aiDocs with actual codebase state as of commit `62b543e`. Development had moved significantly ahead of documentation.
+- **Updated `aiDocs/context.md`:** Status changed from "Pre-Development" to "Active Development — Phase 1 Substantially Complete." Updated tech stack (Next.js 16, React 19, OpenAI primary, Gemini secondary), repository structure, product status, assumptions validated, and key learnings.
+- **Updated `aiDocs/architecture.md`:** Version 2.0 — rewrote file structure, API endpoints, data models (Flyer/Event/Extraction vs old Post model), data flow diagrams, technology stack, environment variables, and security sections to match actual implementation.
+- **Updated `ai/roadmaps/roadmap-tracker.md`:** Checked off completed Phase 0 and Phase 1 items, marked divergences (AI provider shift, features beyond scope), documented active blockers (no "Mark as Gone" UI, no real-time sync, no confirmation form), and added key learnings.
+
+### Key Divergences Documented
+- **AI Provider:** Original plan was Gemini-only; actual uses OpenAI gpt-4o-mini as primary, Gemini as secondary
+- **Data Model:** Original `Post` model replaced by `Flyer`, `Event`, and `Extraction` collections
+- **API Routes:** Original `/api/extract-flyer` and `/api/posts` replaced by `/api/flyers/*`, `/api/events`, `/api/upload/*`, `/api/local/*`
+- **Features Beyond Scope:** Campus building maps, explore page, dark mode, weekly calendar, dual backend mode, about page — all built but were listed as "out of scope" or Phase 2+
+- **Missing Features:** "Mark as Gone" UI, real-time `onSnapshot`, confirmation/edit form for AI output
+
 ### In Progress
 - Created `ai/roadmaps/phase-2-through-4-checklist.md` to track roadmap tasks + status for Phase 2/3/4 work items.
 - Added `src/lib/logger.ts` and wired structured logging through the upload API, Firestore services, feed page, and upload form so debuggable events are emitted during every flow.
@@ -105,28 +118,21 @@ ai/               # Gitignored (working artifacts)
 
 ---
 
-## Next Milestones
+## Next Milestones (as of 2026-04-01)
 
-### Week 1-2: Setup & Validation
-- [ ] Initialize Next.js project
-- [ ] Set up Firebase/Firestore
-- [ ] Obtain Gemini 2.0 Flash API key
-- [ ] Validate BYU flyer landscape (photograph 20-30 real flyers)
-- [ ] Test AI extraction accuracy (80%+ target)
+### Pre-Alpha Blockers
+- [ ] Build "Mark as Gone" UI (status toggle on event detail page)
+- [ ] Wire real-time `onSnapshot` listeners on feed
+- [ ] Build confirmation/edit form for AI-extracted data
+- [ ] Confirm Vercel production deployment is live
 
-### Week 3-4: Core Development
-- [ ] Build feed UI component
-- [ ] Build upload form with image handling
-- [ ] Integrate Gemini API for flyer extraction
-- [ ] Implement Firestore real-time sync
-
-### Week 5-6: Alpha Testing
-- [ ] Deploy to Vercel
+### Alpha Testing (Phase 2)
+- [ ] Deploy to Vercel production
 - [ ] Recruit 5-10 alpha testers
-- [ ] Manual seed data (post real events)
+- [ ] Seed 10-15 real events
 - [ ] Collect feedback and iterate
 
-### Week 7: Public Launch
+### Public Launch (Phase 4)
 - [ ] Social media announcement
 - [ ] Share in BYU ward groups and clubs
 - [ ] Monitor metrics
@@ -136,6 +142,8 @@ ai/               # Gitignored (working artifacts)
 
 ## Version History
 
+- **v0.3.0** (2026-04-01): Documentation alignment — reconciled aiDocs with actual codebase state
+- **v0.2.0** (~2026-03): Core development — upload pipeline, feed, event detail, explore page, campus maps, dark mode
 - **v0.1.0** (2026-02-16): Project foundation, documentation, planning complete
 - **v0.0.0** (2026-02-16): Initial commit
 

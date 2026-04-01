@@ -1,17 +1,14 @@
-# System Architecture: Scavenger Platform
+# System Architecture: Food Finder Platform
 
-**Version:** 1.2  
-**Last Updated:** February 16, 2026  
-**Status:** Pre-Development / Implementation-Ready  
-**All APIs confirmed with real documentation via Context7**
+**Version:** 2.0
+**Last Updated:** April 1, 2026
+**Status:** Active Development — Phase 1 Substantially Complete
 
 ---
 
 ## Overview
 
-Scavenger is a serverless, mobile-first web application that uses AI-powered vision processing to digitize physical event flyers and display them in a real-time feed. The architecture prioritizes simplicity, speed, and zero-DevOps complexity for rapid MVP iteration.
-
-**✅ Verification Status:** All APIs, packages, and features documented below have been verified against official sources. No hallucinated endpoints or experimental features.
+Food Finder is a serverless, mobile-first web application that uses AI-powered vision processing to digitize physical event flyers and display them in a real-time feed. The architecture prioritizes simplicity, speed, and zero-DevOps complexity for rapid MVP iteration.
 
 ---
 
@@ -20,92 +17,124 @@ Scavenger is a serverless, mobile-first web application that uses AI-powered vis
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     Client (Browser)                        │
-│                  Mobile-First React UI                      │
+│            Mobile-First React 19 + Tailwind 4               │
 └────────────────────────┬────────────────────────────────────┘
                          │ HTTPS
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Vercel Edge Network                      │
-│              (Static Hosting + API Routes)                  │
+│                    Vercel / Local Dev                        │
+│           Next.js 16 (App Router + API Routes)              │
 └─────┬───────────────────┬───────────────────┬───────────────┘
       │                   │                   │
-      │ Next.js SSR       │ API Routes        │ Static Assets
+      │ Pages (SSR)       │ API Routes        │ Static Assets
       ▼                   ▼                   ▼
-┌─────────────┐   ┌──────────────┐   ┌────────────────┐
-│   Feed UI   │   │  /api/upload │   │   Images/CSS   │
-│   Upload UI │   │  /api/posts  │   │   Fonts        │
-└─────────────┘   └───────┬──────┘   └────────────────┘
-                          │
-                          ├─────────────┐
-                          │             │
-                          ▼             ▼
-                  ┌────────────┐  ┌─────────────────┐
-                  │  Gemini    │  │   Firestore     │
-                  │ 2.0 Flash  │  │   (Database)    │
-                  │    API     │  │  - Posts        │
-                  └────────────┘  │  - Real-time    │
-                                  └─────────────────┘
-                                          │
-                                          ▼
-                                  ┌─────────────────┐
-                                  │ Firebase Storage│
-                                  │ (Flyer Images)  │
-                                  └─────────────────┘
+┌──────────────┐  ┌───────────────┐  ┌────────────────┐
+│ Home         │  │ /api/upload   │  │ Images/CSS     │
+│ Feed         │  │ /api/flyers   │  │ Leaflet tiles  │
+│ Explore      │  │ /api/events   │  │ Cached images  │
+│ Upload       │  │ /api/local/*  │  └────────────────┘
+│ Events/[id]  │  └──────┬────────┘
+│ About        │         │
+└──────────────┘         ├──────────────┬──────────────┐
+                         │              │              │
+                         ▼              ▼              ▼
+                 ┌──────────────┐ ┌──────────┐ ┌─────────────────┐
+                 │  OpenAI      │ │ Gemini   │ │   Firestore     │
+                 │  gpt-4o-mini │ │ 2.0 Flash│ │   (Database)    │
+                 │  (primary)   │ │ (backup) │ │  - flyers       │
+                 └──────────────┘ └──────────┘ │  - events       │
+                                               │  - extractions  │
+                                               └─────────────────┘
+                                                       │
+                                                       ▼
+                                               ┌─────────────────┐
+                                               │ Firebase Storage │
+                                               │ (Flyer Images)  │
+                                               └─────────────────┘
 ```
 
 ---
 
-## File Structure & Components
-
-### Project Organization
+## File Structure (Actual)
 
 ```
-scavenger-app/
-├── app/
-│   ├── page.tsx                    // Feed view (homepage)
-│   ├── post/
-│   │   └── page.tsx                // Upload flow page
-│   ├── event/[id]/
-│   │   └── page.tsx                // Event detail view
-│   ├── edit/[id]/
-│   │   └── page.tsx                // Edit/status management page
-│   └── api/
-│       ├── extract-flyer/
-│       │   └── route.ts            // Gemini AI extraction endpoint
-│       └── posts/
-│           └── route.ts            // CRUD operations for posts
-├── components/
-│   ├── EventCard.tsx               // Feed item displaying event summary
-│   ├── UploadForm.tsx              // Camera + file picker interface
-│   ├── ConfirmationForm.tsx        // AI data verification form
-│   ├── LoadingState.tsx            // Skeleton cards with pulse animation
-│   └── ErrorBoundary.tsx           // Error handling wrapper
-├── lib/
-│   ├── firebase.ts                 // Firebase initialization & exports
-│   ├── uploadImage.ts              // Firebase Storage upload utility
-│   ├── createPost.ts               // Firestore post creation
-│   ├── getPosts.ts                 // Firestore query utilities
-│   └── formatEventTime.ts          // Date/time formatting with date-fns
-├── public/                         // Static assets
-└── .env.local                      // Environment variables (not committed)
-```
-
-### Component Hierarchy
-
-```
-Feed (app/page.tsx)
-├── Header ("Scavenger 🍕")
-├── Explainer (how it works, 3 steps)
-├── LoadingState (skeleton cards while fetching) OR
-├── EventCard[] (mapped from posts array)
-│   ├── Event name (heading)
-│   ├── Location icon + building & room
-│   ├── Time icon + relative time ("In 30 min", "Happening now")
-│   ├── Food icon + description
-│   ├── Estimated portions (if available)
-│   ├── Status badge ("🔴 Happening Now", "⏰ In 30 min")
-│   └── Thumbnail image (optional)
-└── FloatingButton ("Post Food" - bottom right, fixed position)
+food_finder/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx                          # Home (hero, calendar, discover, map CTA)
+│   │   ├── layout.tsx                        # Root layout
+│   │   ├── feed/page.tsx                     # Event feed (card grid)
+│   │   ├── upload/page.tsx                   # Flyer upload + recent uploads
+│   │   ├── events/[id]/page.tsx              # Event detail view
+│   │   ├── explore/page.tsx                  # Campus buildings explorer
+│   │   ├── about/page.tsx                    # Mission / how it works
+│   │   └── api/
+│   │       ├── events/route.ts               # GET/POST published events
+│   │       ├── flyers/route.ts               # GET/POST flyer metadata
+│   │       ├── flyers/[flyerId]/route.ts     # GET single flyer
+│   │       ├── flyers/[flyerId]/extract/route.ts  # POST Gemini extraction
+│   │       ├── upload/route.ts               # POST multimodal upload (Firebase or local)
+│   │       ├── upload/process/route.ts       # POST process after browser upload
+│   │       ├── local/ingest/route.ts         # POST local extract + save
+│   │       ├── local/extract/route.ts        # POST local extract only
+│   │       ├── local/events/route.ts         # GET local events
+│   │       ├── local/upcoming/route.ts       # GET upcoming local events
+│   │       └── local/cache-image/route.ts    # POST cache Unsplash images
+│   ├── backend/
+│   │   ├── env.ts                            # Environment variable helpers
+│   │   ├── openai/
+│   │   │   ├── extractFlyer.ts               # OpenAI gpt-4o-mini extraction (FlyerExtraction schema)
+│   │   │   └── extractEventFromFlyer.ts      # OpenAI gpt-4o-mini extraction (ExtractedEvent schema)
+│   │   ├── gemini/
+│   │   │   └── extractFlyer.ts               # Gemini 2.0 Flash extraction
+│   │   ├── flyers/
+│   │   │   ├── processUploadedFlyer.ts       # Extract → validate → store (or reject)
+│   │   │   ├── storageAdminUpload.ts         # Firebase Admin Storage operations
+│   │   │   └── flyerDocToJson.ts             # Firestore Timestamp → JSON conversion
+│   │   └── local/
+│   │       ├── eventsStore.ts                # Local filesystem event storage
+│   │       ├── eventsJsonStore.ts            # Local JSON extraction records
+│   │       └── publicUploads.ts              # Save images to public/uploads/
+│   ├── components/
+│   │   ├── layout/Navbar.tsx                 # Navigation header
+│   │   ├── home/WeeklyEventCalendar.tsx      # Calendar grid (events by day/week)
+│   │   ├── ui/
+│   │   │   ├── EventCard.tsx                 # Event card (image, badges, food highlight)
+│   │   │   ├── LocalEventCard.tsx            # Card variant for local mode events
+│   │   │   ├── EventDetailModal.tsx          # Modal for expanded event details
+│   │   │   ├── EmptyState.tsx                # Empty state placeholder
+│   │   │   ├── PrimaryButton.tsx             # Styled action button
+│   │   │   └── PinIcon.tsx                   # Location pin SVG
+│   │   ├── UploadForm.tsx                    # Drag-and-drop file upload + extraction display
+│   │   ├── CampusBuildingMap.tsx             # Building-specific map view
+│   │   ├── CampusBuildingsExplorer.tsx       # Interactive campus building grid
+│   │   ├── CampusMap.tsx                     # Base map visualization
+│   │   ├── FloatingChip.tsx                  # Floating badge component
+│   │   ├── HeroPreview.tsx                   # Hero section preview cards
+│   │   ├── ThemeToggle.tsx                   # Dark/light mode toggle
+│   │   └── Navbar.tsx                        # (Legacy navbar, see layout/Navbar.tsx)
+│   ├── lib/
+│   │   ├── firebase.ts                       # Firebase client init (db, storage, app)
+│   │   ├── eventTiming.ts                    # Campus timezone, date coercion, expiry
+│   │   ├── validateFlyerExtraction.ts        # Required field validation
+│   │   ├── matchByuBuilding.ts               # Fuzzy building name → ID matching
+│   │   ├── homeDiscoverPreview.ts            # Flyer → preview card conversion
+│   │   └── logger.ts                         # Structured logging utility
+│   ├── hooks/
+│   │   └── useHtmlDarkClass.ts               # Dark mode class on <html>
+│   ├── data/
+│   │   └── byuBuildings.ts                   # BYU building database (name, aliases, lat/lng)
+│   └── services/
+│       └── flyers.ts                         # Flyer CRUD (Firestore + API fallback)
+├── data/                                     # Local mode storage
+│   ├── events.json                           # Extraction records (local mode)
+│   └── uploads/                              # Uploaded flyer images (local mode)
+├── public/
+│   ├── uploads/                              # Cached images (Unsplash, local uploads)
+│   └── slides.html                           # Presentation slides
+├── .secrets/                                 # Service account files (gitignored)
+├── env.example                               # Environment variable template
+└── package.json
 ```
 
 ---
@@ -113,546 +142,456 @@ Feed (app/page.tsx)
 ## Implementation Patterns
 
 ### State Management
-- Real-time Firestore listener with cleanup using `useEffect` and `onSnapshot`
-- React hooks for local state management
+- React hooks for local state management (`useState`, `useEffect`)
+- Firestore reads via API routes (not direct client-side `onSnapshot` yet)
 - No complex state management library needed for MVP
 
 ### Error Handling
-- User-friendly error messages for common failures
-- Technical errors logged to console for debugging
-- Retry options provided on all errors
-- Graceful degradation for network issues
+- Extraction validation rejects flyers missing required fields (date, time, place)
+- Rejected uploads are cleaned up from Storage automatically
+- Empty states shown when no events available
+- Structured logging via `src/lib/logger.ts`
 
 ### Loading States
-- Skeleton cards with pulse animation (3-5 cards)
-- Match actual card layout to prevent layout shift
-- Show immediately while data loads
+- Skeleton loaders on home page and feed during data fetch
+- Loading state in UploadForm during extraction
 
-### Form Validation
-- Image validation: JPEG/PNG only, max 10MB
-- Required fields: event name, building, room, date, food description
-- Date/time validation: must be in future, end time after start time
-- Real-time validation feedback
+### Extraction Validation
+- Required fields: date (coercible to YYYY-MM-DD), time (valid HH:MM start or end), place (2+ chars)
+- Date coercion handles varied AI output formats (2026-4-9, 04/09/2026 → 2026-04-09)
+- Wrong-year correction (if extracted date is in past, tries current year)
+- Invalid extractions return 422 with `missingFields` array
+
+### Backend Modes
+- **Firebase mode** (`NEXT_PUBLIC_BACKEND_MODE=firebase`): Firestore + Firebase Storage + Admin SDK
+- **Local mode** (`NEXT_PUBLIC_BACKEND_MODE=local`): `data/events.json` + local filesystem
 
 ---
 
 ## Technology Stack
 
 ### Frontend
-- **Framework:** Next.js 14 (App Router)
-- **Version:** 14.3.0-canary.87 (verified stable)
-- **UI Library:** React 18
-- **Styling:** Tailwind CSS
-- **State Management:** React Context / useState (simple MVP)
+- **Framework:** Next.js 16 (App Router)
+- **Version:** 16.1.6
+- **UI Library:** React 19.2.3
+- **Styling:** Tailwind CSS 4
+- **Maps:** Leaflet 1.9.4
+- **Dates:** date-fns 4.1.0
 - **HTTP Client:** Native fetch API
-
-**Rationale:**
-- Next.js provides SSR for SEO and fast initial loads
-- App Router is the modern Next.js pattern (stable, not experimental)
-- Tailwind enables rapid mobile-first prototyping
-- No complex state management needed for MVP
-- **✅ Verified:** All patterns work with Next.js 14 App Router
 
 **Key Features:**
 - API Routes for backend logic (`app/api/*/route.ts`)
 - Server Components (default) for data fetching
 - Client Components (`'use client'`) for interactivity
-- Built-in Image optimization
+- Dark mode via Tailwind `dark:` classes + custom hook
 
 ---
 
 ### Backend
 - **Runtime:** Node.js 18+ (Vercel serverless functions)
 - **API Framework:** Next.js API Routes
-- **Authentication:** None (MVP) — future: Firebase Auth
-- **File Upload:** Multipart form data via API route
-
-**Rationale:**
-- Next.js API routes = no separate backend needed
-- Serverless = zero infrastructure management
-- Simple REST endpoints for MVP
+- **Authentication:** None (MVP)
+- **File Upload:** Multipart form data via API route + browser-side Firebase Storage upload
 
 ---
 
 ### Database
 - **Primary:** Firestore (Firebase)
-- **Package:** `firebase` v9+ (verified, modular SDK)
+- **Client SDK:** `firebase` 12.9.0 (modular SDK)
+- **Admin SDK:** `firebase-admin` 13.7.0 (server-side operations)
 - **Schema:** Document-based (NoSQL)
-- **Real-time:** Built-in WebSocket support via `onSnapshot()`
+- **Collections:** `flyers`, `events`, `extractions`
 
-**Rationale:**
-- Real-time updates without custom WebSocket logic
-- Generous free tier (50k reads/day, 20k writes/day)
-- Easy to query and scale
-- Built-in offline support (future mobile app)
-- **✅ Verified:** All query patterns work as documented
-
-**Key Features:**
-- Real-time listeners automatically push updates to all clients
-- Composite indexes for complex queries
-- Server-side timestamps for consistency
-- Automatic retry and offline support
+**Current State:**
+- Reads via `getDocs` (polling), not `onSnapshot` (real-time)
+- Admin SDK used for server-side writes (bypasses client security rules)
+- Client SDK used for reads via API route proxies
 
 ---
 
-### AI/ML
-- **Provider:** Google Generative AI (Gemini 2.0 Flash)
-- **Package:** `@google/generative-ai` (verified, official Google SDK)
-- **Endpoint:** REST API via SDK
-- **Model:** `gemini-2.0-flash` (verified stable model)
+### AI/ML (Dual Provider)
 
-**Rationale:**
-- 30x cheaper than GPT-4o (~$0.000075 per image vs ~$0.003)
-- 6x faster (2.24s vs 13s latency)
-- Superior OCR accuracy (WER 0.24 vs 0.51)
-- Native support for multimodal (image + text) prompts
-- **✅ Verified:** JSON schema extraction works exactly as needed
+#### Primary: OpenAI gpt-4o-mini
+- **API:** Responses API (`https://api.openai.com/v1/responses`)
+- **No SDK** — raw `fetch` calls
+- **Used by:** `/api/upload`, `/api/upload/process`, `/api/local/ingest`, `/api/local/extract`
+- **Two extraction schemas:**
+  - `ExtractedEvent` (title, host, campus, date, startTime, endTime, place, food, foodCategory, details)
+  - `OpenAIExtraction` (title, building, room, startIso, endIso, foodDescription, estimatedPortions, notes)
 
-**Key Features:**
-- Accepts base64-encoded images
-- JSON schema output for structured extraction
-- Configurable response format
-- BYU-specific prompt optimization with building codes
-
-**BYU Building Codes Recognized:**
-- TMCB (Tanner Building)
-- MARB (Maeser Building)  
-- WSC (Wilkinson Student Center)
-- Talmage Building
-- JFSB (Joseph F. Smith Building)
-- ESC (Engineering & Computer Science Building)
+#### Secondary: Gemini 2.0 Flash
+- **Package:** `@google/generative-ai` 0.24.1
+- **Model:** `gemini-2.0-flash`
+- **Used by:** `/api/flyers/[flyerId]/extract`
+- **Schema:** `FlyerExtraction` (title, building, room, startIso, endIso, foodDescription, estimatedPortions, notes)
 
 ---
 
 ### Storage
-- **Images:** Firebase Storage
-- **Package:** Included in `firebase` SDK
-- **CDN:** Automatic via Firebase
+- **Production:** Firebase Storage (via Admin SDK signed URLs, 100-year expiration)
+- **Development:** Local filesystem (`data/uploads/`, `public/uploads/`)
+- **Image Caching:** Unsplash images cached to `public/uploads/` via SHA256 hash
 
-**Rationale:**
-- Integrated with Firestore
-- Automatic image optimization
-- Free tier: 5GB storage, 1GB/day download
-- **✅ Verified:** Upload and download URLs work as documented
-
-**Features:**
-- Unique file paths per post: `flyers/{postId}/{filename}`
-- Public download URLs
-- Automatic CDN distribution
+**Service Account Loading** (tries in order):
+1. `FIREBASE_SERVICE_ACCOUNT_PATH` (file path)
+2. `FIREBASE_SERVICE_ACCOUNT_JSON_BASE64` (base64-encoded)
+3. `FIREBASE_SERVICE_ACCOUNT_JSON` (inline JSON)
 
 ---
 
 ### Hosting & Deployment
-- **Platform:** Vercel
+- **Platform:** Vercel (planned, not yet confirmed live)
 - **CI/CD:** GitHub integration (auto-deploy on push to `main`)
-- **Domain:** TBD (vercel.app subdomain for MVP)
-
-**Rationale:**
-- Zero-config deployment
-- Free tier: Unlimited bandwidth for non-commercial
-- Edge network for global low latency
-- Preview deployments for PRs
+- **Domain:** TBD
 
 ---
 
-## Data Models
+## Data Models (Actual)
 
-### Post (Firestore Document)
+### Flyer (Firestore `flyers` collection)
+
+The primary document created when a user uploads a flyer image.
 
 ```typescript
-interface Post {
+interface Flyer {
+  id: string;                              // Auto-generated by Firestore
+  originalFilename: string;                // Original upload filename
+  storagePath: string;                     // Firebase Storage path
+  downloadURL: string;                     // Signed URL to flyer image
+  status: "available" | "gone" | "extracted" | "extracting" | "extraction_failed";
+  uploader: string;                        // "anonymous" (no auth in MVP)
+  createdAt: Timestamp;
+  extractedEvent?: ExtractedEvent | null;  // AI extraction result
+  rawModelOutput?: string;                 // Raw AI response for debugging
+  extractionError?: string | null;
+  extractedAt?: Timestamp;
+  lastExtractionId?: string;               // Reference to extractions collection
+}
+```
+
+### Event (Firestore `events` collection)
+
+Published events (created via POST /api/events after extraction).
+
+```typescript
+interface Event {
   id: string;                    // Auto-generated by Firestore
-  createdAt: Timestamp;          // Server timestamp
-  updatedAt: Timestamp;          // For status changes
-  
-  // Event Details
-  eventName: string;             // "CS Club Pizza Social"
+  title: string;                 // "CS Club Pizza Social"
   location: {
-    building: string;            // "TMCB"
-    room: string;                // "210"
+    building: string | null;     // "TMCB"
+    room: string | null;         // "210"
   };
-  dateTime: {
-    start: Timestamp;            // Event start time
-    end: Timestamp;              // Event end time
+  startAt: Timestamp;            // Event start time
+  endAt: Timestamp | null;       // Event end time
+  timezone: string;              // "America/Denver"
+  food: {
+    description: string | null;  // "3 large pizzas"
+    estimatedPortions: number | null;
   };
-  
-  // Food Details
-  foodDescription: string;       // "3 large pizzas (pepperoni, cheese, veggie)"
-  estimatedPortions?: number;    // Optional: 20
-  dietaryInfo?: string[];        // Optional: ["vegetarian", "gluten-free"]
-  
-  // Metadata
-  status: "available" | "gone";  // Status tracking
-  imageUrl?: string;             // Firebase Storage URL
-  uploaderEditKey: string;       // UUID for edit access (no auth)
-  source: "flyer_photo" | "manual" | "slack" | "email"; // Ingestion source
-  
-  // Analytics (optional)
-  viewCount?: number;            // How many people viewed this
-  claimCount?: number;           // How many "claimed" (future feature)
+  source: {
+    flyerId: string | null;
+    extractionId: string | null;
+    method: "ai+confirm" | "manual";
+  };
+  status: "scheduled";
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+```
+
+### Extraction (Firestore `extractions` collection)
+
+Stored when Gemini extraction is run via `/api/flyers/[flyerId]/extract`.
+
+```typescript
+interface ExtractionRecord {
+  id: string;
+  flyerId: string;
+  model: string;                 // "gemini-2.0-flash"
+  campusTimezone: string;
+  extraction: FlyerExtraction;   // { title, building, room, startIso, endIso, foodDescription, estimatedPortions, notes }
+  rawText: string;
+  createdAt: Timestamp;
+}
+```
+
+### ExtractedEvent (Embedded in Flyer documents)
+
+The schema used by OpenAI extraction, embedded directly in flyer documents.
+
+```typescript
+interface ExtractedEvent {
+  title: string | null;
+  host: string | null;           // Club/department name
+  campus: string | null;         // "BYU" or null
+  date: string | null;           // YYYY-MM-DD
+  startTime: string | null;      // HH:MM (24h)
+  endTime: string | null;        // HH:MM (24h)
+  place: string | null;          // Free-text location (e.g., "TMCB 210")
+  food: string | null;           // e.g., "pizza", "treats"
+  foodCategory: FoodCategory | null;  // pizza | dessert | snacks | refreshments | drinks | meal | other
+  details: string | null;
+  other: Record<string, unknown> | null;
+}
+```
+
+### StoredExtractionRecord (Local mode — `data/events.json`)
+
+```typescript
+interface StoredExtractionRecord {
+  id: string;
+  createdAtIso: string;
+  source: {
+    originalFilename: string;
+    mimeType: string;
+    sizeBytes: number;
+  };
+  imageUrl?: string | null;
+  event: ExtractedEvent;
+  rawModelOutput: string;
 }
 ```
 
 ### Firestore Collection Structure
 
 ```
-/posts
-  /{postId}
-    - All fields from Post interface
-    - Auto-indexing on: createdAt, dateTime.start, status
-```
+/flyers
+  /{flyerId}        — Flyer image metadata + extraction result
 
-**Indexes:**
-- Composite index: `status == "available" AND dateTime.start ASC`
-- Used for: "Show me all available events sorted by soonest first"
+/events
+  /{eventId}        — Published events (from confirmed extractions)
 
----
-
-## API Endpoints
-
-### POST `/api/upload`
-**Purpose:** Upload flyer image, extract data via Gemini, return structured JSON
-
-**Request:**
-```typescript
-// Multipart form data
-{
-  image: File;  // JPEG/PNG, max 10MB
-}
-```
-
-**Response:**
-```typescript
-{
-  success: true,
-  extractedData: {
-    eventName: string;
-    location: { building: string; room: string };
-    dateTime: { start: string; end: string }; // ISO format
-    foodDescription: string;
-    estimatedPortions?: number;
-  },
-  confidence: number; // 0-1, AI confidence score (future)
-}
-```
-
-**Error Handling:**
-- 400: Invalid image format
-- 413: File too large
-- 500: Gemini API error
-
----
-
-### POST `/api/posts`
-**Purpose:** Create a new post after user confirms AI extraction
-
-**Request:**
-```typescript
-{
-  eventName: string;
-  location: { building: string; room: string };
-  dateTime: { start: string; end: string };
-  foodDescription: string;
-  estimatedPortions?: number;
-  imageUrl?: string; // Firebase Storage URL (uploaded separately)
-}
-```
-
-**Response:**
-```typescript
-{
-  success: true,
-  postId: string;
-  editKey: string; // UUID for later editing (no auth)
-  editUrl: string; // Direct link to edit/delete
-}
+/extractions
+  /{extractionId}   — Gemini extraction records (linked to flyers)
 ```
 
 ---
 
-### GET `/api/posts`
-**Purpose:** Fetch all available posts (feed data)
+## API Endpoints (Actual)
 
-**Query Params:**
-- `status` (optional): "available" | "gone" (default: "available")
-- `limit` (optional): number (default: 50)
-- `startAfter` (optional): timestamp (for pagination)
+### Flyer Endpoints
 
-**Response:**
+#### POST `/api/flyers`
+**Purpose:** Save flyer metadata after client uploads to Firebase Storage, then extract via OpenAI.
+
+**Request Body:**
 ```typescript
 {
-  success: true,
-  posts: Post[];
-  hasMore: boolean;
+  downloadURL: string;       // Firebase Storage signed URL
+  storagePath: string;       // Storage path
+  originalFilename: string;
+  mimeType?: string;         // Default: "image/jpeg"
 }
 ```
+
+**Process:** Calls `processUploadedFlyer()` → downloads image → extracts via OpenAI → validates → stores in Firestore (or rejects + deletes from Storage).
+
+**Response (success):**
+```typescript
+{ flyerId: string; downloadURL: string; storagePath: string; }
+```
+
+**Response (validation failure — 422):**
+```typescript
+{ error: "...", missingFields: ["date", "time", "place"] }
+```
+
+#### GET `/api/flyers`
+**Purpose:** Fetch recent flyers via Admin SDK.
+**Query:** `limit` (1-100, default 20)
+
+#### GET `/api/flyers/:flyerId`
+**Purpose:** Fetch single flyer by ID via Admin SDK.
+
+#### POST `/api/flyers/:flyerId/extract`
+**Purpose:** Run Gemini 2.0 Flash extraction on a stored flyer image. Stores result in `extractions` collection and updates flyer status.
 
 ---
 
-### PATCH `/api/posts/:postId`
-**Purpose:** Update post status (mark as "gone")
+### Upload Endpoints
 
-**Request:**
-```typescript
-{
-  editKey: string;     // Required for authorization
-  status: "gone";      // Only allowed status change in MVP
-}
-```
+#### POST `/api/upload`
+**Purpose:** Multimodal upload handler (supports both Firebase and local mode).
+- Firebase mode: uploads via Admin SDK → processes with OpenAI → stores in Firestore
+- Local mode: saves to `data/uploads/` → processes with OpenAI → appends to `data/events.json`
 
-**Response:**
-```typescript
-{
-  success: true,
-  message: "Post marked as gone"
-}
-```
+#### POST `/api/upload/process`
+**Purpose:** Process flyer after browser-side upload to Firebase Storage. Uses OpenAI gpt-4o-mini Responses API.
 
 ---
 
-## API Implementation Details
+### Event Endpoints
 
-### `/api/extract-flyer` Route
+#### POST `/api/events`
+**Purpose:** Create published events (feed + calendar source of truth).
 
-**File:** `app/api/extract-flyer/route.ts`
+**Request Body:**
+```typescript
+{
+  title: string;              // Required
+  building?: string | null;
+  room?: string | null;
+  startIso: string;           // Required, ISO datetime
+  endIso?: string;
+  timezone?: string;          // Default: "America/Denver"
+  foodDescription?: string | null;
+  estimatedPortions?: number | null;
+  flyerId?: string | null;
+  extractionId?: string | null;
+}
+```
 
-**Functionality:**
-- Accepts multipart/form-data with image file
-- Rate limiting: 5 uploads/IP/hour (in-memory map for MVP)
-- Image validation: JPEG/PNG only, max 10MB
-- Converts image to base64
-- Calls Gemini API with BYU-specific prompt and JSON schema
-- Returns structured JSON extraction
+#### GET `/api/events`
+**Purpose:** List events for calendar/feed date ranges.
+**Query:** `from` (ISO, default: now), `to` (ISO, default: now + 7 days)
 
-**Error Codes:**
-- 400: No image provided or invalid format
-- 413: File too large (>10MB)
-- 429: Rate limit exceeded (5/hour/IP)
-- 500: Gemini API error
+---
 
-**Gemini Prompt Strategy:**
-- Instructs AI to extract event name, location, date/time, food details
-- Includes BYU building code recognition (TMCB, MARB, WSC, Talmage, JFSB, ESC)
-- Returns only valid JSON
-- Uses null for unclear fields
+### Local Mode Endpoints
 
-**JSON Schema:**
-- Defines Post structure with required fields
-- Ensures consistent data format
-- Validates location (building + room), dateTime (start + end), food description
+#### POST `/api/local/ingest`
+Extract + save flyer to local filesystem.
 
-### Data Flow: Upload to Feed
+#### POST `/api/local/extract`
+Extract only (no storage).
 
-**Complete Pipeline:**
-1. User uploads image → `UploadForm.tsx`
-2. Image sent to `/api/extract-flyer`
-   - Rate limit check → Image validation → Base64 conversion → Gemini processes
-3. User confirms/edits data → `ConfirmationForm.tsx`
-4. Image uploaded to Firebase Storage → Returns download URL
-5. Post created in Firestore → Generates UUID edit key → Returns postId + editKey
-6. Real-time listener triggers on all clients → New post appears instantly (<100ms)
-7. Edit key saved to localStorage → User can mark as "gone" later
+#### GET `/api/local/events`
+Fetch all extraction records from `data/events.json`.
 
-### Real-Time Status Update Flow
+#### GET `/api/local/upcoming`
+Fetch upcoming events (not ended). Query: `limit` (default 3, max 20).
 
-**Status Change Pipeline:**
-1. User clicks "Mark as Gone" → `app/edit/[id]/page.tsx`
-2. Verify edit key matches → Query Firestore for `uploaderEditKey`
-3. Update status in Firestore → `status: 'gone'` + `updatedAt: serverTimestamp()`
-4. Real-time listener triggers on all clients → Post disappears from feed (<100ms)
-5. Success message shown → "Post marked as gone"
+#### POST `/api/local/cache-image`
+Cache remote Unsplash images locally. Only allows `images.unsplash.com` and `source.unsplash.com` hosts.
+
+---
+
+## Data Flow: Upload to Feed (Actual)
+
+### Firebase Mode Pipeline
+1. User selects image → `UploadForm.tsx` (drag-and-drop or click)
+2. Browser uploads image to Firebase Storage directly (client SDK)
+3. Browser sends `{ downloadURL, storagePath, originalFilename }` to `/api/upload/process`
+4. Server downloads image bytes from Storage
+5. Server calls OpenAI gpt-4o-mini Responses API for extraction
+6. Server validates extraction (`validateExtractedEventRequired`)
+   - **If valid:** Creates Firestore document in `flyers` collection with status "extracted"
+   - **If invalid:** Deletes image from Storage, returns 422 with missing fields
+7. Feed page fetches flyers via `getRecentFlyers()` → API route → Admin SDK → Firestore
+
+### Local Mode Pipeline
+1. User selects image → `UploadForm.tsx`
+2. Image sent as multipart form to `/api/local/ingest`
+3. Server saves image to `data/uploads/`
+4. Server calls OpenAI gpt-4o-mini for extraction
+5. Server validates extraction
+6. Appends extraction record to `data/events.json`
+7. Feed page fetches from `/api/local/events` or `/api/local/upcoming`
+
+### Gemini Extraction (Secondary Path)
+1. Flyer already exists in Firestore (uploaded via primary flow)
+2. POST to `/api/flyers/[flyerId]/extract`
+3. Server fetches flyer document, downloads image bytes
+4. Calls Gemini 2.0 Flash with structured JSON schema
+5. Stores extraction in `extractions` collection
+6. Updates flyer with `status: "extracted"`, `lastExtractionId`
+
+### Status Update Flow
+**Not yet implemented.** The `status` field exists on flyer documents ("available" | "gone" | "extracted" etc.) but there is no UI for users to mark events as gone. This is a pre-alpha blocker.
 
 ---
 
 ## Security Considerations
 
-### MVP (Phase 1)
-- ✅ No user accounts = no password leaks
-- ✅ Rate limiting on API routes (5 uploads/IP/hour)
-- ✅ Image file validation (type, size, dimensions)
-- ✅ Firestore security rules (read: public, write: API only)
-- ✅ Edit keys are UUIDs (hard to guess)
-- ⚠️ No CAPTCHA (accept spam risk for MVP simplicity)
+### Current (Phase 1)
+- No user accounts = no password leaks
+- Server-side writes via Admin SDK (client can't write directly to Firestore)
+- Extraction validation rejects invalid uploads and cleans up Storage
+- Unsplash image caching only allows whitelisted hosts
+- No CAPTCHA (accept spam risk for MVP simplicity)
+- No rate limiting implemented yet (was planned but not built)
 
 ### Phase 2 (Future)
+- Add rate limiting on upload endpoints
 - Add Firebase Authentication (optional login)
-- Implement CAPTCHA on upload form
 - Add content moderation (flag inappropriate posts)
-- HTTPS only (enforced by Vercel)
-
-**⚠️ Security Note:** MVP uses `allow write: if true` for Firestore rules to enable rapid development. This is a **temporary security risk** mitigated by:
-- Rate limiting in API routes (5 uploads/IP/hour)
-- Manual monitoring during alpha/beta
-- Plan to lock down to server-only writes in Phase 2
+- Lock down Firestore rules to server-only writes
 
 ---
 
-## Mobile-First UI/UX Implementation
+## Mobile-First UI/UX
 
-### Design Principles
+### Responsive Design
+- Tailwind CSS 4 with responsive breakpoints
+- Event card grid: 1 column (mobile) → 2 columns (md) → 3 columns (lg)
+- Dark mode support via `useHtmlDarkClass` hook + Tailwind `dark:` classes
+- Keyboard navigation on event cards (Enter/Space opens detail)
 
-**Responsive Breakpoints:**
-- Primary target: 375px (iPhone SE)
-- Secondary: 414px (iPhone Pro), 390px (standard)
-- Tailwind breakpoints: sm (640px), md (768px), lg (1024px)
+### Event Status Indicators
+- **Active** events: Green badge or indicator
+- **Ended** events: "Ended" ribbon overlay, muted styling
+- **Extraction issues**: Warning badge on event detail page
+- Event expiry detection via `isCampusEventEnded()` in `eventTiming.ts`
 
-**Touch-Optimized UI:**
-- Minimum tap target: 44px × 44px (iOS guideline)
-- Large, easy-to-tap buttons
-- High contrast for outdoor viewing
-- Font size minimum: 16px (prevents iOS zoom)
-
-**Accessibility (WCAG 2.1 AA):**
-- All images have alt text
-- Buttons have aria-labels
-- Form inputs have visible or aria labels
-- Color contrast ≥ 4.5:1
-- Keyboard navigation works (Tab key)
-- Focus states visible (outline on :focus)
-- Screen reader tested (VoiceOver)
-
-### Status Indicators
-
-**Visual Badges for Event Timing:**
-- **Happening Now:** Green badge, 🔴 emoji
-- **Starting Soon (<1 hour):** Yellow badge, ⏰ emoji, "In X min"
-- **Today:** Blue badge, 📅 emoji, "Today at h:mm a"
-- **Tomorrow:** Purple badge, 📅 emoji, "Tomorrow at h:mm a"
-- **Future:** Gray badge, 📅 emoji, full date/time
-
-**Implementation:** Uses `date-fns` for relative time formatting
+### Time Formatting
+- Campus timezone: America/Denver (hardcoded)
+- 12-hour display: `formatTime12h()` ("6:00 PM")
+- Date labels: `formatEventDateLabel()` ("Wed, Mar 30")
+- Smart AM/PM handling for AI edge cases (e.g., "8 PM" stored as "08:00")
 
 ---
 
-## Performance Targets & Testing
+## Environment Variables
 
-### MVP Performance Metrics
+See `env.example` for the full template.
 
-**Target Response Times:**
-| Metric | Target | How to Measure |
-|--------|--------|----------------|
-| Feed load time | <2 seconds | Chrome DevTools Network tab |
-| AI extraction | <3 seconds | API route timing |
-| Real-time sync | <100ms | Firestore update to UI change |
-| Image upload | <5 seconds | Typical 2MB photo |
-| Page transition | <100ms | React navigation |
+### Public (browser-accessible)
+```bash
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_BACKEND_MODE=firebase    # "firebase" or "local"
+```
 
-**Testing Methodology:**
-- Chrome DevTools → Network tab
-- Simulate 3G connection (mobile throttling)
-- Test on actual devices (iPhone Safari, Android Chrome)
-- Measure FCP, LCP, CLS
+### Server-only (AI)
+```bash
+OPENAI_API_KEY=          # Required for primary extraction (gpt-4o-mini)
+GEMINI_API_KEY=          # Required for /api/flyers/:flyerId/extract endpoint
+```
 
-### Gemini Accuracy Testing
+### Server-only (Firebase Admin)
+One of these is required when using Firebase mode:
+```bash
+FIREBASE_SERVICE_ACCOUNT_PATH=        # Path to service account JSON file
+FIREBASE_SERVICE_ACCOUNT_JSON_BASE64= # Base64-encoded service account JSON
+FIREBASE_SERVICE_ACCOUNT_JSON=        # Inline service account JSON
+```
 
-**Week 1 Validation Process:**
-1. **Collect:** 20-30 real BYU flyers from campus (TMCB, Wilkinson, Talmage, Library)
-2. **Label:** Create ground truth JSON with manual extraction
-3. **Test:** Run automated test script against Gemini API
-4. **Measure:** Calculate per-field accuracy (event name, building, room, date, time, food)
-
-**Accuracy Thresholds:**
-- **80%+ accuracy** → Proceed with AI-primary flow
-- **70-79% accuracy** → Add "Please verify" warning
-- **<70% accuracy** → Pivot to manual entry as primary
-
-**Field Matching Criteria:**
-- Event name: Exact match (case-insensitive)
-- Building: Case-insensitive match
-- Room: Exact match
-- Date: Format-flexible
-- Time: Within 15-minute tolerance
-- Food: Semantic match (e.g., "pizza" ≈ "large pizza")
-
-### Mobile Testing Checklist
-
-**Week 4: Pre-Alpha Testing**
-
-**Devices:**
-- iPhone (Safari) - iOS 16+
-- Android (Chrome) - Android 11+
-- Screen sizes: 375px, 390px, 414px
-
-**Test Cases:**
-- Upload flow (camera opens, photo captures, gallery upload, preview)
-- Feed browsing (scroll performance, real-time updates, pull-to-refresh)
-- Navigation (tap card → detail, back button, deep links)
-- Offline behavior (error message, retry button, no crash)
-
----
-
-## API Keys & Project Setup
-
-### 1. Get Gemini API Key
-1. Go to [https://ai.google.dev](https://ai.google.dev)
-2. Sign in with Google account
-3. Click "Get API Key"
-4. Create new key or select existing project
-5. Copy the key
-6. Add to `.env.local`: `GEMINI_API_KEY=AIza...`
-
-**Rate Limits (Free Tier):**
-- 1,500 requests per day
-- 15 requests per minute  
-- Sufficient for MVP: 30-50 flyers/week = ~7/day
-
-### 2. Create Firebase Project
-1. Go to [https://console.firebase.google.com](https://console.firebase.google.com)
-2. Click "Add project" → Name: "scavenger-food-finder"
-3. Disable Google Analytics (optional)
-4. Click "Create project"
-
-### 3. Set Up Firestore
-1. Firebase Console → Build → Firestore Database
-2. Click "Create database" → Start in **Production mode**
-3. Choose location: `us-central` (closest to BYU)
-4. Click "Enable"
-
-### 4. Set Up Firebase Storage
-1. Firebase Console → Build → Storage
-2. Click "Get started" → Start in **Production mode**
-3. Use same location as Firestore
-4. Click "Done"
-
-### 5. Get Firebase Config & Set Rules
-1. Project Settings → "Your apps" → Click Web icon (`</>`)
-2. Register app: "Scavenger Web"
-3. Copy `firebaseConfig` to `.env.local` (prefix with `NEXT_PUBLIC_`)
-4. Set Firestore Rules:
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /posts/{postId} {
-      allow read: if true;  // Public read
-      allow write: if true; // MVP: Open write (add auth in Phase 2)
-    }
-  }
-}
+Optional:
+```bash
+FIREBASE_STORAGE_BUCKET=              # Falls back to NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
 ```
 
 ---
 
 ## Real-Time Updates
 
-### How It Works
-1. Client subscribes to Firestore collection: `/posts`
-2. Firestore pushes updates via WebSocket (built-in)
-3. React component re-renders when data changes
-4. No manual polling needed
+### Current State
+- **Not yet implemented.** Feed data is fetched via `getDocs` (polling on page load).
+- `onSnapshot` real-time listeners are planned but not wired up.
+- This is a pre-alpha item to address.
 
-### Implementation
+### Planned Implementation
 ```typescript
-// In React component
 useEffect(() => {
   const unsubscribe = onSnapshot(
-    collection(db, 'posts'),
+    collection(db, 'flyers'),
     (snapshot) => {
-      const posts = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setPosts(posts);
+      const flyers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setFlyers(flyers);
     }
   );
   return () => unsubscribe();
@@ -661,290 +600,66 @@ useEffect(() => {
 
 ---
 
-## Scaling Considerations
-
-### MVP Load Estimates (BYU Single Campus)
-- **Users:** 150-200/week
-- **Posts:** 30-50/week
-- **API Calls:** ~1,000/week
-- **Image Storage:** ~50MB/week
-
-**All within free tiers of:**
-- Vercel: 100GB bandwidth/month
-- Firestore: 50k reads/day, 20k writes/day
-- Firebase Storage: 5GB storage, 1GB/day download
-- Gemini API: Free tier = 1,500 requests/day
-
-### Phase 2+ (Multi-Campus)
-- **CDN:** Vercel Edge automatically scales globally
-- **Database:** Firestore auto-shards (handles millions of documents)
-- **API:** Serverless functions scale to demand
-- **Cost Estimate (1,000 weekly active users):**
-  - Vercel: $0 (hobby tier sufficient)
-  - Firebase: ~$25/month
-  - Gemini API: ~$10/month
-  - **Total: ~$35/month** (until monetization)
-
----
-
 ## Getting Started
 
 ### Prerequisites
 ```bash
-# Install Node.js 18+ (verify with)
-node --version  # Should be v18.0.0 or higher
-
-# Install npm or pnpm
+node --version   # Node.js 18+
 npm --version
 ```
 
-### Project Initialization
-
-**Step 1: Create Next.js Project**
+### Setup
 ```bash
-npx create-next-app@latest scavenger-app
-
-# Answer prompts:
-# ✅ TypeScript
-# ✅ ESLint  
-# ✅ Tailwind CSS
-# ❌ src/ directory (use app/ directly)
-# ✅ App Router
-# ❌ Customize import alias
-
-cd scavenger-app
-```
-
-**Step 2: Install Dependencies**
-```bash
-# Firebase SDK
-npm install firebase
-
-# Gemini API
-npm install @google/generative-ai
-
-# Optional: Date utilities
-npm install date-fns
-```
-
-**Step 3: Environment Variables**
-
-Create `.env.local`:
-```bash
-# Gemini API (server-side only)
-GEMINI_API_KEY=your_key_here
-
-# Firebase (client-side, prefix with NEXT_PUBLIC_)
-NEXT_PUBLIC_FIREBASE_API_KEY=your_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-app.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-app.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456
-NEXT_PUBLIC_FIREBASE_APP_ID=1:123456:web:abcdef
-```
-
-**Step 4: Initialize Firebase**
-
-Create `lib/firebase.ts`:
-```typescript
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export default app;
-```
-
-**Step 5: Run Development Server**
-```bash
+git clone https://github.com/avareesew/food_finder.git
+cd food_finder
+npm install
+cp env.example .env.local
+# Fill in API keys and Firebase config in .env.local
 npm run dev
 # Open http://localhost:3000
 ```
 
----
-
-## Monitoring & Analytics
-
-### MVP
-- **Google Analytics 4:** Page views, user flows
-- **Vercel Analytics:** Performance metrics (TTFB, LCP, CLS)
-- **Firebase Console:** Database usage, API quota
-
-### Phase 2+
-- Add error tracking (Sentry)
-- Add custom event tracking (post creation, button clicks)
-- Add user feedback widget (Hotjar or similar)
-
----
-
-## Backup & Disaster Recovery
-
-### Data Backup
-- **Firestore:** Automatic daily backups by Firebase
-- **Images:** Redundant storage across Firebase regions
-- **Code:** Version-controlled on GitHub
-
-### Rollback Strategy
-- Revert to previous Git commit
-- Vercel keeps deployment history (instant rollback)
-
----
-
-## Future Architecture Enhancements
-
-### Phase 2 (Weeks 8-16)
-- Add Redis cache for frequently accessed posts
-- Implement Slack bot (separate service, Firestore shared DB)
-- Email parser service (Cloud Functions)
-
-### Phase 3 (Multi-Campus)
-- Add campus-specific collections: `/campuses/{campusId}/posts`
-- Implement geolocation filtering
-- Mobile app (React Native, reuse 90% of codebase)
+### Local Development Mode
+Set `NEXT_PUBLIC_BACKEND_MODE=local` in `.env.local` to skip Firebase entirely. Events are stored in `data/events.json` and images in `data/uploads/`. Only requires `OPENAI_API_KEY`.
 
 ---
 
 ## Technology Decisions Log
 
-| Decision | Rationale | Alternatives Considered |
-|----------|-----------|-------------------------|
-| **Next.js over plain React** | SSR for SEO, API routes = no separate backend | Create React App (no SSR), Remix (overkill) |
-| **Firestore over PostgreSQL** | Real-time sync built-in, simpler for MVP | Supabase (more complex), MongoDB (no real-time) |
-| **Gemini over GPT-4o** | 30x cheaper, 6x faster, better OCR | GPT-4o (too expensive), Claude (no vision API) |
-| **Vercel over AWS** | Zero config, free tier generous | AWS Amplify (complex), Netlify (less Next.js optimized) |
-| **No auth in MVP** | Reduces friction, faster to ship | Firebase Auth (adds complexity), Clerk (overkill) |
+| Decision | Rationale | Alternatives Considered | Status |
+|----------|-----------|-------------------------|--------|
+| **Next.js over plain React** | SSR for SEO, API routes = no separate backend | Create React App, Remix | Implemented (v16) |
+| **Firestore over PostgreSQL** | Real-time sync built-in, simpler for MVP | Supabase, MongoDB | Implemented |
+| **OpenAI as primary AI** | gpt-4o-mini via Responses API works well for extraction | Gemini-only (original plan) | Implemented |
+| **Gemini as secondary AI** | Available for re-extraction; keeps optionality | — | Implemented |
+| **Dual backend mode** | Local mode speeds up dev without Firebase credentials | Firebase-only | Implemented |
+| **Vercel over AWS** | Zero config, free tier generous | AWS Amplify, Netlify | Planned (not yet deployed) |
+| **No auth in MVP** | Reduces friction, faster to ship | Firebase Auth, Clerk | Implemented |
+| **Firebase Admin SDK** | Server-side writes bypass client security rules | Client SDK writes | Implemented |
+| **Leaflet for maps** | Lightweight, open-source, no API key needed | Google Maps, Mapbox | Implemented |
 
 ---
 
-## API Verification Summary
+## Future Architecture (Phase 2+)
 
-**All APIs have been verified against official documentation via Context7.**
+### Priority Items (Pre-Alpha Blockers)
+- "Mark as Gone" UI + status update endpoint
+- Real-time `onSnapshot` listeners
+- User confirmation/edit form for AI extractions
+- Vercel production deployment
 
-✅ **Gemini 2.0 Flash**
-- Package: `@google/generative-ai` (confirmed)
-- Model: `gemini-2.0-flash` (confirmed stable)
-- JSON schema extraction: Works as documented
-- Pricing: $0.000075/1k tokens (confirmed)
+### Phase 2 Features
+- Slack bot integration (shared Firestore DB)
+- Email forwarding parser
+- Firebase Authentication (optional, anonymous sign-in)
+- Rate limiting on upload endpoints
+- Analytics integration (GA4)
 
-✅ **Firebase & Firestore**
-- Package: `firebase` v9+ modular SDK (confirmed)
-- Real-time `onSnapshot()`: Works as documented
-- Free tier: 50k reads/day (confirmed)
-
-✅ **Next.js 14**
-- Version: 14.3.0-canary.87 (confirmed stable)
-- App Router: Production-ready (confirmed)
-- API routes with FormData: Works as documented
-
-✅ **Vercel**
-- Zero-config Next.js deployment (confirmed)
-- Free tier: 100GB bandwidth (confirmed)
-- GitHub auto-deploy (confirmed)
-
-**Reference Documentation:**
-- Gemini API: `ai/guides/gemini-api-docs.md`
-- Firebase/Firestore: `ai/guides/firebase-firestore-docs.md`
-- Next.js 14: `ai/guides/nextjs-14-docs.md`
-- Full verification: `ai/guides/api-verification-summary.md`
+### Phase 3 (Multi-Campus)
+- Campus field on events (`campusId`)
+- Campus-specific building databases
+- Timezone handling per campus
 
 ---
 
-## Phase 2+ Architecture Evolution
-
-### Automated Data Cleanup (Cloud Functions)
-
-**Firebase Cloud Function for Expired Post Deletion:**
-- Runs daily at 2 AM Mountain Time
-- Deletes posts where end time was >24 hours ago
-- Batch deletion (max 500 per batch)
-- Logs deletion count for monitoring
-
-### Authentication Integration (Phase 2)
-
-**Optional Firebase Auth:**
-- Anonymous sign-in (no user data collected, reduces spam)
-- Updated Firestore rules: require authentication for writes
-- Post schema adds optional `authorId` field (Firebase Auth UID)
-- Maintains backward compatibility with MVP edit keys
-- Update/delete requires ownership OR valid edit key
-
-### Slack Bot Integration
-
-**Architecture:**
-- Separate Slack Bolt app deployed on Vercel
-- Shared Firestore database with web app
-- Slash command: `/scavenger post [event details]`
-- Listens to channel messages with flyer images
-- Uses same Gemini extraction pipeline
-- Creates posts directly in Firestore → Web app updates automatically
-
-### Multi-Campus Scaling
-
-**Data Model Options:**
-
-**Option A: Campus field in posts (simpler)**
-- Add `campusId` field to each post ('byu', 'uvu', 'utah', etc.)
-- Query filters by campus
-- Easier initial implementation
-
-**Option B: Separate collections (better isolation)**
-- Structure: `/campuses/{campusId}/posts/{postId}`
-- Allows independent security rules per campus
-- Better scaling (sharding)
-- Campus-specific features
-
-**Campus Configuration:**
-- Campus-specific building codes
-- Timezone handling per location
-- Custom branding per campus
-
-### Email Parser Service
-
-**Architecture:**
-- Email forwarded to scavenger@yourdomain.com
-- SendGrid/Mailgun webhook to Firebase Cloud Function
-- Parse email body for event details
-- Extract attachments (flyer images) to Firebase Storage
-- Gemini extraction on images
-- Create post in Firestore → Web app updates automatically
-
-### Performance Optimizations (Post-PMF)
-
-**Redis Cache Layer:**
-- Cache frequently accessed posts (5-minute TTL)
-- Reduces Firestore reads for popular campuses
-- Implemented when scaling beyond single campus
-
-**Image Optimization:**
-- Next.js Image component (built-in optimization)
-- Automatic WebP serving
-- Lazy loading
-- Responsive image sizes
-
-### Monitoring & Observability (Production)
-
-**Sentry Error Tracking:**
-- Capture exceptions with context
-- Performance monitoring (10% sampling)
-- Environment-specific tracking
-
-**Custom Analytics Events:**
-- Track: post_created, event_card_clicked, upload_started
-- Properties: campus, building, source
-- Supports Google Analytics, Segment, Mixpanel
-
----
-
-**This architecture is optimized for rapid MVP iteration with minimal operational overhead. Scale decisions deferred until post-PMF validation. All technical choices verified against real, production-ready APIs.**
+**This architecture is optimized for rapid MVP iteration with minimal operational overhead. Scale decisions deferred until post-PMF validation.**
