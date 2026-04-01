@@ -9,9 +9,12 @@ import { extractFlyerFromImageBytes } from '@/backend/gemini/extractFlyer';
  * Reads the stored flyer (Firestore), fetches the image bytes (via downloadURL),
  * runs Gemini extraction, stores an extraction record, and updates the flyer.
  */
-export async function POST(_request: NextRequest, context: { params: { flyerId: string } }) {
+export async function POST(
+  _request: NextRequest,
+  context: { params: Promise<{ flyerId: string }> }
+) {
   try {
-    const { flyerId } = context.params;
+    const { flyerId } = await context.params;
 
     const flyerRef = doc(db, 'flyers', flyerId);
     const flyerSnap = await getDoc(flyerRef);

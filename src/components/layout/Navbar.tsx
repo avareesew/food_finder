@@ -42,6 +42,12 @@ export default function Navbar() {
                             Discover
                         </Link>
                         <Link
+                            href="/explore"
+                            className={`${linkBase} ${pathname === '/explore' ? linkActive : linkInactive} dark:text-gray-100 dark:hover:bg-gray-900/50 dark:hover:text-brand-orange ${pathname === '/explore' ? 'dark:bg-gray-900/70' : ''}`}
+                        >
+                            Explore
+                        </Link>
+                        <Link
                             href="/about"
                             className={`${linkBase} ${pathname?.startsWith('/about') ? linkActive : linkInactive} dark:text-gray-100 dark:hover:bg-gray-900/50 dark:hover:text-brand-orange ${pathname?.startsWith('/about') ? 'dark:bg-gray-900/70' : ''}`}
                         >

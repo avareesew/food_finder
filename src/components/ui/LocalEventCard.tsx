@@ -46,33 +46,9 @@ export default function LocalEventCard(props: LocalEventCardProps) {
   const prettyStart = props.date ? formatPrettyTime(props.date, props.startTime) : null;
   const prettyEnd = props.date ? formatPrettyTime(props.date, props.endTime) : null;
 
-  const [cachedImageUrl, setCachedImageUrl] = useState<string | null>(null);
-
+  const [imgFailed, setImgFailed] = useState(false);
   useEffect(() => {
-    const u = props.imageUrl ?? null;
-    if (!u) return;
-    if (!/^https?:\/\//i.test(u)) return;
-    if (!/unsplash\.com/i.test(u)) return;
-
-    let cancelled = false;
-    async function cache() {
-      try {
-        const res = await fetch('/api/local/cache-image', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ url: u }),
-        });
-        const json = await res.json();
-        if (cancelled) return;
-        if (json?.success && typeof json.localUrl === 'string') setCachedImageUrl(json.localUrl);
-      } catch {
-        // ignore
-      }
-    }
-    cache();
-    return () => {
-      cancelled = true;
-    };
+    setImgFailed(false);
   }, [props.imageUrl]);
 
   const timeLine =
@@ -87,18 +63,19 @@ export default function LocalEventCard(props: LocalEventCardProps) {
       ? `${props.food ?? 'Food'}${props.foodCategory ? ` • ${props.foodCategory}` : ''}`
       : null;
 
-  const resolvedImageUrl = cachedImageUrl ?? props.imageUrl;
+  const resolvedImageUrl = props.imageUrl;
 
   return (
     <article className="bg-gray-50 rounded-[1.85rem] border border-gray-200 shadow-[0_8px_30px_-18px_rgba(0,0,0,0.25)] hover:shadow-[0_18px_44px_-20px_rgba(0,0,0,0.35)] overflow-hidden transition-all duration-300 h-full flex flex-col hover:-translate-y-0.5 ring-1 ring-brand-orange/10 dark:bg-gray-900 dark:border-gray-800 dark:ring-0">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 border-b border-gray-100 dark:bg-gray-800 dark:border-gray-800">
         {/* Warm overlay for light mode to add depth */}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-50/55 via-transparent to-transparent pointer-events-none dark:from-transparent" />
-        {resolvedImageUrl ? (
+        {resolvedImageUrl && !imgFailed ? (
           <img
             src={resolvedImageUrl}
             alt={props.title}
             className="w-full h-full object-cover"
+            onError={() => setImgFailed(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-orange-50/50">

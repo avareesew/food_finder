@@ -1,7 +1,11 @@
+import { unlink } from 'node:fs/promises';
+import path from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
-import { uploadFlyer } from '@/backend/flyers/uploadFlyer';
 import { saveUpload, appendEvent } from '@/backend/local/eventsStore';
 import { extractFlyerWithOpenAI } from '@/backend/openai/extractFlyer';
+import { processUploadedFlyer } from '@/backend/flyers/processUploadedFlyer';
+import { uploadBytesToStorage } from '@/backend/flyers/storageAdminUpload';
+import { validateOpenAIExtractionRequired } from '@/lib/validateFlyerExtraction';
 
 export async function POST(request: NextRequest) {
     try {
@@ -15,63 +19,123 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        /**
-         * Local-first fallback:
-         * If Firebase Storage isn't configured (no bucket), use local disk + OpenAI extraction.
-         *
-         * This keeps the existing UI working even before Firebase is set up.
-         */
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
+
         const firebaseBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
-        if (!firebaseBucket) {
-            const arrayBuffer = await file.arrayBuffer();
-            const bytes = new Uint8Array(arrayBuffer);
 
-            const { relPath } = await saveUpload({ filename: file.name, bytes });
-            const { extraction, rawModelOutput } = await extractFlyerWithOpenAI({
-                imageBytes: bytes,
+        /**
+         * Firebase: multipart to this API → Admin SDK uploads to Storage (no browser CORS),
+         * then extraction + Firestore on the server.
+         */
+        if (firebaseBucket) {
+            const timestamp = Date.now();
+            const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+            const storagePath = `flyers/${timestamp}_${safeFilename || 'flyer'}`;
+
+            const { downloadURL } = await uploadBytesToStorage({
+                bytes,
+                storagePath,
+                contentType: file.type || 'application/octet-stream',
+            });
+
+            const result = await processUploadedFlyer({
+                downloadURL,
+                storagePath,
+                originalFilename: file.name,
                 mimeType: file.type || 'image/jpeg',
-                campusTimezone: 'America/Denver',
+                imageBytes: bytes,
             });
 
-            const record = await appendEvent({
-                id: `local_${Date.now()}`,
-                createdAtIso: new Date().toISOString(),
-                imagePath: relPath,
-                extraction,
-                rawModelOutput,
-            });
+            if (!result.flyerId) {
+                return NextResponse.json(
+                    {
+                        error: 'Flyer not saved',
+                        details: result.rejectedReason ?? 'Missing required event details.',
+                        missing: result.missingFields,
+                        validationFailed: true,
+                        event: result.event,
+                    },
+                    { status: 422 }
+                );
+            }
 
             return NextResponse.json({
                 success: true,
-                mode: 'local',
-                record,
-                message: 'Flyer processed and saved to data/events.json',
+                mode: 'firebase',
+                flyerId: result.flyerId,
+                downloadURL: result.downloadURL,
+                event: result.event,
+                rawModelOutput: result.rawModelOutput,
+                extractionError: null,
+                saved: { id: result.flyerId },
+                message: 'Flyer stored in Firebase and extracted successfully.',
             });
         }
 
-        const { flyerId, downloadURL } = await uploadFlyer({ file });
+        const { relPath } = await saveUpload({ filename: file.name, bytes });
+        const { extraction, rawModelOutput } = await extractFlyerWithOpenAI({
+            imageBytes: bytes,
+            mimeType: file.type || 'image/jpeg',
+            campusTimezone: 'America/Denver',
+        });
+
+        const openAiVal = validateOpenAIExtractionRequired(extraction);
+        if (!openAiVal.ok) {
+            await unlink(path.join(process.cwd(), relPath)).catch(() => {});
+            return NextResponse.json(
+                {
+                    error: 'Flyer not saved',
+                    details: openAiVal.message,
+                    missing: openAiVal.missing,
+                    validationFailed: true,
+                },
+                { status: 422 }
+            );
+        }
+
+        const record = await appendEvent({
+            id: `local_${Date.now()}`,
+            createdAtIso: new Date().toISOString(),
+            imagePath: relPath,
+            extraction,
+            rawModelOutput,
+        });
 
         return NextResponse.json({
             success: true,
-            mode: 'firebase',
-            flyerId,
-            downloadURL,
-            message: 'Upload successful'
+            mode: 'local',
+            record,
+            message: 'Flyer processed and saved to data/events.json',
         });
-
     } catch (error) {
         console.error('Upload error:', error);
-        const msg = error instanceof Error ? error.message : 'Unknown error';
-        const isMissingEnv = msg.startsWith('Missing required environment variable:');
+        const msg = formatUploadError(error);
+        const isMissingEnv = msg.startsWith('Missing required environment variable:') || msg.startsWith('Missing ');
+        const firebaseHint =
+            /permission-denied|Missing or insufficient permissions/i.test(msg)
+                ? 'Check Firestore rules for the flyers collection.'
+                : /FIREBASE_SERVICE_ACCOUNT_JSON|service account/i.test(msg)
+                  ? 'Add FIREBASE_SERVICE_ACCOUNT_JSON to .env.local (JSON key from Firebase Console → Project settings → Service accounts).'
+                  : undefined;
         return NextResponse.json(
             {
                 error: isMissingEnv ? msg : 'Upload failed',
                 details: msg,
-                hint: isMissingEnv
-                    ? 'Create .env.local and set OPENAI_API_KEY (for local mode) or NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET (for firebase mode).'
-                    : undefined
+                hint: firebaseHint,
             },
             { status: isMissingEnv ? 400 : 500 }
         );
     }
+}
+
+function formatUploadError(error: unknown): string {
+    if (error instanceof Error) {
+        const any = error as Error & { code?: string };
+        if (typeof any.code === 'string' && any.message) {
+            return `${any.code}: ${any.message}`;
+        }
+        return error.message;
+    }
+    return 'Unknown error';
 }

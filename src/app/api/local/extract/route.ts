@@ -1,7 +1,10 @@
+import { unlink } from 'node:fs/promises';
+import path from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
 import { extractEventFromFlyerWithOpenAI } from '@/backend/openai/extractEventFromFlyer';
 import { appendExtractionRecord } from '@/backend/local/eventsJsonStore';
 import { saveFlyerToPublicUploads } from '@/backend/local/publicUploads';
+import { validateExtractedEventRequired } from '@/lib/validateFlyerExtraction';
 
 /**
  * Extraction-only MVP endpoint (does NOT store anything):
@@ -23,7 +26,7 @@ export async function POST(request: NextRequest) {
     const bytes = new Uint8Array(arrayBuffer);
 
     // Save the original flyer image locally so Discover can show the real flyer.
-    const { publicUrl: imageUrl } = await saveFlyerToPublicUploads({
+    const { publicUrl: imageUrl, relativePath } = await saveFlyerToPublicUploads({
       originalFilename: file.name,
       bytes,
     });
@@ -34,7 +37,22 @@ export async function POST(request: NextRequest) {
       campusTimezone: 'America/Denver',
     });
 
-    // Persist successful extractions for MVP testing (local dev only)
+    const validation = validateExtractedEventRequired(event);
+    if (!validation.ok) {
+      await unlink(path.join(process.cwd(), relativePath)).catch(() => {});
+      return NextResponse.json(
+        {
+          error: 'Flyer not saved',
+          details: validation.message,
+          missing: validation.missing,
+          validationFailed: true,
+          event,
+          rawModelOutput,
+        },
+        { status: 422 }
+      );
+    }
+
     const record = await appendExtractionRecord({
       id: `extract_${Date.now()}`,
       createdAtIso: new Date().toISOString(),

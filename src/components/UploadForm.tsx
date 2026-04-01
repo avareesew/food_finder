@@ -41,6 +41,8 @@ export default function UploadForm() {
     const [savedId, setSavedId] = useState<string | null>(null);
     const [recentFlyers, setRecentFlyers] = useState<Flyer[]>([]);
     const [localRecents, setLocalRecents] = useState<LocalRecentRecord[]>([]);
+    const [errorDetails, setErrorDetails] = useState<string | null>(null);
+    const [errorHint, setErrorHint] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -84,6 +86,8 @@ export default function UploadForm() {
             setMessage('');
             setExtracted(null);
             setSavedId(null);
+            setErrorDetails(null);
+            setErrorHint(null);
         }
     };
 
@@ -96,12 +100,15 @@ export default function UploadForm() {
         setMessage('');
         setExtracted(null);
         setSavedId(null);
+        setErrorDetails(null);
+        setErrorHint(null);
 
         logger.info('upload-submit-start', { fileName: file.name });
-        const formData = new FormData();
-        formData.append('file', file);
 
         try {
+            const formData = new FormData();
+            formData.append('file', file);
+
             const endpoint =
                 process.env.NEXT_PUBLIC_BACKEND_MODE === 'firebase'
                     ? '/api/upload'
@@ -118,7 +125,7 @@ export default function UploadForm() {
                 setStatus('success');
                 setMessage(
                     process.env.NEXT_PUBLIC_BACKEND_MODE === 'firebase'
-                        ? 'Flyer uploaded successfully!'
+                        ? 'Flyer stored in Firebase and extracted successfully.'
                         : 'Flyer extracted successfully'
                 );
 
@@ -131,20 +138,53 @@ export default function UploadForm() {
 
                 if (process.env.NEXT_PUBLIC_BACKEND_MODE === 'local') fetchLocalRecents();
                 else fetchRecentFlyers();
+            } else if (response.status === 422 && result?.validationFailed) {
+                setStatus('error');
+                setMessage(result.error || 'Flyer not saved');
+                setErrorDetails(typeof result.details === 'string' ? result.details : null);
+                const miss = Array.isArray(result.missing) ? (result.missing as string[]).filter(Boolean) : [];
+                setErrorHint(
+                    miss.length > 0
+                        ? `Required on the flyer: ${miss.join(', ')}.`
+                        : 'The flyer must include a clear date, time, and place before it can be saved.'
+                );
+                if (result?.event) {
+                    setExtracted(result.event as ExtractedEvent);
+                }
+                setSavedId(null);
+                logger.warn('upload-validation-rejected', {
+                    missing: miss,
+                    details: result.details,
+                });
             } else {
                 setStatus('error');
                 setMessage(result.error || 'Upload failed');
+                setErrorDetails(typeof result.details === 'string' ? result.details : null);
+                setErrorHint(typeof result.hint === 'string' ? result.hint : null);
                 logger.warn('upload-submit-failed', {
                     status: response.status,
                     message: result.error,
+                    details: result.details,
                 });
             }
         } catch (error) {
+            const msg = error instanceof Error ? error.message : 'Unknown error';
+            const code =
+                error && typeof error === 'object' && 'code' in error
+                    ? String((error as { code: unknown }).code)
+                    : '';
             logger.error('upload-submit-error', {
-                message: error instanceof Error ? error.message : 'Unknown error',
+                message: msg,
+                code: code || undefined,
             });
             setStatus('error');
-            setMessage('An unexpected error occurred');
+            setMessage('Upload or processing failed');
+            setErrorDetails(code ? `${code}: ${msg}` : msg);
+            setErrorHint(
+                /storage\/|permission-denied/i.test(`${code} ${msg}`)
+                    ? 'Allow reads/writes in Firebase Storage rules for path flyers/*, and Firestore rules for flyers.'
+                    : null
+            );
         } finally {
             setUploading(false);
         }
@@ -162,6 +202,8 @@ export default function UploadForm() {
         setMessage('');
         setExtracted(null);
         setSavedId(null);
+        setErrorDetails(null);
+        setErrorHint(null);
     };
 
     return (
@@ -188,6 +230,10 @@ export default function UploadForm() {
                                             <p className="pl-1">or drag and drop</p>
                                         </div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
+                                        <p className="text-xs text-amber-800/90 dark:text-amber-200/90 max-w-xs mx-auto mt-2 leading-snug">
+                                            Flyers must show a <strong>date</strong>, <strong>time</strong> (start and/or end),
+                                            and <strong>where</strong> it happens — otherwise we won&apos;t save the upload.
+                                        </p>
                                     </>
                                 ) : (
                                     <div className="relative group/preview">
@@ -222,8 +268,16 @@ export default function UploadForm() {
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                                     </svg>
                                 </div>
-                                <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-red-800">{message}</h3>
+                                <div className="ml-3 space-y-2">
+                                    <h3 className="text-sm font-medium text-red-800 dark:text-red-200">{message}</h3>
+                                    {errorDetails && (
+                                        <pre className="text-xs text-red-900/90 whitespace-pre-wrap break-words font-mono bg-red-100/80 dark:bg-red-950/50 dark:text-red-100 rounded-md p-2 border border-red-200/80 dark:border-red-900">
+                                            {errorDetails}
+                                        </pre>
+                                    )}
+                                    {errorHint && (
+                                        <p className="text-xs text-red-900/90 dark:text-red-200/90">{errorHint}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -264,7 +318,13 @@ export default function UploadForm() {
                                 Extracted Details
                             </h3>
                             <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
-                                {savedId ? `Saved to data/events.json as ${savedId}` : 'Saved to data/events.json'}
+                                {process.env.NEXT_PUBLIC_BACKEND_MODE === 'firebase'
+                                    ? savedId
+                                        ? `Saved to Firestore (flyers/${savedId})`
+                                        : 'Saved to Firestore'
+                                    : savedId
+                                      ? `Saved to data/events.json as ${savedId}`
+                                      : 'Saved to data/events.json'}
                             </p>
                         </div>
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-brand-orange/10 text-brand-orange border border-brand-orange/20 dark:bg-brand-orange/15">
@@ -420,8 +480,17 @@ export default function UploadForm() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start">
-                                        <p className="text-base font-serif font-bold text-gray-900 truncate pr-4 dark:text-gray-50" title={flyer.originalFilename}>
-                                            {flyer.originalFilename}
+                                        <p
+                                            className="text-base font-serif font-bold text-gray-900 truncate pr-4 dark:text-gray-50"
+                                            title={
+                                                flyer.extractedEvent?.title?.trim()
+                                                    ? flyer.extractedEvent.title
+                                                    : flyer.originalFilename
+                                            }
+                                        >
+                                            {flyer.extractedEvent?.title?.trim()
+                                                ? flyer.extractedEvent.title
+                                                : flyer.originalFilename}
                                         </p>
                                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${flyer.status === 'available' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-gray-100 text-gray-600'
                                             }`}>

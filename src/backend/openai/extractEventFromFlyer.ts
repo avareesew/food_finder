@@ -1,4 +1,5 @@
 import { requireEnv } from '@/backend/env';
+import { coerceExtractedDateToYyyyMmDd } from '@/lib/eventTiming';
 
 export type FoodCategory =
   | 'pizza'
@@ -62,11 +63,15 @@ function normalize(input: unknown): ExtractedEvent {
     'other',
   ]);
 
+  const rawDate = typeof obj?.date === 'string' ? obj.date.trim() : null;
+  const date =
+    rawDate != null ? (coerceExtractedDateToYyyyMmDd(rawDate) ?? rawDate) : null;
+
   return {
     title: typeof obj?.title === 'string' ? obj.title : null,
     host: typeof obj?.host === 'string' ? obj.host : null,
     campus: typeof obj?.campus === 'string' ? obj.campus : null,
-    date: typeof obj?.date === 'string' ? obj.date : null,
+    date,
     startTime: typeof obj?.startTime === 'string' ? obj.startTime : null,
     endTime: typeof obj?.endTime === 'string' ? obj.endTime : null,
     place: typeof obj?.place === 'string' ? obj.place : null,
@@ -155,6 +160,7 @@ export async function extractEventFromFlyerWithOpenAI(args: {
       ],
       temperature: 0,
     }),
+    signal: AbortSignal.timeout(120_000),
   });
 
   if (!res.ok) {

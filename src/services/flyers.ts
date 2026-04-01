@@ -12,15 +12,22 @@ import {
     Timestamp
 } from 'firebase/firestore';
 import { logger } from '@/lib/logger';
+import type { ExtractedEvent } from '@/backend/openai/extractEventFromFlyer';
+
+/** Firestore Timestamp or JSON from GET /api/flyers (plain { seconds, nanoseconds }). */
+export type FlyerCreatedAt = Timestamp | { seconds: number; nanoseconds?: number };
 
 export interface Flyer {
     id?: string;
-    createdAt: Timestamp;
+    createdAt: FlyerCreatedAt;
     originalFilename: string;
     storagePath: string;
     downloadURL: string;
     status: string;
     uploader?: string;
+    extractedEvent?: ExtractedEvent | null;
+    rawModelOutput?: string | null;
+    extractionError?: string | null;
 }
 
 const FLYERS_COLLECTION = 'flyers';
@@ -33,8 +40,10 @@ export async function createFlyer(data: Omit<Flyer, 'id' | 'createdAt'>) {
         logger.info('create-flyer-start', {
             originalFilename: data.originalFilename,
         });
+        // Firestore rejects `undefined` anywhere in the document; JSON round-trip drops undefined keys.
+        const sanitized = JSON.parse(JSON.stringify(data)) as Omit<Flyer, 'id' | 'createdAt'>;
         const docRef = await addDoc(collection(db, FLYERS_COLLECTION), {
-            ...data,
+            ...sanitized,
             createdAt: serverTimestamp(),
         });
         logger.info('create-flyer-success', {
@@ -50,11 +59,25 @@ export async function createFlyer(data: Omit<Flyer, 'id' | 'createdAt'>) {
 }
 
 /**
- * Fetches recent flyers from Firestore
+ * Fetches recent flyers. In `firebase` mode the browser uses GET /api/flyers (Admin SDK) so
+ * Firestore security rules can stay locked down. Local / server still uses the client SDK where needed.
  */
 export async function getRecentFlyers(limitCount = 10) {
     try {
         logger.info('get-recent-flyers-start', { limitCount });
+
+        if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_BACKEND_MODE === 'firebase') {
+            const res = await fetch(`/api/flyers?limit=${limitCount}`);
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                throw new Error(
+                    typeof body.details === 'string' ? body.details : `HTTP ${res.status}`
+                );
+            }
+            const json = (await res.json()) as { flyers?: Flyer[] };
+            return Array.isArray(json.flyers) ? json.flyers : [];
+        }
+
         const q = query(
             collection(db, FLYERS_COLLECTION),
             orderBy('createdAt', 'desc'),
@@ -109,19 +132,38 @@ export async function getFlyer(id: string): Promise<Flyer | null> {
         return mockData[id] || null;
     }
 
-    // Real Firestore Data
     try {
         logger.info('get-flyer-start', { id });
+
+        if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_BACKEND_MODE === 'firebase') {
+            const res = await fetch(`/api/flyers/${encodeURIComponent(id)}`);
+            if (res.status === 404) {
+                logger.warn('get-flyer-missing', { id });
+                return null;
+            }
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                throw new Error(
+                    typeof body.details === 'string' ? body.details : `HTTP ${res.status}`
+                );
+            }
+            const json = (await res.json()) as { flyer?: Flyer };
+            if (json.flyer) {
+                logger.info('get-flyer-success', { id });
+                return json.flyer;
+            }
+            return null;
+        }
+
         const docRef = doc(db, FLYERS_COLLECTION, id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
             logger.info('get-flyer-success', { id });
             return { id: docSnap.id, ...docSnap.data() } as Flyer;
-        } else {
-            logger.warn('get-flyer-missing', { id });
-            return null;
         }
+        logger.warn('get-flyer-missing', { id });
+        return null;
     } catch (error) {
         logger.error('get-flyer-failure', {
             message: error instanceof Error ? error.message : 'Unknown error',

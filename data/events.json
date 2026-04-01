@@ -189,5 +189,53 @@
       "other": null
     },
     "rawModelOutput": "{\n  \"title\": \"\\\"CHILL OUT\\\" Closing Social\",\n  \"host\": \"AIS\",\n  \"campus\": null,\n  \"date\": \"2023-12-05\",\n  \"startTime\": \"17:00\",\n  \"endTime\": \"19:00\",\n  \"place\": \"Location TBD\",\n  \"food\": \"Christmas Dinner for the first 200 people\",\n  \"foodCategory\": \"meal\",\n  \"details\": \"Hot Chocolate Bar, Service Project, and Games.\",\n  \"other\": null\n}"
+  },
+  {
+    "id": "extract_1772140885621",
+    "createdAtIso": "2026-02-26T21:21:25.621Z",
+    "source": {
+      "originalFilename": "IS Temple Trip Flyer.png",
+      "mimeType": "image/png",
+      "sizeBytes": 2018372
+    },
+    "imageUrl": "/uploads/1772140879329_IS_Temple_Trip_Flyer.png",
+    "event": {
+      "title": "IS Temple Trip",
+      "host": "IS",
+      "campus": "BYU",
+      "date": "2026-02-27",
+      "startTime": "11:00",
+      "endTime": null,
+      "place": "Provo City Center Temple, 50 S University Ave, Provo, UT 84601",
+      "food": null,
+      "foodCategory": null,
+      "details": "Join us to participate in temple endowments or baptisms!",
+      "other": null
+    },
+    "rawModelOutput": "{\n  \"title\": \"IS Temple Trip\",\n  \"host\": \"IS\",\n  \"campus\": \"BYU\",\n  \"date\": \"2026-02-27\",\n  \"startTime\": \"11:00\",\n  \"endTime\": null,\n  \"place\": \"Provo City Center Temple, 50 S University Ave, Provo, UT 84601\",\n  \"food\": null,\n  \"foodCategory\": null,\n  \"details\": \"Join us to participate in temple endowments or baptisms!\",\n  \"other\": null\n}"
+  },
+  {
+    "id": "extract_1772481006002",
+    "createdAtIso": "2026-03-02T19:50:06.002Z",
+    "source": {
+      "originalFilename": "IMG_9300.PNG",
+      "mimeType": "image/png",
+      "sizeBytes": 2509621
+    },
+    "imageUrl": "/uploads/1772481000793_IMG_9300.PNG",
+    "event": {
+      "title": "PROFESSIONAL DEVELOPMENT PANEL",
+      "host": null,
+      "campus": null,
+      "date": "2026-02-25",
+      "startTime": "19:00",
+      "endTime": null,
+      "place": "TNRB W328",
+      "food": "refreshments",
+      "foodCategory": "refreshments",
+      "details": null,
+      "other": null
+    },
+    "rawModelOutput": "{\n  \"title\": \"PROFESSIONAL DEVELOPMENT PANEL\",\n  \"host\": null,\n  \"campus\": null,\n  \"date\": \"2026-02-25\",\n  \"startTime\": \"19:00\",\n  \"endTime\": null,\n  \"place\": \"TNRB W328\",\n  \"food\": \"refreshments\",\n  \"foodCategory\": \"refreshments\",\n  \"details\": null,\n  \"other\": null\n}"
   }
 ]

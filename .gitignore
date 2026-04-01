@@ -40,6 +40,9 @@ firestore-debug.log
 **/config/keys.json
 credentials.json
 service-account.json
+.secrets/*
+!.secrets/README.txt
+*-firebase-adminsdk-*.json
 
 # Logs
 logs/

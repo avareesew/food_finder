@@ -1,6 +1,9 @@
+import { unlink } from 'node:fs/promises';
+import path from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
 import { appendEvent, saveUpload } from '@/backend/local/eventsStore';
 import { extractFlyerWithOpenAI } from '@/backend/openai/extractFlyer';
+import { validateOpenAIExtractionRequired } from '@/lib/validateFlyerExtraction';
 
 /**
  * Local-first MVP endpoint (NOT for production/serverless persistence):
@@ -31,7 +34,20 @@ export async function POST(request: NextRequest) {
       campusTimezone: 'America/Denver',
     });
 
-    // 3) Append to data/events.json
+    const openAiVal = validateOpenAIExtractionRequired(extraction);
+    if (!openAiVal.ok) {
+      await unlink(path.join(process.cwd(), relPath)).catch(() => {});
+      return NextResponse.json(
+        {
+          error: 'Flyer not saved',
+          details: openAiVal.message,
+          missing: openAiVal.missing,
+          validationFailed: true,
+        },
+        { status: 422 }
+      );
+    }
+
     const record = await appendEvent({
       id: `local_${Date.now()}`,
       createdAtIso: new Date().toISOString(),
