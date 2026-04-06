@@ -1,0 +1,39 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyIdTokenFromAuthorizationHeader } from '@/backend/auth/verifyBearer';
+import {
+    getConfiguredAdminEmail,
+    getProfileDoc,
+    isConfiguredAdminEmail,
+    userMayUploadFlyer,
+} from '@/backend/auth/userProfiles';
+import { isByuEmail, normalizeEmail } from '@/lib/authShared';
+
+export async function GET(request: NextRequest) {
+    try {
+        const decoded = await verifyIdTokenFromAuthorizationHeader(request.headers.get('authorization'));
+        const email = decoded.email;
+        if (!email) {
+            return NextResponse.json({ error: 'Signed-in account has no email' }, { status: 403 });
+        }
+        const normalized = normalizeEmail(email);
+        if (!isByuEmail(normalized)) {
+            return NextResponse.json({ error: 'Only @byu.edu accounts are allowed.' }, { status: 403 });
+        }
+        const isAdmin = isConfiguredAdminEmail(normalized);
+        const mayUpload = await userMayUploadFlyer(decoded.uid, normalized);
+        const profile = await getProfileDoc(decoded.uid);
+        const tokenName = typeof decoded.name === 'string' && decoded.name.trim() ? decoded.name.trim() : null;
+        const displayName = profile?.displayName ?? tokenName;
+        return NextResponse.json({
+            uid: decoded.uid,
+            email: normalized,
+            displayName,
+            canUpload: mayUpload,
+            isAdmin,
+            adminEmailConfigured: Boolean(getConfiguredAdminEmail()),
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unauthorized';
+        return NextResponse.json({ error: message }, { status: 401 });
+    }
+}

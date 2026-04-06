@@ -10,6 +10,14 @@ export type StoredExtractionRecord = {
     originalFilename: string;
     mimeType: string;
     sizeBytes: number;
+    /** Plain-text Slack ingest (no image) */
+    sourceType?: 'flyer' | 'slack_text';
+    slackFileId?: string;
+    slackChannelId?: string;
+    slackTeamId?: string;
+    slackMessageTs?: string;
+    slackWorkspaceName?: string;
+    slackWorkspaceLabel?: string;
   };
   imageUrl?: string | null;
   event: ExtractedEvent;

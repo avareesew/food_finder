@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Managed only via Firebase Admin SDK (Next.js API routes). Do not expose writes to the browser.
+    match /userProfiles/{userId} {
+      allow read, write: if false;
+    }
+
+    // Existing collections: keep or tighten to match your deployment. Flyers are often written by Admin SDK only.
+    match /flyers/{flyerId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

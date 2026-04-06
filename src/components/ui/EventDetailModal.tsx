@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { getFlyer, type Flyer } from '@/services/flyers';
-import PrimaryButton from '@/components/ui/PrimaryButton';
 import {
     coerceExtractedDateToYyyyMmDd,
     formatEventDateLabel,
@@ -16,22 +14,31 @@ type Props = {
     open: boolean;
     flyerId: string | null;
     onClose: () => void;
+    /** When provided for this `flyerId`, skip network fetch (local JSON / feed already has the row). */
+    initialFlyer?: Flyer | null;
 };
 
 /**
  * Large overlay (not full-screen) with split flyer + details, dark-themed to match Discover/home in dark mode.
  */
-export default function EventDetailModal({ open, flyerId, onClose }: Props) {
+export default function EventDetailModal({ open, flyerId, onClose, initialFlyer = null }: Props) {
     const [flyer, setFlyer] = useState<Flyer | null>(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (!open || !flyerId) {
             setFlyer(null);
+            setLoading(false);
+            return;
+        }
+        if (initialFlyer && initialFlyer.id === flyerId) {
+            setFlyer(initialFlyer);
+            setLoading(false);
             return;
         }
         let cancelled = false;
         setLoading(true);
+        setFlyer(null);
         getFlyer(flyerId)
             .then((f) => {
                 if (!cancelled) setFlyer(f);
@@ -42,7 +49,7 @@ export default function EventDetailModal({ open, flyerId, onClose }: Props) {
         return () => {
             cancelled = true;
         };
-    }, [open, flyerId]);
+    }, [open, flyerId, initialFlyer]);
 
     useEffect(() => {
         if (!open) return;
@@ -108,7 +115,7 @@ export default function EventDetailModal({ open, flyerId, onClose }: Props) {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="event-detail-modal-title"
-                className="relative flex w-full max-w-[min(94vw,72rem)] max-h-[min(88vh,46rem)] flex-col overflow-hidden rounded-3xl border border-gray-800 bg-gray-950 text-gray-100 shadow-[0_25px_80px_-20px_rgba(0,0,0,0.85)] md:max-h-[min(92vh,56rem)] md:flex-row"
+                className="relative flex w-full max-w-[min(96vw,80rem)] max-h-[min(92vh,52rem)] flex-col overflow-hidden rounded-3xl border border-gray-800 bg-gray-950 text-gray-100 shadow-[0_25px_80px_-20px_rgba(0,0,0,0.85)] md:max-h-[min(94vh,56rem)] md:flex-row"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
@@ -122,21 +129,31 @@ export default function EventDetailModal({ open, flyerId, onClose }: Props) {
                     </svg>
                 </button>
 
-                {/* Flyer image — left */}
-                <div className="relative h-[38vh] max-h-[280px] shrink-0 overflow-hidden bg-gray-900 md:h-auto md:max-h-none md:w-[min(44%,420px)] md:min-h-[320px]">
+                {/* Flyer image — left: full image visible (letterboxing OK) */}
+                <div className="relative flex min-h-[32vh] max-h-[42vh] w-full shrink-0 items-center justify-center overflow-hidden bg-gray-900 px-3 py-4 md:min-h-0 md:max-h-none md:h-auto md:w-[min(48%,560px)] md:max-w-[560px] md:self-stretch md:px-6 md:py-8">
                     {loading ? (
-                        <div className="h-full w-full animate-pulse bg-gray-800" />
+                        <div className="h-48 w-full max-w-md animate-pulse rounded-2xl bg-gray-800 md:h-96" />
                     ) : flyer?.downloadURL ? (
                         // eslint-disable-next-line @next/next/no-img-element -- remote flyer URL
                         <img
                             src={flyer.downloadURL}
                             alt=""
-                            className="h-full w-full object-cover md:absolute md:inset-0 md:h-full"
+                            referrerPolicy="no-referrer"
+                            className="max-h-[min(40vh,360px)] w-auto max-w-full object-contain md:max-h-[min(86vh,720px)]"
                         />
                     ) : (
-                        <div className="flex h-full w-full items-center justify-center text-7xl opacity-25">🍕</div>
+                        <div className="flex min-h-[12rem] w-full flex-col items-center justify-center gap-3 px-4">
+                            <span className="text-[5.5rem] leading-none sm:text-8xl" aria-hidden>
+                                {(() => {
+                                    const fe = flyer?.extractedEvent?.foodEmoji;
+                                    return typeof fe === 'string' && fe.trim() ? fe.trim() : '🍽️';
+                                })()}
+                            </span>
+                            <p className="text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                {flyer?.sourceType === 'slack_text' ? 'No flyer · Slack text' : 'No image on file'}
+                            </p>
+                        </div>
                     )}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-950/80 via-transparent to-transparent md:hidden" />
                 </div>
 
                 {/* Details — right, scrollable */}
@@ -266,39 +283,8 @@ export default function EventDetailModal({ open, flyerId, onClose }: Props) {
                                 </div>
                             </div>
 
-                            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                                <PrimaryButton
-                                    type="button"
-                                    className="flex-1 py-4 text-base sm:py-5 sm:text-lg"
-                                    onClick={onClose}
-                                >
-                                    I&apos;m going! 🎉
-                                </PrimaryButton>
-                                <button
-                                    type="button"
-                                    className="flex h-14 w-full shrink-0 items-center justify-center rounded-2xl border border-gray-700 bg-gray-900 text-gray-400 transition hover:border-brand-orange hover:text-brand-orange sm:h-[3.25rem] sm:w-14"
-                                    aria-label="Share"
-                                >
-                                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <p className="mt-5 text-center text-xs text-gray-500 sm:text-left">
-                                Click outside or press Esc to return ·{' '}
-                                <Link
-                                    href={`/events/${flyerId}`}
-                                    className="font-semibold text-brand-orange hover:underline"
-                                    onClick={onClose}
-                                >
-                                    Open full page
-                                </Link>
+                            <p className="mt-8 text-center text-xs text-gray-500 sm:text-left">
+                                Click outside or press Esc to close.
                             </p>
                         </>
                     )}

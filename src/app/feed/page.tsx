@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Timestamp } from 'firebase/firestore';
-import { getRecentFlyers, Flyer } from '@/services/flyers';
+import { getRecentFlyers, type Flyer } from '@/services/flyers';
+import { homePreviewRecordToFlyer } from '@/lib/homeDiscoverPreview';
 import EventCard from '@/components/ui/EventCard';
+import EventDetailModal from '@/components/ui/EventDetailModal';
 import EmptyState from '@/components/ui/EmptyState';
 import LocalEventCard from '@/components/ui/LocalEventCard';
 
@@ -30,6 +32,19 @@ export default function FeedPage() {
     const [flyers, setFlyers] = useState<Flyer[]>([]);
     const [localRecords, setLocalRecords] = useState<LocalRecord[]>([]);
     const [loading, setLoading] = useState(true);
+    const [detailFlyerId, setDetailFlyerId] = useState<string | null>(null);
+    const [detailInitialFlyer, setDetailInitialFlyer] = useState<Flyer | null>(null);
+
+    const closeDetail = useCallback(() => {
+        setDetailFlyerId(null);
+        setDetailInitialFlyer(null);
+    }, []);
+
+    const openFirebaseDetail = useCallback((id: string) => {
+        const row = flyers.find((f) => f.id === id) ?? null;
+        setDetailInitialFlyer(row);
+        setDetailFlyerId(id);
+    }, [flyers]);
 
     useEffect(() => {
         if (process.env.NEXT_PUBLIC_BACKEND_MODE === 'local') {
@@ -100,6 +115,12 @@ export default function FeedPage() {
 
     return (
         <main className="min-h-screen pt-28 pb-12 dark:bg-gray-950 bg-[radial-gradient(1200px_circle_at_20%_0%,rgba(255,90,31,0.10),transparent_55%),radial-gradient(900px_circle_at_90%_10%,rgba(255,90,31,0.06),transparent_50%)] bg-brand-canvas">
+            <EventDetailModal
+                open={detailFlyerId !== null}
+                flyerId={detailFlyerId}
+                initialFlyer={detailInitialFlyer}
+                onClose={closeDetail}
+            />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}
@@ -130,7 +151,7 @@ export default function FeedPage() {
                 </div>
 
                 {/* Light-mode section framing to reduce "empty" feel */}
-                <div className="rounded-[2.25rem] border border-gray-200/70 bg-white/55 backdrop-blur-sm p-4 sm:p-6 shadow-soft dark:border-gray-800 dark:bg-transparent dark:shadow-none">
+                <div className="rounded-[2.25rem] border border-gray-200/70 bg-white/80 p-4 sm:p-6 shadow-soft dark:border-gray-800 dark:bg-gray-950/40 dark:shadow-none">
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -143,6 +164,10 @@ export default function FeedPage() {
                             {localRecords.map((r) => (
                                 <LocalEventCard
                                     key={r.id}
+                                    onOpen={() => {
+                                        setDetailFlyerId(r.id);
+                                        setDetailInitialFlyer(homePreviewRecordToFlyer(r));
+                                    }}
                                     imageUrl={r.imageUrl}
                                     title={r.event.title ?? 'Untitled Event'}
                                     place={r.event.place}
@@ -182,6 +207,7 @@ export default function FeedPage() {
                                 <EventCard
                                     key={flyer.id}
                                     id={flyer.id!}
+                                    onOpenDetails={openFirebaseDetail}
                                     eventName={title}
                                     location={typeof ev?.place === 'string' ? ev.place : undefined}
                                     description={desc}
@@ -190,8 +216,9 @@ export default function FeedPage() {
                                     eventEndTime={typeof ev?.endTime === 'string' ? ev.endTime : null}
                                     food={typeof ev?.food === 'string' ? ev.food : null}
                                     foodCategory={typeof ev?.foodCategory === 'string' ? ev.foodCategory : null}
+                                    foodEmoji={typeof ev?.foodEmoji === 'string' ? ev.foodEmoji : null}
                                     status={cardStatus}
-                                    imageUrl={flyer.downloadURL}
+                                    imageUrl={flyer.downloadURL || undefined}
                                     createdAt={flyer.createdAt}
                                 />
                             );

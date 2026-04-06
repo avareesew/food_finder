@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
@@ -34,8 +35,10 @@ export default function RootLayout({
 })();`.trim(),
           }}
         />
-        <Navbar />
-        {children}
+        <AuthProvider>
+          <Navbar />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

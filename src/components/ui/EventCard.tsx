@@ -1,6 +1,6 @@
 import { formatDistance } from 'date-fns';
 import type { Timestamp } from 'firebase/firestore';
-import { useState, useEffect, useMemo, type KeyboardEvent, type MouseEvent } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     coerceExtractedDateToYyyyMmDd,
     formatEventDateLabel,
@@ -8,7 +8,6 @@ import {
     isCampusEventEnded,
     resolveCampusEventYyyyMmDd,
 } from '@/lib/eventTiming';
-import EventDetailModal from '@/components/ui/EventDetailModal';
 
 type CreatedAtLike = Timestamp | { seconds: number; nanoseconds?: number };
 
@@ -19,6 +18,7 @@ function createdAtToMs(createdAt: CreatedAtLike): number {
 
 interface EventCardProps {
     id: string;
+    onOpenDetails: (id: string) => void;
     eventName?: string;
     location?: string;
     description?: string | null;
@@ -28,6 +28,8 @@ interface EventCardProps {
     eventEndTime?: string | null;
     food?: string | null;
     foodCategory?: string | null;
+    /** Shown when there is no flyer image (e.g. Slack text) */
+    foodEmoji?: string | null;
     startTime?: Timestamp;
     status: string;
     imageUrl?: string;
@@ -57,6 +59,7 @@ function FoodUtensilsIcon({ className }: { className?: string }) {
 
 export default function EventCard({
     id,
+    onOpenDetails,
     eventName,
     location,
     description,
@@ -65,6 +68,7 @@ export default function EventCard({
     eventEndTime,
     food,
     foodCategory,
+    foodEmoji,
     startTime,
     status,
     imageUrl,
@@ -111,45 +115,48 @@ export default function EventCard({
     }, [hasReliableEventDate, status, eventDate, eventEndTime, eventStartTime]);
 
     const [imgFailed, setImgFailed] = useState(false);
-    const [detailOpen, setDetailOpen] = useState(false);
     useEffect(() => {
         setImgFailed(false);
     }, [imageUrl]);
 
-    function openDetail(e: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) {
-        if ('key' in e && e.key !== 'Enter' && e.key !== ' ') return;
-        if ('key' in e) e.preventDefault();
-        setDetailOpen(true);
-    }
-
     return (
-        <>
-            <EventDetailModal open={detailOpen} flyerId={id} onClose={() => setDetailOpen(false)} />
-            <article
-                role="button"
-                tabIndex={0}
-                aria-label={`Open details for ${title}`}
-                onClick={openDetail}
-                onKeyDown={openDetail}
-                className={`relative block group h-full cursor-pointer overflow-hidden rounded-[1.5rem] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.08)] border transition-all duration-300 flex flex-col group-hover:-translate-y-1 dark:bg-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 ${
-                    eventEnded
-                        ? 'border-gray-200/80 opacity-[0.92] dark:border-gray-700'
-                        : 'border-gray-100 dark:border-gray-800'
-                } bg-white dark:bg-gray-900`}
-            >
+        <div
+            role="button"
+            tabIndex={0}
+            onClick={() => onOpenDetails(id)}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onOpenDetails(id);
+                }
+            }}
+            className={`relative group h-full w-full cursor-pointer overflow-hidden rounded-[1.5rem] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.08)] border transition-all duration-300 flex flex-col group-hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950 ${
+                eventEnded
+                    ? 'border-gray-200/80 opacity-[0.92] dark:border-gray-700'
+                    : 'border-gray-100 dark:border-gray-800'
+            } bg-white dark:bg-gray-900`}
+            aria-label={`Open details for ${title}`}
+        >
+            <div className="flex h-full flex-col">
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
                     {imageUrl && !imgFailed ? (
                         <img
                             src={imageUrl}
                             alt={title}
+                            referrerPolicy="no-referrer"
                             className={`relative z-0 w-full h-full object-cover transition-transform duration-700 ease-out ${
                                 eventEnded ? 'brightness-[0.88]' : 'group-hover:scale-105'
                             }`}
                             onError={() => setImgFailed(true)}
                         />
                     ) : (
-                        <div className="relative z-0 flex h-full w-full items-center justify-center bg-orange-50/50 dark:bg-gray-800">
-                            <span className="text-4xl filter drop-shadow-sm">🍕</span>
+                        <div className="relative z-0 flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-orange-50/90 to-amber-50/80 px-4 dark:from-gray-800 dark:to-gray-900">
+                            <span className="text-6xl leading-none filter drop-shadow-sm sm:text-7xl" aria-hidden>
+                                {(foodEmoji && foodEmoji.trim()) || '🍽️'}
+                            </span>
+                            <span className="text-center text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                Text post · no flyer
+                            </span>
                         </div>
                     )}
 
@@ -265,14 +272,14 @@ export default function EventCard({
 
                     <div className="mt-auto pt-4 flex items-center justify-between">
                         <span className="text-xs font-semibold text-brand-orange flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-                            View details
+                            View flyer & details
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </span>
                     </div>
                 </div>
-            </article>
-        </>
+            </div>
+        </div>
     );
 }

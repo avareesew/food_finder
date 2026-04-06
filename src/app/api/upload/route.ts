@@ -6,6 +6,9 @@ import { extractFlyerWithOpenAI } from '@/backend/openai/extractFlyer';
 import { processUploadedFlyer } from '@/backend/flyers/processUploadedFlyer';
 import { uploadBytesToStorage } from '@/backend/flyers/storageAdminUpload';
 import { validateOpenAIExtractionRequired } from '@/lib/validateFlyerExtraction';
+import { verifyIdTokenFromAuthorizationHeader } from '@/backend/auth/verifyBearer';
+import { userMayUploadFlyer } from '@/backend/auth/userProfiles';
+import { isByuEmail, normalizeEmail } from '@/lib/authShared';
 
 export async function POST(request: NextRequest) {
     try {
@@ -29,6 +32,41 @@ export async function POST(request: NextRequest) {
          * then extraction + Firestore on the server.
          */
         if (firebaseBucket) {
+            let uid: string;
+            let emailNorm: string;
+            try {
+                const decoded = await verifyIdTokenFromAuthorizationHeader(
+                    request.headers.get('authorization')
+                );
+                const email = decoded.email;
+                if (!email || !isByuEmail(email)) {
+                    return NextResponse.json(
+                        { error: 'Sign in with your @byu.edu account to upload.' },
+                        { status: 403 }
+                    );
+                }
+                emailNorm = normalizeEmail(email);
+                uid = decoded.uid;
+                const allowed = await userMayUploadFlyer(uid, emailNorm);
+                if (!allowed) {
+                    return NextResponse.json(
+                        {
+                            error: 'Upload not enabled for your account yet.',
+                            hint: 'Ask the site admin to turn on flyer upload for your email.',
+                        },
+                        { status: 403 }
+                    );
+                }
+            } catch {
+                return NextResponse.json(
+                    {
+                        error: 'Sign in required',
+                        hint: 'Sign in at /login with your @byu.edu account, then try again.',
+                    },
+                    { status: 401 }
+                );
+            }
+
             const timestamp = Date.now();
             const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
             const storagePath = `flyers/${timestamp}_${safeFilename || 'flyer'}`;

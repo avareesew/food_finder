@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 type LocalEventCardProps = {
+  onOpen?: () => void;
   imageUrl?: string | null;
   title: string;
   place?: string | null;
@@ -65,7 +66,7 @@ export default function LocalEventCard(props: LocalEventCardProps) {
 
   const resolvedImageUrl = props.imageUrl;
 
-  return (
+  const article = (
     <article className="bg-gray-50 rounded-[1.85rem] border border-gray-200 shadow-[0_8px_30px_-18px_rgba(0,0,0,0.25)] hover:shadow-[0_18px_44px_-20px_rgba(0,0,0,0.35)] overflow-hidden transition-all duration-300 h-full flex flex-col hover:-translate-y-0.5 ring-1 ring-brand-orange/10 dark:bg-gray-900 dark:border-gray-800 dark:ring-0">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 border-b border-gray-100 dark:bg-gray-800 dark:border-gray-800">
         {/* Warm overlay for light mode to add depth */}
@@ -74,6 +75,7 @@ export default function LocalEventCard(props: LocalEventCardProps) {
           <img
             src={resolvedImageUrl}
             alt={props.title}
+            referrerPolicy="no-referrer"
             className="w-full h-full object-cover"
             onError={() => setImgFailed(true)}
           />
@@ -126,5 +128,27 @@ export default function LocalEventCard(props: LocalEventCardProps) {
       </div>
     </article>
   );
+
+  if (props.onOpen) {
+    return (
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={props.onOpen}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            props.onOpen?.();
+          }
+        }}
+        className="block h-full w-full rounded-[1.85rem] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+        aria-label={`Open details for ${props.title}`}
+      >
+        {article}
+      </div>
+    );
+  }
+
+  return article;
 }
 

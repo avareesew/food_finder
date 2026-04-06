@@ -28,6 +28,15 @@ export interface Flyer {
     extractedEvent?: ExtractedEvent | null;
     rawModelOutput?: string | null;
     extractionError?: string | null;
+    /** Present when this row was ingested from Slack */
+    slackTeamId?: string;
+    slackChannelId?: string;
+    slackFileId?: string;
+    slackWorkspaceName?: string;
+    slackWorkspaceLabel?: string;
+    slackMessageTs?: string;
+    /** No image — e.g. Slack text ingest */
+    sourceType?: 'flyer' | 'slack_text';
 }
 
 const FLYERS_COLLECTION = 'flyers';

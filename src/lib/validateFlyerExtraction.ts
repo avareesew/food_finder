@@ -85,3 +85,28 @@ export function validateOpenAIExtractionRequired(ex: OpenAIExtraction): {
 
   return { ok: false, message, missing: uniq };
 }
+
+/** BYU campus default when Slack posts say TBA for location */
+export const SLACK_TBA_PLACE_FALLBACK = 'Tanner Building';
+
+/**
+ * If the place is clearly "to be announced", use the campus default building.
+ */
+export function applySlackTbaPlaceFallback(place: string | null | undefined): string | null {
+  if (place == null || typeof place !== 'string') return place ?? null;
+  const p = place.trim();
+  if (p.length < 2) return null;
+  const tba =
+    /^(tba|t\.b\.a\.|tbd|to be announced|to be determined|tb\s*a)$/i.test(p) ||
+    (/\btba\b/i.test(p) && p.length < 48);
+  if (tba) return SLACK_TBA_PLACE_FALLBACK;
+  return p;
+}
+
+/**
+ * Same required fields as a flyer, but applies TBA → Tanner Building before checking place.
+ */
+export function validateSlackTextExtractedEvent(ev: ExtractedEvent): ReturnType<typeof validateExtractedEventRequired> {
+  const place = applySlackTbaPlaceFallback(ev.place);
+  return validateExtractedEventRequired({ ...ev, place });
+}

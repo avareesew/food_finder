@@ -171,12 +171,22 @@ export default function EventDetailPage() {
                                 <img
                                     src={flyer.downloadURL}
                                     alt={displayTitle}
+                                    referrerPolicy="no-referrer"
                                     className={`h-full w-full object-cover ${eventEnded ? 'brightness-[0.88]' : ''}`}
                                     onError={() => setImgFailed(true)}
                                 />
                             ) : (
-                                <div className="flex h-full w-full items-center justify-center bg-orange-50/50 dark:bg-gray-800">
-                                    <span className="text-6xl opacity-30">🍕</span>
+                                <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-orange-50/90 to-amber-50/80 px-4 dark:from-gray-800 dark:to-gray-900">
+                                    <span className="text-7xl leading-none sm:text-8xl" aria-hidden>
+                                        {typeof ev?.foodEmoji === 'string' && ev.foodEmoji.trim()
+                                            ? ev.foodEmoji.trim()
+                                            : '🍽️'}
+                                    </span>
+                                    {flyer.sourceType === 'slack_text' ? (
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                                            Text post · no flyer
+                                        </span>
+                                    ) : null}
                                 </div>
                             )}
 

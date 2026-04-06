@@ -26,6 +26,8 @@ export type ExtractedEvent = {
   foodCategory: FoodCategory | null;
   details: string | null; // any extra helpful info (club name, agenda, notes)
   other: Record<string, unknown> | null; // optional extra extracted fields
+  /** Single display emoji for food (Slack text posts, optional elsewhere) */
+  foodEmoji?: string | null;
 };
 
 type ExtractResult = {
@@ -50,7 +52,7 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' ? (value as Record<string, unknown>) : null;
 }
 
-function normalize(input: unknown): ExtractedEvent {
+export function normalizeExtractedEvent(input: unknown): ExtractedEvent {
   const obj = asRecord(input);
   const fc = obj?.foodCategory;
   const allowed: Set<string> = new Set([
@@ -67,6 +69,7 @@ function normalize(input: unknown): ExtractedEvent {
   const date =
     rawDate != null ? (coerceExtractedDateToYyyyMmDd(rawDate) ?? rawDate) : null;
 
+  const fe = obj?.foodEmoji;
   return {
     title: typeof obj?.title === 'string' ? obj.title : null,
     host: typeof obj?.host === 'string' ? obj.host : null,
@@ -79,6 +82,7 @@ function normalize(input: unknown): ExtractedEvent {
     foodCategory: typeof fc === 'string' && allowed.has(fc) ? (fc as FoodCategory) : null,
     details: typeof obj?.details === 'string' ? obj.details : null,
     other: obj?.other && typeof obj.other === 'object' ? (obj.other as Record<string, unknown>) : null,
+    foodEmoji: typeof fe === 'string' && fe.trim() ? fe.trim().slice(0, 8) : null,
   };
 }
 
@@ -127,7 +131,8 @@ export async function extractEventFromFlyerWithOpenAI(args: {
     `Use campus timezone: ${campusTimezone}.`,
     ``,
     `Return these keys EXACTLY:`,
-    `title, host, campus, date, startTime, endTime, place, food, foodCategory, details, other`,
+    `title, host, campus, date, startTime, endTime, place, food, foodCategory, details, other, foodEmoji`,
+    `- foodEmoji: one emoji for the food type (e.g. 🍕) or null if unclear.`,
     ``,
     `Formatting rules:`,
     `- date: "YYYY-MM-DD"`,
@@ -188,10 +193,11 @@ export async function extractEventFromFlyerWithOpenAI(args: {
         foodCategory: null,
         details: `Failed to parse JSON: ${parsed.error}`,
         other: null,
+        foodEmoji: null,
       },
     };
   }
 
-  return { rawModelOutput: String(rawModelOutput || ''), event: normalize(parsed.value) };
+  return { rawModelOutput: String(rawModelOutput || ''), event: normalizeExtractedEvent(parsed.value) };
 }
 

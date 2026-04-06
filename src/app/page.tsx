@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import WeeklyEventCalendar from '@/components/home/WeeklyEventCalendar';
+import EventDetailModal from '@/components/ui/EventDetailModal';
 import {
+  homePreviewRecordToFlyer,
   pickClosestUpcomingFromFlyers,
   type HomeDiscoverPreviewRecord,
 } from '@/lib/homeDiscoverPreview';
-import { getRecentFlyers } from '@/services/flyers';
+import { getRecentFlyers, type Flyer } from '@/services/flyers';
 
 type LocalApiUpcomingRecord = {
   id: string;
@@ -43,6 +45,8 @@ function localApiRecordToPreview(r: LocalApiUpcomingRecord): HomeDiscoverPreview
 export default function Home() {
   const [discoverPreview, setDiscoverPreview] = useState<HomeDiscoverPreviewRecord[]>([]);
   const [discoverPreviewLoading, setDiscoverPreviewLoading] = useState(true);
+  const [detailFlyerId, setDetailFlyerId] = useState<string | null>(null);
+  const [detailInitialFlyer, setDetailInitialFlyer] = useState<Flyer | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -72,8 +76,26 @@ export default function Home() {
     };
   }, []);
 
+  const openDiscoverPreview = (r: HomeDiscoverPreviewRecord) => {
+    setDetailFlyerId(r.id);
+    setDetailInitialFlyer(
+      process.env.NEXT_PUBLIC_BACKEND_MODE === 'local' ? homePreviewRecordToFlyer(r) : null
+    );
+  };
+
+  const closeDiscoverDetail = () => {
+    setDetailFlyerId(null);
+    setDetailInitialFlyer(null);
+  };
+
   return (
     <main className="min-h-screen bg-brand-canvas text-brand-black pt-28 pb-12 dark:bg-gray-950 dark:text-gray-50">
+      <EventDetailModal
+        open={detailFlyerId !== null}
+        flyerId={detailFlyerId}
+        initialFlyer={detailInitialFlyer}
+        onClose={closeDiscoverDetail}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* HERO */}
         <section className="text-center mb-16">
@@ -183,16 +205,25 @@ export default function Home() {
               </>
             ) : discoverPreview.length > 0 ? (
               discoverPreview.map((r) => (
-                  <Link
+                  <div
                     key={r.id}
-                    href={`/events/${r.id}`}
-                    className="block bg-white p-4 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer dark:bg-gray-900 dark:border-gray-800"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openDiscoverPreview(r)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openDiscoverPreview(r);
+                      }
+                    }}
+                    className="block bg-white p-4 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer dark:bg-gray-900 dark:border-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                   >
                     <div className="h-48 bg-gray-100 rounded-2xl mb-4 overflow-hidden relative dark:bg-gray-800">
                       {r.imageUrl ? (
                         <img
                           src={r.imageUrl}
                           alt={r.event.title ?? 'Event flyer'}
+                          referrerPolicy="no-referrer"
                           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
@@ -219,7 +250,7 @@ export default function Home() {
                         ) : null}
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 ))
             ) : (
               [1, 2, 3].map((i) => (

@@ -11,6 +11,7 @@ import {
   validateExtractedEventRequired,
   type FlyerRequiredMissing,
 } from '@/lib/validateFlyerExtraction';
+import { inferFoodEmoji } from '@/lib/foodEmoji';
 
 async function fetchBytesFromDownloadUrl(downloadURL: string): Promise<Uint8Array> {
   const res = await fetch(downloadURL, { signal: AbortSignal.timeout(60_000) });
@@ -30,6 +31,11 @@ async function createFlyerAdminDoc(data: {
   extractedEvent?: ExtractedEvent | null;
   rawModelOutput?: string | null;
   extractionError?: string | null;
+  slackTeamId?: string;
+  slackChannelId?: string;
+  slackFileId?: string;
+  slackWorkspaceName?: string;
+  slackWorkspaceLabel?: string;
 }): Promise<string> {
   ensureFirebaseAdminInitialized();
   const sanitized = JSON.parse(JSON.stringify(data)) as typeof data;
@@ -47,6 +53,14 @@ export type ProcessUploadedFlyerInput = {
   mimeType: string;
   /** When set (same bytes just uploaded), skips a redundant download from Storage — faster and avoids hangs. */
   imageBytes?: Uint8Array;
+  /** Set when ingesting from Slack (cron / sync). */
+  slackSource?: {
+    teamId: string;
+    channelId?: string;
+    fileId?: string;
+    workspaceName?: string;
+    workspaceLabel?: string;
+  };
 };
 
 export type ProcessUploadedFlyerResult = {
@@ -65,7 +79,7 @@ export type ProcessUploadedFlyerResult = {
  * Pass `imageBytes` when you already have the file in memory to avoid re-fetching the signed URL from Node.
  */
 export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Promise<ProcessUploadedFlyerResult> {
-  const { downloadURL, storagePath, originalFilename, mimeType, imageBytes: providedBytes } = args;
+  const { downloadURL, storagePath, originalFilename, mimeType, imageBytes: providedBytes, slackSource } = args;
 
   let imageBytes: Uint8Array;
   if (providedBytes && providedBytes.length > 0) {
@@ -106,6 +120,7 @@ export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Pro
       foodCategory: null,
       details: extractionError,
       other: null,
+      foodEmoji: null,
     };
     rawModelOutput = '';
   }
@@ -131,22 +146,32 @@ export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Pro
     };
   }
 
+  const extractedEventWithEmoji: ExtractedEvent = {
+    ...extractedEvent,
+    foodEmoji: extractedEvent.foodEmoji ?? inferFoodEmoji(extractedEvent.food, extractedEvent.foodCategory),
+  };
+
   const flyerId = await createFlyerAdminDoc({
     originalFilename,
     storagePath,
     downloadURL,
     status: 'extracted',
     uploader: 'anonymous',
-    extractedEvent,
+    extractedEvent: extractedEventWithEmoji,
     rawModelOutput,
     extractionError: null,
+    ...(slackSource?.teamId && { slackTeamId: slackSource.teamId }),
+    ...(slackSource?.channelId && { slackChannelId: slackSource.channelId }),
+    ...(slackSource?.fileId && { slackFileId: slackSource.fileId }),
+    ...(slackSource?.workspaceName && { slackWorkspaceName: slackSource.workspaceName }),
+    ...(slackSource?.workspaceLabel && { slackWorkspaceLabel: slackSource.workspaceLabel }),
   });
 
   return {
     flyerId,
     downloadURL,
     storagePath,
-    event: extractedEvent,
+    event: extractedEventWithEmoji,
     rawModelOutput,
     extractionError: null,
     rejectedReason: null,

@@ -1,3 +1,4 @@
+import type { ExtractedEvent, FoodCategory } from '@/backend/openai/extractEventFromFlyer';
 import type { Flyer } from '@/services/flyers';
 import {
   coerceExtractedDateToYyyyMmDd,
@@ -21,8 +22,52 @@ export type HomeDiscoverPreviewRecord = {
     food: string | null;
     foodCategory: string | null;
     details: string | null;
+    foodEmoji?: string | null;
   };
 };
+
+const FOOD_CATEGORIES: readonly FoodCategory[] = [
+  'pizza',
+  'dessert',
+  'snacks',
+  'refreshments',
+  'drinks',
+  'meal',
+  'other',
+] as const;
+
+function coerceFoodCategory(value: string | null): FoodCategory | null {
+  if (!value) return null;
+  return FOOD_CATEGORIES.includes(value as FoodCategory) ? (value as FoodCategory) : null;
+}
+
+/** Build a `Flyer` for the detail modal when data already lives in JSON preview (local / home). */
+export function homePreviewRecordToFlyer(r: HomeDiscoverPreviewRecord): Flyer {
+  const sec = Math.floor(new Date(r.createdAtIso).getTime() / 1000);
+  const ev: ExtractedEvent = {
+    title: r.event.title,
+    host: r.event.host,
+    campus: r.event.campus,
+    date: r.event.date,
+    startTime: r.event.startTime,
+    endTime: r.event.endTime,
+    place: r.event.place,
+    food: r.event.food,
+    foodCategory: coerceFoodCategory(r.event.foodCategory),
+    details: r.event.details,
+    other: null,
+    foodEmoji: r.event.foodEmoji ?? null,
+  };
+  return {
+    id: r.id,
+    createdAt: { seconds: Number.isFinite(sec) ? sec : Math.floor(Date.now() / 1000) },
+    originalFilename: r.event.title?.trim() || 'Event',
+    storagePath: '',
+    downloadURL: r.imageUrl ?? '',
+    status: 'available',
+    extractedEvent: ev,
+  };
+}
 
 function sortInstantMs(date: string, startTime: string | null): number {
   const t = startTime && /^\d{2}:\d{2}$/.test(startTime) ? `${startTime}:00` : '00:00:00';
@@ -66,6 +111,7 @@ export function flyerToHomeDiscoverPreview(f: Flyer): HomeDiscoverPreviewRecord 
       food: typeof ev?.food === 'string' ? ev.food : null,
       foodCategory: ev?.foodCategory != null ? String(ev.foodCategory) : null,
       details: typeof ev?.details === 'string' ? ev.details : null,
+      foodEmoji: typeof ev?.foodEmoji === 'string' ? ev.foodEmoji : null,
     },
   };
 }
