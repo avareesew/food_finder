@@ -9,6 +9,7 @@ import EventCard from '@/components/ui/EventCard';
 import EventDetailModal from '@/components/ui/EventDetailModal';
 import EmptyState from '@/components/ui/EmptyState';
 import LocalEventCard from '@/components/ui/LocalEventCard';
+import { logger } from '@/lib/logger';
 
 type LocalRecord = {
     id: string;
@@ -56,7 +57,7 @@ export default function FeedPage() {
                     recs.sort((a, b) => (b.createdAtIso || '').localeCompare(a.createdAtIso || ''));
                     setLocalRecords(recs);
                 } catch (err) {
-                    console.error(err);
+                    logger.error('feed-local-fetch-error', { message: err instanceof Error ? err.message : String(err) });
                 } finally {
                     setLoading(false);
                 }
@@ -105,7 +106,7 @@ export default function FeedPage() {
                     setFlyers(data);
                 }
             } catch (err) {
-                console.error('Feed fetch error:', err);
+                logger.error('feed-firebase-fetch-error', { message: err instanceof Error ? err.message : String(err) });
             } finally {
                 setLoading(false);
             }

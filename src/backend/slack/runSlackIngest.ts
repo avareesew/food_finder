@@ -17,6 +17,7 @@ import {
   markSlackTextMessageSeen,
 } from '@/backend/slack/slackDedupe';
 import { validateSlackTextExtractedEvent } from '@/lib/validateFlyerExtraction';
+import { logger } from '@/lib/logger';
 
 const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
 
@@ -80,6 +81,7 @@ export async function runSlackIngest(workspaces: SlackIngestWorkspace[]): Promis
   const oldest = oldestUnixString(lookbackDays);
 
   for (const ws of workspaces) {
+    logger.info('slack-ingest-workspace-start', { label: ws.label, channelCount: ws.channelIds.length });
     let teamId: string;
     let slackWorkspaceName = ws.label;
     try {
@@ -262,5 +264,11 @@ export async function runSlackIngest(workspaces: SlackIngestWorkspace[]): Promis
     }
   }
 
+  logger.info('slack-ingest-summary', {
+    ingested: summary.ingested,
+    textEventsIngested: summary.textEventsIngested,
+    failed: summary.failed,
+    skippedAlreadySeen: summary.skippedAlreadySeen,
+  });
   return summary;
 }

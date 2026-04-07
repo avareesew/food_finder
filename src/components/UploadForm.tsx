@@ -202,7 +202,7 @@ export default function UploadForm() {
             const json = await res.json();
             setLocalRecents(Array.isArray(json.records) ? (json.records as LocalRecentRecord[]) : []);
         } catch (error) {
-            console.error('Failed to fetch local recent flyers', error);
+            logger.error('local-recents-fetch-error', { message: error instanceof Error ? error.message : String(error) });
         }
     };
 

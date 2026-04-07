@@ -2,6 +2,7 @@ import { requireEnv } from '@/backend/env';
 import { normalizeExtractedEvent, type ExtractedEvent } from '@/backend/openai/extractEventFromFlyer';
 import { applySlackTbaPlaceFallback } from '@/lib/validateFlyerExtraction';
 import { inferFoodEmoji } from '@/lib/foodEmoji';
+import { logger } from '@/lib/logger';
 
 function stripCodeFences(text: string): string {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
@@ -47,6 +48,7 @@ export async function extractEventsFromSlackMessageText(args: {
   nowYearHint: number;
 }): Promise<{ events: ExtractedEvent[]; rawModelOutput: string }> {
   const { messageText, nowYearHint } = args;
+  logger.info('openai-extract-start', { type: 'slack-text', textLength: messageText.length });
   const apiKey = requireEnv('OPENAI_API_KEY');
 
   const prompt = [

@@ -9,6 +9,7 @@ import { uploadBytesToStorage } from '@/backend/flyers/storageAdminUpload';
 import type { FlyerRequiredMissing } from '@/lib/validateFlyerExtraction';
 import { validateExtractedEventRequired } from '@/lib/validateFlyerExtraction';
 import { inferFoodEmoji } from '@/lib/foodEmoji';
+import { logger } from '@/lib/logger';
 
 export type IngestFlyerFromBytesMeta = {
   slackTeamId?: string;
@@ -39,6 +40,7 @@ export async function ingestFlyerImageBytes(args: {
   const firebaseBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim();
   const safeFilename = (args.originalFilename || 'flyer').replace(/[^a-zA-Z0-9.-]/g, '_');
   const mimeType = args.mimeType || 'image/jpeg';
+  logger.info('flyer-image-ingest-start', { filename: args.originalFilename, mode: firebaseBucket ? 'firebase' : 'local' });
 
   if (firebaseBucket) {
     const timestamp = Date.now();

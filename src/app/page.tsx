@@ -10,6 +10,7 @@ import {
   type HomeDiscoverPreviewRecord,
 } from '@/lib/homeDiscoverPreview';
 import { getRecentFlyers, type Flyer } from '@/services/flyers';
+import { logger } from '@/lib/logger';
 
 type LocalApiUpcomingRecord = {
   id: string;
@@ -65,7 +66,7 @@ export default function Home() {
           setDiscoverPreview(pickClosestUpcomingFromFlyers(flyers, 3));
         }
       } catch (e) {
-        console.error(e);
+        logger.error('home-discover-fetch-error', { message: e instanceof Error ? e.message : String(e) });
         if (!cancelled) setDiscoverPreview([]);
       } finally {
         if (!cancelled) setDiscoverPreviewLoading(false);

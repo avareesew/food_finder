@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import { appendExtractionRecord } from '@/backend/local/eventsJsonStore';
 import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
 import type { ExtractedEvent } from '@/backend/openai/extractEventFromFlyer';
+import { logger } from '@/lib/logger';
 
 export type PersistSlackTextFlyerArgs = {
   extractedEvent: ExtractedEvent;
@@ -23,6 +24,7 @@ export async function persistSlackTextFlyer(args: PersistSlackTextFlyerArgs): Pr
   const firebaseBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim();
   const idSuffix = `${args.slackMessageTs.replace(/\./g, '_')}_${args.eventIndex}`;
   const titleBit = safeFilenamePart(args.extractedEvent.title ?? 'activity');
+  logger.info('slack-text-persist', { title: args.extractedEvent.title, mode: firebaseBucket ? 'firebase' : 'local' });
 
   if (firebaseBucket) {
     ensureFirebaseAdminInitialized();
