@@ -5,10 +5,32 @@
 
 ---
 
+## [0.5.1] - 2026-04-07 — Final Readiness Pass
+
+### Structured Logging
+- Finished structured logging coverage for all **21 API routes** plus the shared admin helper and Gmail ingest pipeline
+- Added start/success/failure events for admin user management, admin flyer cleanup, and Gmail cron entrypoints
+- Added per-message Gmail failure logs and final Gmail ingest summary logs for the test → log → fix loop
+
+### Documentation
+- Added `ai/context.md` as the AI bookshelf entrypoint for new sessions
+- Updated README, `CLAUDE.md`, `aiDocs/context.md`, `aiDocs/architecture.md`, `aiDocs/mvp.md`, and the active roadmap to reflect the current repo structure and teammate-owned deployment handoff
+- Removed stale references to the deleted roadmap tracker path in active docs
+
+### Verification
+- Added `scripts/scan-secrets.sh` to scan tracked files and git history while ignoring documented placeholders in `env.example`
+- Repaired the local dependency state with `npm install` so `googleapis` resolves again during production builds
+- Switched `scripts/test.sh` back to the stable webpack build path after Turbopack stalled on the current admin/Gmail-heavy app build
+- `logs/secrets-20260407-161820.log` confirms the tracked files + git history scan found no likely committed secrets
+- `logs/test-20260407-163109.log` confirms lint + production build succeeded on the readiness-pass branch and enumerated the full 21-route API surface
+- `logs/slack-ingest-20260407-163207.log` captures the config-error branch (`exit 2`) of `scripts/test-slack-ingest.sh` when a separate shell could not reach the local dev server
+
+---
+
 ## [0.5.0] - 2026-04-06 — Technical Process Final Sprint
 
 ### Structured Logging
-- Integrated `src/lib/logger.ts` structured logger into **all 16 API routes** and **6 backend pipeline files**
+- Expanded `src/lib/logger.ts` structured logger across the API surface that existed on April 6 plus key backend pipeline files
 - Zero `console.error` calls remain in `src/` — every error path uses `logger.error` with event name and structured details
 - Added `logger.info` for key operations: upload-start, slack-ingest-start/complete, flyer-processing-start/success, openai-extract-start/success
 - Added `logger.warn` for rejected flyers and unauthorized admin access attempts
@@ -59,7 +81,7 @@ Key findings:
 - **Retroactive audit:** Reconciled all aiDocs with actual codebase state as of commit `62b543e`
 - **Updated `aiDocs/context.md`:** Status changed from "Pre-Development" to "Active Development — Phase 1 Substantially Complete"
 - **Updated `aiDocs/architecture.md`:** Version 2.0 — rewrote file structure, API endpoints, data models, data flow diagrams
-- **Updated `ai/roadmaps/roadmap-tracker.md`:** Checked off completed Phase 0 and Phase 1 items, documented divergences
+- **Updated the then-active roadmap tracker** (now archived as `ai/roadmaps/archived/roadmap-tracker-v1.md`): checked off completed Phase 0 and Phase 1 items, documented divergences
 
 ### Key Divergences Documented
 - **AI Provider:** Original plan was Gemini-only; actual uses OpenAI gpt-4o-mini as primary, Gemini as secondary
@@ -128,6 +150,7 @@ Key findings:
 
 | Version | Date | Summary |
 |---------|------|---------|
+| v0.5.1 | 2026-04-07 | Final readiness pass — logging coverage, AI bookshelf, verification |
 | v0.5.0 | 2026-04-06 | Technical process final sprint — logging, scripts, docs |
 | v0.4.0 | 2026-04-06 | Post-pivot documentation cleanup + Round 2 interviews |
 | v0.3.0 | 2026-04-01 | Documentation alignment — reconciled docs with codebase |

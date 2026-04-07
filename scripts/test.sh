@@ -35,7 +35,7 @@ trap 'echo "=== Tests FAILED at $(date -u) ===" | tee -a "$LOG_FILE"; exit 1' ER
   echo ""
 
   echo "--- Build ---"
-  npm run build 2>&1
+  npm run build -- --webpack 2>&1
   echo "=== Build succeeded ==="
   echo ""
 
