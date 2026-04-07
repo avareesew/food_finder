@@ -72,6 +72,34 @@ Before alpha testing, these must be built:
 
 ---
 
+## Enforced Code Standards
+
+### Structured Logging (mandatory)
+- **Always** use `import { logger } from '@/lib/logger'` for all logging.
+- **Never** use raw `console.log`, `console.error`, `console.warn`, or `console.info` in `src/`.
+- The only file allowed to use `console.*` is `src/lib/logger.ts` itself.
+- ESLint enforces this via a `no-console` rule — violations will error.
+
+### Verification Before Commit
+- Run `npm run lint` — **0 errors required** before committing.
+- Run `npm run build` — must succeed before committing.
+- If either fails, fix issues before creating the commit.
+
+### Commit Message Format
+Use conventional commits: `type(scope): summary`
+
+Allowed types: `feat`, `fix`, `docs`, `refactor`, `chore`, `test`
+
+Examples:
+- `feat(map): add real-time event markers`
+- `fix(slack): handle empty channel response`
+- `docs(changelog): update for v0.4`
+
+### Changelog
+Update `aiDocs/changelog.md` after any significant change.
+
+---
+
 ## Campus Details
 
 - **Campus:** BYU Provo, UT

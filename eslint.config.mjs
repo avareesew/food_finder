@@ -13,6 +13,14 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Ban raw console.* in src/ — use logger instead.
+  {
+    files: ["src/**/*.{ts,tsx,js,jsx}"],
+    ignores: ["src/lib/logger.ts"],
+    rules: {
+      "no-console": "error",
+    },
+  },
 ]);
 
 export default eslintConfig;
