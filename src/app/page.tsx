@@ -118,32 +118,34 @@ export default function Home() {
             campus. We&apos;ve got the good stuff, mapped out for you.
           </p>
 
-          <div className="max-w-xl mx-auto bg-white p-2 rounded-full shadow-soft flex items-center border border-gray-100 dark:bg-gray-900 dark:border-gray-800 w-full">
-            <div className="pl-4 text-gray-400 dark:text-gray-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+          <div className="max-w-xl mx-auto w-full flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1 bg-white p-2 rounded-full shadow-soft flex items-center border border-gray-100 dark:bg-gray-900 dark:border-gray-800">
+              <div className="pl-4 text-gray-400 dark:text-gray-500">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Search by location or food type..."
+                className="flex-1 px-4 py-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 font-medium dark:text-gray-100 dark:placeholder-gray-500"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Search by location or food type..."
-              className="flex-1 px-4 py-3 bg-transparent border-none focus:ring-0 text-gray-800 placeholder-gray-400 font-medium dark:text-gray-100 dark:placeholder-gray-500"
-            />
-            <Link href="/feed">
+            <Link href="/feed" className="w-full sm:w-auto">
               <button
                 type="button"
-                className="bg-[#FF5A1F] text-white px-5 sm:px-8 py-3 rounded-full font-semibold hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg shrink-0"
+                className="w-full sm:w-auto bg-[#FF5A1F] text-white px-8 py-3 rounded-full font-semibold hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg"
               >
                 Search
               </button>
