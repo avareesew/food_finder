@@ -1,173 +1,135 @@
-# Scavenger 🍕
+# Scavenger
 
-**Campus Food Finder Platform**
+**Campus Food Discovery Platform — BYU Pilot**
 
-Make invisible campus food discoverable in real-time. Scavenger uses AI-powered flyer parsing to create a searchable feed of free food events on campus.
-
----
-
-## 🎯 Project Status
-
-**Phase:** Planning & Documentation Complete  
-**Next:** MVP Development (2-3 weeks)  
-**Target Launch:** BYU Campus Pilot
+Scavenger turns club food events into a professional recruitment tool. Club leaders post to their official Slack or email channels — Scavenger automatically ingests those posts and pins them to a live campus map. Students discover free food anonymously, no login required.
 
 ---
 
-## 📁 Project Structure
+## Project Status
 
-```
-project-root/
-├── aiDocs/              # 📚 TRACKED: Product documentation
-│   ├── context.md       # ⭐ START HERE - Project overview
-│   ├── prd.md           # Product requirements
-│   ├── mvp.md           # MVP specification
-│   ├── architecture.md  # Technical architecture
-│   ├── coding-style.md  # Code standards
-│   └── changelog.md     # Change history
-│
-├── ai/                  # 🚫 GITIGNORED: Working artifacts
-│   ├── guides/          # Research, library docs
-│   ├── roadmaps/        # Task checklists
-│   └── notes/           # Brainstorming
-│
-├── scripts/             # 🛠️ CLI utilities
-│
-└── src/ (coming soon)   # 💻 Application code
-```
+**Phase:** Final Sprint — Presentations April 8, 13, 15, 2026
+**Built:** Core pipeline complete (upload → AI extraction → feed → map)
+**In Progress:** Demo polish, presentation slides, club president submission form
+**Next:** Alpha testing with sub-association leaders (post-April 8)
 
 ---
 
-## 🚀 Quick Start
-
-### For New Team Members
-
-1. **Read the context document first:**
-   ```bash
-   open aiDocs/context.md
-   ```
-
-2. **Review the PRD and MVP spec:**
-   ```bash
-   open aiDocs/prd.md
-   open aiDocs/mvp.md
-   ```
-
-3. **Check the technical architecture:**
-   ```bash
-   open aiDocs/architecture.md
-   ```
-
-### For Development (Coming Soon)
+## Quick Start
 
 ```bash
-# Install dependencies
 npm install
-
-# Set up environment
 cp env.example .env.local
-# Add your API keys
-
-# Run dev server
+# Fill in API keys (see env.example for required vars)
 npm run dev
+# Open http://localhost:3000
 ```
 
----
+### Local Development (No Firebase Required)
 
-## Local MVP extraction (writes results to `data/events.json`)
-
-If you want to validate the end-to-end AI extraction flow **before Firebase**, use:
-
-- `POST /api/local/extract` → returns extracted event JSON and appends it to `data/events.json`.
-
-### Setup
-
-1. Ensure `.env.local` contains:
-   - `OPENAI_API_KEY=...`
-   - `NEXT_PUBLIC_BACKEND_MODE=local`
-
-2. Start the dev server:
-
-```bash
-npm run dev
-```
-
-### Test with curl
+Set `NEXT_PUBLIC_BACKEND_MODE=local` in `.env.local` — events stored in `data/events.json`, only `OPENAI_API_KEY` required.
 
 ```bash
 curl -sS -X POST "http://localhost:3000/api/local/extract" \
-  -F "file=@/absolute/path/to/flyer.jpg" | jq
+  -F "file=@/path/to/flyer.jpg" | jq
 ```
 
-**Note:** This returns JSON only. When we switch to Firebase later, we’ll store the same shape in Firestore.
-
 ---
 
-## 📊 Key Metrics (MVP Goals)
-
-- **30+** posts per week
-- **150+** unique visitors
-- **<5%** "ghost chase" rate
-- **25%** repeat usage rate
-- **5+** organic posts (non-team)
-
----
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 14 + React + Tailwind CSS |
-| Backend | Next.js API Routes (Serverless) |
+| Framework | Next.js 16 (App Router) + React 19 |
+| Styling | Tailwind CSS 4 |
 | Database | Firestore (Firebase) |
-| AI/ML | Gemini 2.0 Flash API |
+| AI (Primary) | OpenAI gpt-4o-mini via Responses API |
+| AI (Secondary) | Gemini 2.0 Flash |
+| Maps | Leaflet |
+| Auth | Firebase Auth |
 | Hosting | Vercel |
 
 ---
 
-## 📖 Documentation
+## How It Works
 
-All documentation lives in `aiDocs/` and is tracked in git:
-
-- **[context.md](aiDocs/context.md)** - Project overview, status, mission ⭐ START HERE
-- **[prd.md](aiDocs/prd.md)** - Full product requirements document
-- **[mvp.md](aiDocs/mvp.md)** - MVP demo specification
-- **[architecture.md](aiDocs/architecture.md)** - System architecture and tech decisions
-- **[coding-style.md](aiDocs/coding-style.md)** - Code standards and patterns
-- **[changelog.md](aiDocs/changelog.md)** - Version history
+1. **Club leader** posts a food event to their official Slack channel or email list
+2. **Scavenger ingests** the post automatically (or leader can upload a flyer manually)
+3. **AI extracts** event details — title, location, time, food type
+4. **Map pin appears** — students see it on the live campus map
+5. **Student shows up** — finds free food, discovers the club
 
 ---
 
-## 🎓 The Problem We're Solving
+## Project Structure
 
-- **41% of college students** experience food insecurity
-- **Thousands of pounds** of free food go to waste daily on campus
-- **Information gap:** Food exists, but students can't find it
-
-**Solution:** AI-powered flyer scanning + real-time feed = zero food waste, zero hungry students.
+```
+food_finder/
+├── CLAUDE.md                  # AI behavioral guidance — start here
+├── aiDocs/                    # Product documentation (tracked in git)
+│   ├── context.md             # Project overview & status ⭐ START HERE
+│   ├── prd.md                 # Product requirements (v2.0 post-pivot)
+│   ├── mvp.md                 # What's built + demo flow
+│   ├── architecture.md        # Tech stack, API endpoints, data models
+│   ├── coding-style.md        # Code standards
+│   ├── changelog.md           # Version history
+│   └── archived/              # Pre-pivot flyer-era docs
+├── ai/                        # Working artifacts (tracked in git)
+│   ├── notes/                 # Customer interviews, sprint plans
+│   ├── roadmaps/              # Current roadmap + tracker
+│   └── guides/                # API docs, market research
+├── src/
+│   ├── app/                   # Next.js pages + API routes
+│   ├── backend/               # Server-side logic (OpenAI, Gemini, Slack, auth)
+│   ├── components/            # React components
+│   ├── lib/                   # Utilities
+│   └── services/              # Firestore service layer
+├── env.example                # Required environment variables
+└── vercel.json                # Vercel deployment config
+```
 
 ---
 
-## 🤝 Contributing
+## Key Docs
 
-1. Read `aiDocs/context.md` for project overview
-2. Follow `aiDocs/coding-style.md` for code standards
-3. Update `aiDocs/changelog.md` with significant changes
-4. Test on mobile (we're mobile-first!)
+- **[CLAUDE.md](CLAUDE.md)** — Project context and coding rules
+- **[context.md](aiDocs/context.md)** — Full project overview, current status, key learnings
+- **[prd.md](aiDocs/prd.md)** — Product requirements (post-pivot)
+- **[architecture.md](aiDocs/architecture.md)** — API endpoints, data models, tech decisions
+- **[roadmap](ai/roadmaps/2026-04-06-current-roadmap.md)** — Where we are and what's next
+- **[Round 2 interviews](ai/notes/2026-04-06-round2-club-interviews.md)** — Most recent customer research
 
 ---
 
-## 📞 Contact
+## What We Learned (The Pivot)
+
+Originally built around AI-powered flyer scanning. Customer research across 5 club interviews falsified that assumption:
+
+- Tanner/Marriott School prohibits physical flyers by policy
+- All Round 2 clubs (Sales Society, Finance Society, Women of Accountancy) rely on email + Instagram
+- When asked about zero-effort automation from official channels, clubs rated it **9.7/10 on average**
+
+**Pivot:** Flyer scanning → Email/Slack automated ingestion as the primary path.
+
+---
+
+## MVP Success Metrics
+
+| Metric | Target |
+|--------|--------|
+| Posts per week | 30+ |
+| Unique visitors | 150+ |
+| Repeat users | 25%+ |
+| Ghost chase rate | <5% |
+| Organic posts (non-team) | 5+ |
+
+---
+
+## Contact
 
 - **Product Lead:** Ava Williams
 - **GitHub:** [github.com/avareesew/food_finder](https://github.com/avareesew/food_finder)
 
 ---
 
-## 📜 License
-
-TBD
-
----
-
-**Built with 💙 by BYU students, for students.**
+*Built by BYU MIS students, for students.*
