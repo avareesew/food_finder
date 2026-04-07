@@ -1,8 +1,8 @@
 # Food Finder: Campus Food Discovery Platform - Project Context
 
-**Last Updated:** April 1, 2026
-**Project Status:** Active Development — Phase 1 Substantially Complete
-**Current Phase:** Preparing for Alpha Testing (Phase 2)
+**Last Updated:** April 6, 2026
+**Project Status:** Active Development — Final Sprint (April 1–8)
+**Current Phase:** Customer Validation + Demo Build (pre-presentation)
 
 ---
 
@@ -158,7 +158,7 @@ See `aiDocs/architecture.md` for complete technical architecture.
 ### Phase 0: Setup & Validation (Week 1) — COMPLETE
 - Market research, PRD, MVP spec, architecture
 - Firebase + Next.js initialized
-- 2 club president interviews (Kendall Castellaw, Carson Fellows)
+- 2 club president interviews (Kendall Castellaw, Carson Fellows) — `ai/notes/2026-02-24-round1-club-interviews.md`
 - AI extraction validated (OpenAI gpt-4o-mini)
 
 ### Phase 1: Core Development (Weeks 2-4) — SUBSTANTIALLY COMPLETE
@@ -169,6 +169,11 @@ See `aiDocs/architecture.md` for complete technical architecture.
 - "Mark as gone" UI: NOT DONE
 - Real-time `onSnapshot`: NOT DONE
 - Confirmation/edit form: NOT DONE
+
+### Final Sprint: Customer Validation (April 1–8) — IN PROGRESS
+- 2 Round 2 interviews complete (Michael Nichols, Sales Society; Molly Wakefield, Finance Society VP) — `ai/notes/2026-04-06-round2-club-interviews.md`
+- Key finding: automation rated 9.5/10 avg; professionalism tension confirmed; sub-associations as early adopters identified
+- Falsification tests and demo build in progress
 
 ### Phase 2: Alpha Testing (Week 5) — NOT STARTED
 - Recruit 5-10 alpha testers
@@ -183,10 +188,10 @@ See `aiDocs/architecture.md` for complete technical architecture.
 
 ## Assumptions Validated
 
-1. **BYU clubs print physical flyers** — PARTIALLY VALIDATED
+1. **BYU clubs print physical flyers** — FALSIFIED (pivoted)
    - Tanner/Marriott Building prohibits flyers by policy
-   - Non-Tanner clubs do use flyers and email with food callouts
-   - Feed should focus on "food at upcoming events," not just leftovers
+   - Round 2 clubs (Sales Society, Finance Society) rely entirely on email + Instagram
+   - Pivot confirmed: email/text ingestion is the primary input path, not flyer scanning
 
 2. **Students will browse without logging in** — ASSUMED (pending alpha validation)
 
@@ -286,9 +291,13 @@ food_finder/
 
 ### Customer Discovery
 1. **Recruitment framing > waste reduction** — clubs want more attendees, not guilt relief
-2. **Liability is a non-issue** — confirmed independently by two club presidents
+2. **Liability is a non-issue** — confirmed independently across 4 club interviews
 3. **Leftover supply is lower than expected** — feed should surface during-event food, not just scraps
 4. **Flyer density varies by building** — Tanner is flyer-free; other buildings still use them
+5. **Automation is the #1 supply-side unlock** — avg 9.5/10 rating across Round 2 interviews (Sales Society 10/10, Finance Society 9/10); zero-effort ingestion from official channels is the reason club leaders adopt
+6. **Professionalism tension is real** — both Round 2 clubs independently raised concern about "food hunters"; Marriott School "professional manners" initiative adds institutional pressure; product needs an "Expectations" / "Requirements" field on event pins
+7. **Sub-associations are the highest-value early adopter segment** — smaller budgets, higher food frequency, less marketing bandwidth; mentioned independently by both Round 2 interviewees
+8. **Slack is not universal** — Finance Society explicitly does not use Slack; email ingestion must be a first-class path
 
 ### Technical
 1. **OpenAI gpt-4o-mini works well** as primary extractor; Gemini available as backup

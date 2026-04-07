@@ -2,7 +2,7 @@
 ## 7-Week Implementation Roadmap
 
 **Date Created:** February 16, 2026
-**Last Updated:** April 1, 2026
+**Last Updated:** April 6, 2026
 **Purpose:** Track progress across all phases of MVP development
 **Status:** Phase 0 Complete · Phase 1 Substantially Complete · Phase 2-4 Not Started
 
@@ -42,7 +42,7 @@
 | Checkpoint | Status | Notes |
 |-----------|--------|-------|
 | Can we deploy to production? | ✅ Complete | Next.js 16 + Firebase initialized; local dev working |
-| Do BYU clubs print physical flyers? | ⚠️ At Risk | Tanner/Marriott prohibits flyers (Interview 1). Non-Tanner clubs do use flyers (Interview 2). Mixed results. |
+| Do BYU clubs print physical flyers? | ❌ Falsified — Pivoted | Tanner prohibits flyers. Round 2 clubs (Sales Society, Finance Society) rely on email + Instagram only. Pivot to email/text ingestion confirmed across 4 interviews. |
 | Can AI extract data accurately? | 🔀 Diverged | Gemini AND OpenAI both integrated. OpenAI gpt-4o-mini is the primary extraction path; Gemini 2.0 Flash available as secondary. |
 | Does Firestore real-time sync work? | ✅ Complete | Firestore reads/writes working via Admin SDK. Client reads via API routes. Real-time `onSnapshot` not yet wired (polling via `getDocs`). |
 
@@ -53,7 +53,7 @@
 - [x] AI API keys obtained — both `OPENAI_API_KEY` and `GEMINI_API_KEY`
 - [ ] Next.js deployed to Vercel (not confirmed)
 - [ ] 20-30 BYU flyers photographed (not confirmed)
-- [x] 3-5 club president interviews — 2/3+ complete (Kendall Castellaw 2026-02-24, Carson Fellows 2026-02-25; see `ai/notes/week1-club-interviews.md`)
+- [x] 3-5 club president interviews — 5 complete: Kendall Castellaw 2026-02-24, Carson Fellows 2026-02-25 (see `ai/notes/2026-02-24-round1-club-interviews.md`); Michael Nichols, Molly Wakefield, Abigail Armstrong 2026-04-06 (see `ai/notes/2026-04-06-round2-club-interviews.md`)
 - [x] AI extraction accuracy tested — OpenAI gpt-4o-mini with validation pipeline working
 - [x] Firestore read/write verified
 - [ ] Formal GO/NO-GO decision made (development proceeded without formal gate)
@@ -239,6 +239,13 @@ Not yet reached.
 - Liability is a non-issue per two independent interviews
 - Leftover supply is lower than expected — feed should focus on "food at upcoming events" not just leftovers
 
+### Final Sprint Learnings (April 2026 — Round 2 Interviews)
+- **Automation is the #1 supply-side unlock** — rated 10/10 (Sales Society), 9/10 (Finance Society), 10/10 (Women of Accountancy); avg 9.7/10 across 3 Round 2 interviews
+- **Professionalism tension is real and confirmed (2/2)** — both clubs independently worried about food hunters; Marriott "professional manners" initiative adds institutional pressure; need an "Expectations / Requirements" field on pins
+- **Sub-associations are the best early adopter segment** — smaller budgets, higher food frequency, less marketing capacity; called out independently by both interviewees
+- **Slack is not universal** — Finance Society does not use Slack at all; email must be the primary ingestion path
+- **Physical flyer assumption is fully falsified** — pivot to email/text ingestion is confirmed correct
+
 ### Weeks 3-6 Learnings (Development)
 - OpenAI gpt-4o-mini via Responses API works well as primary extractor; no need to be Gemini-only
 - Dual backend mode (Firebase vs local) is valuable for development velocity
@@ -278,8 +285,9 @@ Not yet reached.
 | 2026-02-16 | All | Roadmap created | Team |
 | 2026-02-24 | Phase 0 | Interview 1 complete, upload form + Firebase working | Team |
 | 2026-04-01 | All | Retroactive alignment — reconciled tracker with actual codebase state | Ava + Claude |
+| 2026-04-06 | Phase 0 | Round 2 interviews complete (Michael Nichols, Molly Wakefield, Abigail Armstrong) — automation confirmed 9.7/10 avg, professionalism tension nuanced, sub-associations as early adopters, Teams/Outlook risk flagged | Ava + Claude |
 
 ---
 
-**Last Updated:** April 1, 2026
+**Last Updated:** April 6, 2026
 **Next Review:** Before starting Phase 2 (Alpha Testing)
