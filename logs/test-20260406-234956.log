@@ -1,0 +1,104 @@
+=== Running lint + build at Tue Apr  7 05:49:56 UTC 2026 ===
+
+> campus-food-finder@0.1.0 lint
+> eslint
+
+
+/Users/ryantetro/campus-food-finder/src/app/events/[id]/page.tsx
+   55:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/ryantetro/campus-food-finder/src/app/events/[id]/page.tsx:55:9
+  53 |
+  54 |     useEffect(() => {
+> 55 |         setImgFailed(false);
+     |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  56 |     }, [flyer?.downloadURL]);
+  57 |
+  58 |     if (loading) {  react-hooks/set-state-in-effect
+  101:32  error  React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/rules-of-hooks
+  111:24  error  React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/rules-of-hooks
+
+/Users/ryantetro/campus-food-finder/src/app/page.tsx
+  223:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/ryantetro/campus-food-finder/src/backend/slack/slackDedupe.ts
+  49:7  error  React Hook "useFirestoreDedupe" is called in function "isSlackFileSeen" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"    react-hooks/rules-of-hooks
+  92:7  error  React Hook "useFirestoreDedupe" is called in function "markSlackFileSeen" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"  react-hooks/rules-of-hooks
+
+/Users/ryantetro/campus-food-finder/src/components/UploadForm.tsx
+  463:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  687:55  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  765:55  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  829:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  865:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/ryantetro/campus-food-finder/src/components/ui/EventCard.tsx
+  119:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/ryantetro/campus-food-finder/src/components/ui/EventCard.tsx:119:9
+  117 |     const [imgFailed, setImgFailed] = useState(false);
+  118 |     useEffect(() => {
+> 119 |         setImgFailed(false);
+      |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  120 |     }, [imageUrl]);
+  121 |
+  122 |     return (  react-hooks/set-state-in-effect
+  143:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @next/next/no-img-element
+
+/Users/ryantetro/campus-food-finder/src/components/ui/EventDetailModal.tsx
+  30:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/ryantetro/campus-food-finder/src/components/ui/EventDetailModal.tsx:30:13
+  28 |     useEffect(() => {
+  29 |         if (!open || !flyerId) {
+> 30 |             setFlyer(null);
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  31 |             setLoading(false);
+  32 |             return;
+  33 |         }  react-hooks/set-state-in-effect
+
+/Users/ryantetro/campus-food-finder/src/components/ui/LocalEventCard.tsx
+  52:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/ryantetro/campus-food-finder/src/components/ui/LocalEventCard.tsx:52:5
+  50 |   const [imgFailed, setImgFailed] = useState(false);
+  51 |   useEffect(() => {
+> 52 |     setImgFailed(false);
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  53 |   }, [props.imageUrl]);
+  54 |
+  55 |   const timeLine =  react-hooks/set-state-in-effect
+  75:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @next/next/no-img-element
+
+/Users/ryantetro/campus-food-finder/src/lib/eventTiming.ts
+  111:7  error  'startMin' is never reassigned. Use 'const' instead  prefer-const
+  161:7  error  'h' is never reassigned. Use 'const' instead         prefer-const
+
+✖ 18 problems (10 errors, 8 warnings)
+  2 errors and 0 warnings potentially fixable with the `--fix` option.
+
+=== Tests failed at Tue Apr  7 05:49:59 UTC 2026 ===

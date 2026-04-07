@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { formatDistance } from 'date-fns';
 import Link from 'next/link';
@@ -38,7 +38,7 @@ export default function EventDetailPage() {
     const params = useParams();
     const [flyer, setFlyer] = useState<Flyer | null>(null);
     const [loading, setLoading] = useState(true);
-    const [imgFailed, setImgFailed] = useState(false);
+    const [failedImgUrl, setFailedImgUrl] = useState<string | null>(null);
 
     useEffect(() => {
         async function loadFlyer() {
@@ -51,9 +51,23 @@ export default function EventDetailPage() {
         loadFlyer();
     }, [params.id]);
 
-    useEffect(() => {
-        setImgFailed(false);
-    }, [flyer?.downloadURL]);
+    // Hooks must be called before any early returns (rules-of-hooks)
+    const ev = flyer?.extractedEvent;
+    const rawDateStr = typeof ev?.date === 'string' ? ev.date.trim() : '';
+    const hasReliableEventDate = Boolean(coerceExtractedDateToYyyyMmDd(rawDateStr || null));
+
+    const effectiveEventDate = resolveCampusEventYyyyMmDd(rawDateStr || null);
+
+    const eventEnded = (() => {
+        if (!flyer) return false;
+        const byTime = isCampusEventEnded({
+            eventDate: rawDateStr || null,
+            endTime: typeof ev?.endTime === 'string' ? ev.endTime : null,
+            startTime: typeof ev?.startTime === 'string' ? ev.startTime : null,
+        });
+        if (hasReliableEventDate) return byTime;
+        return flyer.status === 'gone' || byTime;
+    })();
 
     if (loading) {
         return (
@@ -85,7 +99,7 @@ export default function EventDetailPage() {
         );
     }
 
-    const ev = flyer.extractedEvent;
+    const imgFailed = failedImgUrl === flyer.downloadURL;
     const displayTitle =
         typeof ev?.title === 'string' && ev.title.trim() ? ev.title.trim() : flyer.originalFilename;
     const createdSec =
@@ -96,27 +110,11 @@ export default function EventDetailPage() {
         ? formatDistance(new Date(createdSec * 1000), new Date(), { addSuffix: true })
         : 'recently';
 
-    const rawDateStr = typeof ev?.date === 'string' ? ev.date.trim() : '';
-    const hasReliableEventDate = Boolean(coerceExtractedDateToYyyyMmDd(rawDateStr || null));
-    const effectiveEventDate = useMemo(
-        () => resolveCampusEventYyyyMmDd(rawDateStr || null),
-        [rawDateStr]
-    );
     const dateLabel = formatEventDateLabel(effectiveEventDate);
     const start12 = formatTime12h(typeof ev?.startTime === 'string' ? ev.startTime : null);
     const end12 = formatTime12h(typeof ev?.endTime === 'string' ? ev.endTime : null);
     const timeLine =
         start12 && end12 ? `${start12} – ${end12}` : start12 ? start12 : end12 ? `Until ${end12}` : null;
-
-    const eventEnded = useMemo(() => {
-        const byTime = isCampusEventEnded({
-            eventDate: rawDateStr || null,
-            endTime: typeof ev?.endTime === 'string' ? ev.endTime : null,
-            startTime: typeof ev?.startTime === 'string' ? ev.startTime : null,
-        });
-        if (hasReliableEventDate) return byTime;
-        return flyer.status === 'gone' || byTime;
-    }, [hasReliableEventDate, flyer.status, rawDateStr, ev?.endTime, ev?.startTime]);
 
     const treatAsExpired = hasReliableEventDate ? eventEnded : flyer.status === 'gone';
 
@@ -173,7 +171,7 @@ export default function EventDetailPage() {
                                     alt={displayTitle}
                                     referrerPolicy="no-referrer"
                                     className={`h-full w-full object-cover ${eventEnded ? 'brightness-[0.88]' : ''}`}
-                                    onError={() => setImgFailed(true)}
+                                    onError={() => setFailedImgUrl(flyer.downloadURL ?? null)}
                                 />
                             ) : (
                                 <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-orange-50/90 to-amber-50/80 px-4 dark:from-gray-800 dark:to-gray-900">

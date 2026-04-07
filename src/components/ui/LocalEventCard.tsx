@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type LocalEventCardProps = {
   onOpen?: () => void;
@@ -47,10 +47,8 @@ export default function LocalEventCard(props: LocalEventCardProps) {
   const prettyStart = props.date ? formatPrettyTime(props.date, props.startTime) : null;
   const prettyEnd = props.date ? formatPrettyTime(props.date, props.endTime) : null;
 
-  const [imgFailed, setImgFailed] = useState(false);
-  useEffect(() => {
-    setImgFailed(false);
-  }, [props.imageUrl]);
+  const [failedImgUrl, setFailedImgUrl] = useState<string | null>(null);
+  const imgFailed = failedImgUrl === props.imageUrl;
 
   const timeLine =
     prettyDate && prettyStart
@@ -77,7 +75,7 @@ export default function LocalEventCard(props: LocalEventCardProps) {
             alt={props.title}
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover"
-            onError={() => setImgFailed(true)}
+            onError={() => setFailedImgUrl(props.imageUrl ?? null)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-orange-50/50">

@@ -108,7 +108,7 @@ export function isCampusEventEnded(args: {
   if (resolved > today) return false;
 
   let endMin = parseHmToMinutes(endTime);
-  let startMin = parseHmToMinutes(startTime);
+  const startMin = parseHmToMinutes(startTime);
   /**
    * Common extraction mistake: "8:00 PM" stored as 08:00 (8 AM). If start is clearly PM/evening
    * and end reads as morning but is before start, assume end was meant PM the same day.
@@ -158,7 +158,7 @@ export function formatEventDateLabel(yyyyMmDd: string | null | undefined): strin
 export function formatTime12h(hhMm: string | null | undefined): string | null {
   const mins = parseHmToMinutes(hhMm ?? '');
   if (mins == null) return null;
-  let h = Math.floor(mins / 60);
+  const h = Math.floor(mins / 60);
   const m = mins % 60;
   const am = h < 12 || h === 24;
   const h12 = h % 12 === 0 ? 12 : h % 12;

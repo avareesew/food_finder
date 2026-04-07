@@ -1,0 +1,77 @@
+=== Running lint + build at Tue Apr  7 05:57:10 UTC 2026 ===
+
+> campus-food-finder@0.1.0 lint
+> eslint
+
+
+/Users/ryantetro/campus-food-finder/src/app/page.tsx
+  223:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/ryantetro/campus-food-finder/src/components/UploadForm.tsx
+  463:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  687:55  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  765:55  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  829:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  865:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/ryantetro/campus-food-finder/src/components/ui/EventCard.tsx
+  141:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/ryantetro/campus-food-finder/src/components/ui/LocalEventCard.tsx
+  73:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+✖ 8 problems (0 errors, 8 warnings)
+
+=== Lint succeeded ===
+
+> campus-food-finder@0.1.0 build
+> next build --webpack
+
+▲ Next.js 16.1.6 (webpack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.8s
+  Running TypeScript ...
+  Collecting page data using 13 workers ...
+  Generating static pages using 13 workers (0/24) ...
+  Generating static pages using 13 workers (6/24) 
+  Generating static pages using 13 workers (12/24) 
+  Generating static pages using 13 workers (18/24) 
+✓ Generating static pages using 13 workers (24/24) in 295.4ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ○ /admin
+├ ƒ /api/admin/users
+├ ƒ /api/auth/me
+├ ƒ /api/auth/register
+├ ƒ /api/auth/sync-profile
+├ ƒ /api/cron/slack-ingest
+├ ƒ /api/events
+├ ƒ /api/flyers
+├ ƒ /api/flyers/[flyerId]
+├ ƒ /api/flyers/[flyerId]/extract
+├ ƒ /api/local/cache-image
+├ ƒ /api/local/events
+├ ƒ /api/local/extract
+├ ƒ /api/local/ingest
+├ ƒ /api/local/upcoming
+├ ƒ /api/upload
+├ ƒ /api/upload/process
+├ ƒ /events/[id]
+├ ○ /explore
+├ ○ /feed
+├ ○ /login
+└ ○ /upload
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+=== Build succeeded ===
+=== Tests completed successfully at Tue Apr  7 05:57:24 UTC 2026 ===
