@@ -118,7 +118,7 @@ export default function Home() {
             campus. We&apos;ve got the good stuff, mapped out for you.
           </p>
 
-          <div className="max-w-xl mx-auto bg-white p-2 rounded-full shadow-soft flex items-center border border-gray-100 dark:bg-gray-900 dark:border-gray-800">
+          <div className="max-w-xl mx-auto bg-white p-2 rounded-full shadow-soft flex items-center border border-gray-100 dark:bg-gray-900 dark:border-gray-800 w-full">
             <div className="pl-4 text-gray-400 dark:text-gray-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +143,7 @@ export default function Home() {
             <Link href="/feed">
               <button
                 type="button"
-                className="bg-[#FF5A1F] text-white px-8 py-3 rounded-full font-semibold hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg"
+                className="bg-[#FF5A1F] text-white px-5 sm:px-8 py-3 rounded-full font-semibold hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg shrink-0"
               >
                 Search
               </button>
