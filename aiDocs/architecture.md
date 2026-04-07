@@ -1,14 +1,18 @@
 # System Architecture: Food Finder Platform
 
-**Version:** 2.0
-**Last Updated:** April 1, 2026
-**Status:** Active Development — Phase 1 Substantially Complete
+**Version:** 2.1
+**Last Updated:** April 6, 2026
+**Status:** Active Development — Final Sprint
 
 ---
 
 ## Overview
 
-Food Finder is a serverless, mobile-first web application that uses AI-powered vision processing to digitize physical event flyers and display them in a real-time feed. The architecture prioritizes simplicity, speed, and zero-DevOps complexity for rapid MVP iteration.
+Scavenger is a serverless, mobile-first web application that ingests club food event announcements from official Slack channels and emails, extracts structured event data via AI, and displays events on a live campus map and feed. The architecture prioritizes simplicity, speed, and zero-DevOps complexity for rapid MVP iteration.
+
+**Primary ingestion path:** Slack channel monitoring → AI text extraction → map pin
+**Secondary path:** Manual text/email paste → AI extraction → map pin
+**Tertiary path:** Flyer image upload → OpenAI vision extraction → map pin
 
 ---
 
@@ -75,6 +79,11 @@ food_finder/
 │   │       ├── flyers/[flyerId]/extract/route.ts  # POST Gemini extraction
 │   │       ├── upload/route.ts               # POST multimodal upload (Firebase or local)
 │   │       ├── upload/process/route.ts       # POST process after browser upload
+│   │       ├── cron/slack-ingest/route.ts    # POST cron-triggered Slack channel ingestion
+│   │       ├── auth/me/route.ts              # GET current user profile
+│   │       ├── auth/register/route.ts        # POST register new user
+│   │       ├── auth/sync-profile/route.ts    # POST sync Firebase Auth → Firestore profile
+│   │       ├── admin/users/route.ts          # GET/PATCH user management (admin only)
 │   │       ├── local/ingest/route.ts         # POST local extract + save
 │   │       ├── local/extract/route.ts        # POST local extract only
 │   │       ├── local/events/route.ts         # GET local events
@@ -84,13 +93,23 @@ food_finder/
 │   │   ├── env.ts                            # Environment variable helpers
 │   │   ├── openai/
 │   │   │   ├── extractFlyer.ts               # OpenAI gpt-4o-mini extraction (FlyerExtraction schema)
-│   │   │   └── extractEventFromFlyer.ts      # OpenAI gpt-4o-mini extraction (ExtractedEvent schema)
+│   │   │   ├── extractEventFromFlyer.ts      # OpenAI gpt-4o-mini extraction (ExtractedEvent schema)
+│   │   │   └── extractEventsFromSlackText.ts # OpenAI text extraction for Slack messages
 │   │   ├── gemini/
 │   │   │   └── extractFlyer.ts               # Gemini 2.0 Flash extraction
 │   │   ├── flyers/
 │   │   │   ├── processUploadedFlyer.ts       # Extract → validate → store (or reject)
+│   │   │   ├── ingestFlyerImageBytes.ts      # Ingest flyer from raw image bytes
+│   │   │   ├── persistSlackTextFlyer.ts      # Persist Slack-sourced event text as flyer record
 │   │   │   ├── storageAdminUpload.ts         # Firebase Admin Storage operations
 │   │   │   └── flyerDocToJson.ts             # Firestore Timestamp → JSON conversion
+│   │   ├── auth/
+│   │   │   ├── userProfiles.ts               # Firestore user profile CRUD
+│   │   │   └── verifyBearer.ts               # Bearer token verification middleware
+│   │   ├── slack/
+│   │   │   ├── runSlackIngest.ts             # Full Slack channel ingestion pipeline
+│   │   │   ├── slackClient.ts                # Slack API client (channel history, messages)
+│   │   │   └── slackDedupe.ts                # Deduplication logic (prevents re-ingesting same message)
 │   │   └── local/
 │   │       ├── eventsStore.ts                # Local filesystem event storage
 │   │       ├── eventsJsonStore.ts            # Local JSON extraction records
@@ -291,9 +310,13 @@ interface Event {
   source: {
     flyerId: string | null;
     extractionId: string | null;
-    method: "ai+confirm" | "manual";
+    method: "ai+confirm" | "manual" | "slack" | "email";
   };
-  status: "scheduled";
+  status: "scheduled" | "available" | "gone";
+  // Fields requested by Round 2 club interviews:
+  requirements?: string | null;  // "Stay for full event, Business Casual" (Sales Society, Finance Society)
+  clubLink?: string | null;      // URL to club signup/interest form (Finance Society, Women of Accountancy)
+  scarcityNote?: string | null;  // "Food for first 100 people" (Women of Accountancy)
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -444,6 +467,23 @@ interface StoredExtractionRecord {
 #### GET `/api/events`
 **Purpose:** List events for calendar/feed date ranges.
 **Query:** `from` (ISO, default: now), `to` (ISO, default: now + 7 days)
+
+---
+
+### Slack Ingestion Endpoint
+
+#### POST `/api/cron/slack-ingest`
+**Purpose:** Cron-triggered Slack channel ingestion. Reads recent messages from configured club Slack channels, extracts events via OpenAI, deduplicates, and stores in Firestore.
+
+**Auth:** Bearer token (server-to-server, not user-facing)
+
+**Backend pipeline:**
+1. `slackClient.ts` — fetch channel history since last ingest
+2. `extractEventsFromSlackText.ts` — OpenAI text extraction per message
+3. `slackDedupe.ts` — skip already-ingested messages
+4. `persistSlackTextFlyer.ts` — store as flyer record in Firestore
+
+**Config:** See `src/lib/slackIngestEnv.ts` for required env vars (`SLACK_BOT_TOKEN`, `SLACK_CHANNEL_IDS`, `SLACK_INGEST_SECRET`)
 
 ---
 

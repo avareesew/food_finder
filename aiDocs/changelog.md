@@ -7,6 +7,34 @@
 
 ## [Unreleased]
 
+### Documentation Cleanup (2026-04-06)
+- **Archived** `aiDocs/prd.md` → `aiDocs/archived/prd-v1-flyer-era.md`
+- **Archived** `aiDocs/mvp.md` → `aiDocs/archived/mvp-v1-flyer-era.md`
+- **Archived** all original phase0–4 roadmap files → `ai/roadmaps/archived/`
+- **Rewrote** `aiDocs/prd.md` (v2.0) — reflects pivot to email/Slack automation, sub-associations as go-to-market, new feature fields (Requirements, Club Link, Scarcity), updated personas and assumptions
+- **Rewrote** `aiDocs/mvp.md` (v2.0) — reflects what was actually built, April 8 demo flow, post-pivot build priorities
+- **Created** `ai/roadmaps/2026-04-06-current-roadmap.md` — single current-state roadmap replacing all old phase files
+- **Created** `CLAUDE.md` — project behavioral guidance for AI context
+- **Updated** `aiDocs/architecture.md` — added Slack ingestion endpoints, email ingestion path, updated Event data model with Requirements/ClubLink/ScarcityNote fields
+- **Removed** `ai/` from `.gitignore` — ai/ folder is now tracked in git
+- **Renamed** `ai/notes/week1-club-interviews.md` → `2026-02-24-round1-club-interviews.md`
+
+### Round 2 Customer Interviews (2026-04-06)
+**Interviews:** Michael Nichols (Sales Society President), Molly Wakefield (Finance Society VP), Abigail Armstrong (Women of Accountancy President)
+Full notes: `ai/notes/2026-04-06-round2-club-interviews.md`
+
+Key findings:
+- **Automation validated at 9.7/10 average** — zero-effort ingestion from official channels is THE reason club leaders adopt. Ratings: 10/10, 9/10, 10/10.
+- **Professionalism tension confirmed (2/3)** — Sales Society and Finance Society worry about food hunters; Marriott "professional manners" initiative adds institutional pressure. Women of Accountancy takes opposite view (food as a deliberate bribe).
+- **Sub-associations are the best early adopter segment** — smaller budgets, higher food frequency, less marketing bandwidth. Mentioned independently by Sales Society and Finance Society.
+- **Slack is not universal** — Finance Society and Women of Accountancy don't use Slack. Email is the more universal first-class path.
+- **New features requested:** Requirements / Expectations field (2/3), Club Link / Join button (2/3), Scarcity note — "Food for first X people" (Women of Accountancy).
+- **Institutional approval is a real constraint** — Women of Accountancy requires 2-faculty flyer approval. "BYU Official" verification framing helps clubs navigate this.
+- **Risk flagged:** Potential BYU mandate to move to Teams + Outlook. Unconfirmed — needs follow-up with BYU club administration.
+- **Flyer assumption fully falsified** — all 3 Round 2 clubs rely on email + Instagram as primary channels.
+
+
+
 ### Documentation Alignment (2026-04-01)
 - **Retroactive audit:** Reconciled all aiDocs with actual codebase state as of commit `62b543e`. Development had moved significantly ahead of documentation.
 - **Updated `aiDocs/context.md`:** Status changed from "Pre-Development" to "Active Development — Phase 1 Substantially Complete." Updated tech stack (Next.js 16, React 19, OpenAI primary, Gemini secondary), repository structure, product status, assumptions validated, and key learnings.
