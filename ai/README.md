@@ -1,15 +1,19 @@
 # AI Working Space
 
-This folder contains temporary working artifacts and is **gitignored**.
+This folder contains working artifacts and is **tracked in git**.
 
 ## Structure
 
-- `guides/` - Library documentation, research output, external references
-- `roadmaps/` - Task checklists, sprint plans, WIP tracking
-- `notes/` - Brainstorming, quick notes, scratch work
+- `guides/` — Library documentation, market research, API references
+- `roadmaps/` — Current roadmap + tracker, archived phase plans
+- `notes/` — Customer interviews, sprint plans, brainstorming
 
-## Usage
+## Key Files
 
-Feel free to add any working files here without worrying about git. This is your local workspace for organizing thoughts and tasks.
+- `roadmaps/2026-04-06-current-roadmap.md` — Living roadmap with task tracking ⭐
+- `notes/2026-04-06-round2-club-interviews.md` — Most recent customer research (Round 2)
+- `notes/2026-02-24-round1-club-interviews.md` — Round 1 customer interviews
 
-**Note:** Important decisions and documentation should be moved to `aiDocs/` (which is tracked in git).
+## Note
+
+Both `ai/` (working artifacts) and `aiDocs/` (source-of-truth docs) are tracked in git. Finalized product decisions live in `aiDocs/`.

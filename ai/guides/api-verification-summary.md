@@ -1,8 +1,10 @@
 # API Verification Summary
 ## All APIs are Real and Production-Ready ✅
 
-**Date:** February 16, 2026  
+**Date:** February 16, 2026
 **Purpose:** Verify that all planned APIs actually exist and match our architecture
+
+> ⚠️ **Note (April 6, 2026):** This doc was written when Gemini was the planned primary AI. The project now uses **OpenAI gpt-4o-mini as primary** and Gemini 2.0 Flash as secondary. Next.js is also on v16, not v14. Firebase/Firestore verification is still accurate. See `aiDocs/architecture.md` for the current stack.
 
 ---
 
