@@ -70,6 +70,7 @@ export async function ingestFlyerImageBytes(args: {
               workspaceLabel: m.slackWorkspaceLabel,
             }
           : undefined,
+      ingestMeta: m?.slackTeamId != null ? { sourceType: 'slack_image' } : undefined,
     });
 
     if (!result.flyerId) {

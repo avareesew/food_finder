@@ -7,7 +7,7 @@ import { processUploadedFlyer } from '@/backend/flyers/processUploadedFlyer';
 import { uploadBytesToStorage } from '@/backend/flyers/storageAdminUpload';
 import { validateOpenAIExtractionRequired } from '@/lib/validateFlyerExtraction';
 import { verifyIdTokenFromAuthorizationHeader } from '@/backend/auth/verifyBearer';
-import { userMayUploadFlyer } from '@/backend/auth/userProfiles';
+import { isConfiguredAdminEmail, userMayUploadFlyer } from '@/backend/auth/userProfiles';
 import { isByuEmail, normalizeEmail } from '@/lib/authShared';
 import { logger } from '@/lib/logger';
 
@@ -40,13 +40,20 @@ export async function POST(request: NextRequest) {
                     request.headers.get('authorization')
                 );
                 const email = decoded.email;
-                if (!email || !isByuEmail(email)) {
+                if (!email) {
                     return NextResponse.json(
-                        { error: 'Sign in with your @byu.edu account to upload.' },
+                        { error: 'Sign in with your @byu.edu account (or the admin account) to upload.' },
                         { status: 403 }
                     );
                 }
-                emailNorm = normalizeEmail(email);
+                const normalized = normalizeEmail(email);
+                if (!isByuEmail(normalized) && !isConfiguredAdminEmail(normalized)) {
+                    return NextResponse.json(
+                        { error: 'Sign in with your @byu.edu account (or the admin account) to upload.' },
+                        { status: 403 }
+                    );
+                }
+                emailNorm = normalized;
                 uid = decoded.uid;
                 const allowed = await userMayUploadFlyer(uid, emailNorm);
                 if (!allowed) {

@@ -1,5 +1,5 @@
 import type { SlackIngestWorkspace } from '@/lib/slackIngestEnv';
-import { slackIngestLookbackDays } from '@/lib/slackIngestEnv';
+import { slackOldestUnixString } from '@/lib/slackIngestEnv';
 import { ingestFlyerImageBytes } from '@/backend/flyers/ingestFlyerImageBytes';
 import { persistSlackTextFlyer } from '@/backend/flyers/persistSlackTextFlyer';
 import { extractEventsFromSlackMessageText } from '@/backend/openai/extractEventsFromSlackText';
@@ -20,11 +20,6 @@ import { validateSlackTextExtractedEvent } from '@/lib/validateFlyerExtraction';
 import { logger } from '@/lib/logger';
 
 const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
-
-function oldestUnixString(lookbackDays: number): string {
-  const sec = Math.floor(Date.now() / 1000 - lookbackDays * 24 * 60 * 60);
-  return `${sec}.000000`;
-}
 
 function pickMime(file: SlackFile, downloadContentType: string): string {
   const fromFile = (file.mimetype || '').trim();
@@ -77,8 +72,7 @@ export async function runSlackIngest(workspaces: SlackIngestWorkspace[]): Promis
     errors: [],
   };
 
-  const lookbackDays = slackIngestLookbackDays();
-  const oldest = oldestUnixString(lookbackDays);
+  const oldest = slackOldestUnixString();
 
   for (const ws of workspaces) {
     logger.info('slack-ingest-workspace-start', { label: ws.label, channelCount: ws.channelIds.length });
@@ -226,7 +220,7 @@ export async function runSlackIngest(workspaces: SlackIngestWorkspace[]): Promis
                   const v = validateSlackTextExtractedEvent(ev);
                   if (!v.ok) continue;
 
-                  await persistSlackTextFlyer({
+                  const persisted = await persistSlackTextFlyer({
                     extractedEvent: ev,
                     rawModelOutput,
                     slackChannelId: channelId,
@@ -236,8 +230,10 @@ export async function runSlackIngest(workspaces: SlackIngestWorkspace[]): Promis
                     slackWorkspaceLabel: ws.label,
                     eventIndex: i,
                   });
-                  saved += 1;
-                  summary.textEventsIngested += 1;
+                  if (persisted.mode === 'firebase' && 'flyerId' in persisted) {
+                    saved += 1;
+                    summary.textEventsIngested += 1;
+                  }
                 }
 
                 await markSlackTextMessageSeen(teamId, channelId, msg.ts, {

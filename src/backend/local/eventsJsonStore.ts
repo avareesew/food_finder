@@ -10,8 +10,8 @@ export type StoredExtractionRecord = {
     originalFilename: string;
     mimeType: string;
     sizeBytes: number;
-    /** Plain-text Slack ingest (no image) */
-    sourceType?: 'flyer' | 'slack_text';
+    /** Plain-text ingest (no image) */
+    sourceType?: 'flyer' | 'slack_text' | 'gmail_text';
     slackFileId?: string;
     slackChannelId?: string;
     slackTeamId?: string;

@@ -2,7 +2,7 @@ import type { ExtractedEvent } from '@/backend/openai/extractEventFromFlyer';
 import type { OpenAIExtraction } from '@/backend/openai/extractFlyer';
 import { coerceExtractedDateToYyyyMmDd } from '@/lib/eventTiming';
 
-export type FlyerRequiredMissing = 'date' | 'time' | 'place';
+export type FlyerRequiredMissing = 'date' | 'time' | 'place' | 'food';
 
 const HM = /^([01]?\d|2[0-3]):([0-5]\d)$/;
 
@@ -41,12 +41,19 @@ export function validateExtractedEventRequired(ev: ExtractedEvent): {
     missing.push('place');
   }
 
+  const food = typeof ev.food === 'string' ? ev.food.trim() : '';
+  const foodCat = typeof ev.foodCategory === 'string' ? ev.foodCategory.trim() : '';
+  if (food.length < 2 && foodCat.length < 2) {
+    missing.push('food');
+  }
+
   if (missing.length === 0) return { ok: true };
 
   const hint: Record<FlyerRequiredMissing, string> = {
     date: 'a clear event date (calendar day)',
     time: 'start and/or end time (e.g. 18:30)',
     place: 'where it happens (building / room)',
+    food: 'explicit food or refreshments (e.g. pizza, cookies, drinks)',
   };
   const message = `This flyer was not saved. The image must show ${missing.map((k) => hint[k]).join(', ')}. Please upload a flyer that includes all of them, or fix the text and try again.`;
 

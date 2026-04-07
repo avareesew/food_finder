@@ -1,50 +1,37 @@
+import * as admin from 'firebase-admin';
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyIdTokenFromAuthorizationHeader } from '@/backend/auth/verifyBearer';
 import {
+    deleteUserProfileDoc,
+    getConfiguredAdminEmail,
+    getProfileDoc,
     isConfiguredAdminEmail,
     listUserProfiles,
     setUserCanUpload,
 } from '@/backend/auth/userProfiles';
-import { isByuEmail, normalizeEmail } from '@/lib/authShared';
+import { requireAdminSession, respondAdminRouteError } from '@/backend/auth/requireAdmin';
+import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
+import { normalizeEmail } from '@/lib/authShared';
 import { logger } from '@/lib/logger';
-
-async function requireAdmin(request: NextRequest) {
-    const decoded = await verifyIdTokenFromAuthorizationHeader(request.headers.get('authorization'));
-    const email = decoded.email;
-    if (!email || !isByuEmail(email)) {
-        throw new Error('FORBIDDEN');
-    }
-    if (!isConfiguredAdminEmail(normalizeEmail(email))) {
-        throw new Error('FORBIDDEN');
-    }
-    if (!process.env.ADMIN_EMAIL?.trim()) {
-        throw new Error('NO_ADMIN_CONFIGURED');
-    }
-    return decoded;
-}
 
 export async function GET(request: NextRequest) {
     try {
-        await requireAdmin(request);
+        await requireAdminSession(request);
         const users = await listUserProfiles();
         return NextResponse.json({ users });
     } catch (error) {
         const code = error instanceof Error ? error.message : '';
         if (code === 'FORBIDDEN') {
             logger.warn('admin-users-forbidden', { method: 'GET' });
-            return NextResponse.json({ error: 'Admin access only.' }, { status: 403 });
+        } else if (code && code !== 'NO_ADMIN_CONFIGURED' && !/Missing Authorization|bearer token/i.test(code)) {
+            logger.error('admin-users-error', { method: 'GET', message: code });
         }
-        if (code === 'NO_ADMIN_CONFIGURED') {
-            return NextResponse.json({ error: 'ADMIN_EMAIL is not set on the server.' }, { status: 503 });
-        }
-        logger.error('admin-users-error', { method: 'GET', message: code });
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        return respondAdminRouteError(error);
     }
 }
 
 export async function PATCH(request: NextRequest) {
     try {
-        const adminDecoded = await requireAdmin(request);
+        const adminDecoded = await requireAdminSession(request);
         const body = (await request.json()) as { uid?: unknown; canUpload?: unknown };
         const uid = typeof body.uid === 'string' ? body.uid.trim() : '';
         if (!uid || uid === adminDecoded.uid) {
@@ -59,25 +46,60 @@ export async function PATCH(request: NextRequest) {
         await setUserCanUpload(uid, body.canUpload);
         return NextResponse.json({ ok: true });
     } catch (error) {
-        const code = error instanceof Error ? error.message : '';
-        if (code === 'FORBIDDEN') {
+        const msg = error instanceof Error ? error.message : '';
+        if (msg === 'FORBIDDEN') {
             logger.warn('admin-users-forbidden', { method: 'PATCH' });
-            return NextResponse.json({ error: 'Admin access only.' }, { status: 403 });
         }
-        if (code === 'NO_ADMIN_CONFIGURED') {
-            return NextResponse.json({ error: 'ADMIN_EMAIL is not set on the server.' }, { status: 503 });
-        }
-        const msg = error instanceof Error ? error.message : 'Update failed';
-        logger.error('admin-users-patch-error', { message: msg });
         if (/Cannot remove upload access/.test(msg)) {
             return NextResponse.json({ error: msg }, { status: 403 });
         }
         if (/not found/i.test(msg)) {
             return NextResponse.json({ error: msg }, { status: 404 });
         }
-        if (/Missing Authorization|verify/i.test(msg)) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        if (
+            msg &&
+            msg !== 'FORBIDDEN' &&
+            msg !== 'NO_ADMIN_CONFIGURED' &&
+            !/Missing Authorization|bearer token/i.test(msg)
+        ) {
+            logger.error('admin-users-patch-error', { message: msg });
         }
-        return NextResponse.json({ error: msg }, { status: 400 });
+        return respondAdminRouteError(error);
+    }
+}
+
+export async function DELETE(request: NextRequest) {
+    try {
+        const adminDecoded = await requireAdminSession(request);
+        const url = new URL(request.url);
+        const uid = url.searchParams.get('uid')?.trim() ?? '';
+        if (!uid || uid === adminDecoded.uid) {
+            return NextResponse.json({ error: 'Invalid user id.' }, { status: 400 });
+        }
+        const adminEmail = getConfiguredAdminEmail();
+        const target = await getProfileDoc(uid);
+        const targetEmail = target?.email ? normalizeEmail(target.email) : '';
+        if (adminEmail && targetEmail && isConfiguredAdminEmail(targetEmail)) {
+            return NextResponse.json({ error: 'Cannot delete the admin account.' }, { status: 403 });
+        }
+        ensureFirebaseAdminInitialized();
+        try {
+            await admin.auth().getUser(uid);
+        } catch (e: unknown) {
+            const code = e && typeof e === 'object' && 'code' in e ? String((e as { code: unknown }).code) : '';
+            if (code === 'auth/user-not-found') {
+                await deleteUserProfileDoc(uid).catch(() => {});
+                return NextResponse.json({
+                    ok: true,
+                    note: 'Auth user was already gone; profile cleaned up if present.',
+                });
+            }
+            throw e;
+        }
+        await admin.auth().deleteUser(uid);
+        await deleteUserProfileDoc(uid).catch(() => {});
+        return NextResponse.json({ ok: true });
+    } catch (error) {
+        return respondAdminRouteError(error);
     }
 }

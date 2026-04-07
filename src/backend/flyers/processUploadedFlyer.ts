@@ -11,6 +11,7 @@ import {
   validateExtractedEventRequired,
   type FlyerRequiredMissing,
 } from '@/lib/validateFlyerExtraction';
+import { computeEventDedupeKey } from '@/lib/eventDedupe';
 import { inferFoodEmoji } from '@/lib/foodEmoji';
 import { logger } from '@/lib/logger';
 
@@ -37,6 +38,11 @@ async function createFlyerAdminDoc(data: {
   slackFileId?: string;
   slackWorkspaceName?: string;
   slackWorkspaceLabel?: string;
+  eventDedupeKey?: string;
+  sourceType?: string;
+  gmailMessageId?: string;
+  gmailEventDedupe?: string;
+  emailRFCMessageId?: string;
 }): Promise<string> {
   ensureFirebaseAdminInitialized();
   const sanitized = JSON.parse(JSON.stringify(data)) as typeof data;
@@ -62,6 +68,14 @@ export type ProcessUploadedFlyerInput = {
     workspaceName?: string;
     workspaceLabel?: string;
   };
+  /** Optional Gmail / dedupe metadata (Slack cron may omit). */
+  ingestMeta?: {
+    eventDedupeKey?: string;
+    sourceType?: string;
+    gmailMessageId?: string;
+    gmailEventDedupe?: string;
+    emailRFCMessageId?: string;
+  };
 };
 
 export type ProcessUploadedFlyerResult = {
@@ -80,7 +94,15 @@ export type ProcessUploadedFlyerResult = {
  * Pass `imageBytes` when you already have the file in memory to avoid re-fetching the signed URL from Node.
  */
 export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Promise<ProcessUploadedFlyerResult> {
-  const { downloadURL, storagePath, originalFilename, mimeType, imageBytes: providedBytes, slackSource } = args;
+  const {
+    downloadURL,
+    storagePath,
+    originalFilename,
+    mimeType,
+    imageBytes: providedBytes,
+    slackSource,
+    ingestMeta,
+  } = args;
   logger.info('flyer-processing-start', { originalFilename, hasProvidedBytes: Boolean(providedBytes?.length) });
 
   let imageBytes: Uint8Array;
@@ -156,20 +178,48 @@ export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Pro
 
   logger.info('flyer-extraction-success', { originalFilename, title: extractedEventWithEmoji.title });
 
+  const dedupeKey = ingestMeta?.eventDedupeKey ?? computeEventDedupeKey(extractedEventWithEmoji);
+  ensureFirebaseAdminInitialized();
+  const dupSnap = await admin
+    .firestore()
+    .collection('flyers')
+    .where('eventDedupeKey', '==', dedupeKey)
+    .limit(1)
+    .get();
+  if (!dupSnap.empty) {
+    await deleteStorageObjectAtPath(storagePath).catch(() => {});
+    return {
+      flyerId: null,
+      downloadURL,
+      storagePath,
+      event: extractedEventWithEmoji,
+      rawModelOutput,
+      extractionError: null,
+      rejectedReason: 'This event is already on the calendar (duplicate).',
+      missingFields: undefined,
+    };
+  }
+
+  const meta = ingestMeta;
   const flyerId = await createFlyerAdminDoc({
     originalFilename,
     storagePath,
     downloadURL,
     status: 'extracted',
-    uploader: 'anonymous',
+    uploader: slackSource?.teamId ? 'slack' : meta?.gmailMessageId ? 'gmail' : 'anonymous',
     extractedEvent: extractedEventWithEmoji,
     rawModelOutput,
     extractionError: null,
+    eventDedupeKey: dedupeKey,
     ...(slackSource?.teamId && { slackTeamId: slackSource.teamId }),
     ...(slackSource?.channelId && { slackChannelId: slackSource.channelId }),
     ...(slackSource?.fileId && { slackFileId: slackSource.fileId }),
     ...(slackSource?.workspaceName && { slackWorkspaceName: slackSource.workspaceName }),
     ...(slackSource?.workspaceLabel && { slackWorkspaceLabel: slackSource.workspaceLabel }),
+    ...(meta?.sourceType && { sourceType: meta.sourceType }),
+    ...(meta?.gmailMessageId && { gmailMessageId: meta.gmailMessageId }),
+    ...(meta?.gmailEventDedupe && { gmailEventDedupe: meta.gmailEventDedupe }),
+    ...(meta?.emailRFCMessageId && { emailRFCMessageId: meta.emailRFCMessageId }),
   });
 
   return {

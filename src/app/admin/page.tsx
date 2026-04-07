@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import AdminNavTabs from '@/components/admin/AdminNavTabs';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { normalizeEmail } from '@/lib/authShared';
 
@@ -21,6 +22,7 @@ export default function AdminPage() {
     const [listLoading, setListLoading] = useState(false);
     const [listError, setListError] = useState<string | null>(null);
     const [toggleBusyUid, setToggleBusyUid] = useState<string | null>(null);
+    const [deleteBusyUid, setDeleteBusyUid] = useState<string | null>(null);
 
     const adminEmailNorm = me ? normalizeEmail(me.email) : '';
 
@@ -52,6 +54,38 @@ export default function AdminPage() {
         if (!user || !me?.isAdmin) return;
         void loadUsers(user);
     }, [authLoading, firebaseConfigured, loadUsers, me?.isAdmin, user]);
+
+    const onDeleteUser = async (row: ListedUser) => {
+        if (!user || !me?.isAdmin) return;
+        if (row.uid === user.uid) return;
+        if (normalizeEmail(row.email) === adminEmailNorm) return;
+        if (
+            !window.confirm(
+                `Remove ${row.email} from sign-in and delete their profile? Flyers they already posted stay in the feed.`
+            )
+        ) {
+            return;
+        }
+        setDeleteBusyUid(row.uid);
+        setListError(null);
+        try {
+            const token = await user.getIdToken();
+            const res = await fetch(`/api/admin/users?uid=${encodeURIComponent(row.uid)}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = (await res.json().catch(() => ({}))) as { error?: string };
+            if (!res.ok) {
+                setListError(typeof data.error === 'string' ? data.error : 'Delete failed.');
+                return;
+            }
+            setUsers((prev) => prev.filter((u) => u.uid !== row.uid));
+        } catch {
+            setListError('Delete failed.');
+        } finally {
+            setDeleteBusyUid(null);
+        }
+    };
 
     const onToggle = async (row: ListedUser, next: boolean) => {
         if (!user || !me?.isAdmin) return;
@@ -101,7 +135,9 @@ export default function AdminPage() {
         return (
             <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 pt-28 sm:pt-32 bg-brand-canvas min-h-screen dark:bg-gray-950 space-y-6">
                 <h1 className="text-3xl font-serif font-bold text-brand-black dark:text-gray-50">Admin</h1>
-                <p className="text-gray-600 dark:text-gray-300">Sign in with your @byu.edu email to continue.</p>
+                <p className="text-gray-600 dark:text-gray-300">
+                    Sign in with your admin account (@byu.edu or the configured admin Gmail) to continue.
+                </p>
                 <Link
                     href="/login"
                     className="inline-flex rounded-full bg-[#FF5A1F] px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-orange-600"
@@ -135,19 +171,16 @@ export default function AdminPage() {
 
     return (
         <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 pt-28 sm:pt-32 bg-brand-canvas min-h-screen dark:bg-gray-950">
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-serif font-bold text-brand-black dark:text-gray-50">
-                        Flyer upload access
-                    </h1>
-                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                        @byu.edu accounts appear here after they sign in. Only people with upload enabled below can post
-                        flyers to Firebase.
-                    </p>
-                </div>
-                <Link href="/upload" className="text-sm font-semibold text-brand-orange hover:underline">
-                    Upload page →
-                </Link>
+            <AdminNavTabs />
+            <div className="mb-8 mt-6">
+                <h1 className="text-3xl font-serif font-bold text-brand-black dark:text-gray-50">
+                    Flyer upload access
+                </h1>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    Profiles appear after each user signs in at least once. New accounts are created under{' '}
+                    <span className="font-medium text-gray-800 dark:text-gray-200">Create user</span>. Only people with
+                    upload enabled can post flyers.
+                </p>
             </div>
 
             {listError && (
@@ -164,13 +197,15 @@ export default function AdminPage() {
                     <div className="p-6 text-sm text-gray-600 dark:text-gray-300">Loading users…</div>
                 ) : users.length === 0 ? (
                     <div className="p-6 text-sm text-gray-600 dark:text-gray-300">
-                        No profiles yet. Have someone create an account or sign in on /login, then refresh this page.
+                        No profiles yet. Use Create user, then have them sign in once with the password link you emailed.
                     </div>
                 ) : (
                     <ul className="divide-y divide-gray-100 dark:divide-gray-800">
                         {users.map((row) => {
                             const isSelf = normalizeEmail(row.email) === adminEmailNorm;
                             const busy = toggleBusyUid === row.uid;
+                            const delBusy = deleteBusyUid === row.uid;
+                            const canDelete = !isSelf && normalizeEmail(row.email) !== adminEmailNorm;
                             return (
                                 <li
                                     key={row.uid}
@@ -198,7 +233,7 @@ export default function AdminPage() {
                                             <p className="mt-1 text-xs font-semibold text-brand-orange">Admin</p>
                                         ) : null}
                                     </div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                                         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
                                             Upload
                                         </span>
@@ -222,6 +257,16 @@ export default function AdminPage() {
                                                 />
                                             </button>
                                         )}
+                                        {canDelete ? (
+                                            <button
+                                                type="button"
+                                                disabled={delBusy}
+                                                onClick={() => void onDeleteUser(row)}
+                                                className="text-xs font-semibold text-red-600 hover:text-red-700 disabled:opacity-50 dark:text-red-400"
+                                            >
+                                                {delBusy ? 'Removing…' : 'Remove user'}
+                                            </button>
+                                        ) : null}
                                     </div>
                                 </li>
                             );

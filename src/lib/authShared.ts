@@ -11,6 +11,19 @@ export function isByuEmail(email: string | null | undefined): boolean {
     return normalizeEmail(email).endsWith(BYU_EMAIL_DOMAIN);
 }
 
+/** Sign-in: @byu.edu students, or the single configured admin address (often Gmail). */
+export function isAllowedSignInEmail(
+    email: string | null | undefined,
+    configuredAdminEmail: string | null | undefined
+): boolean {
+    if (!email) return false;
+    const n = normalizeEmail(email);
+    if (isByuEmail(n)) return true;
+    const admin = configuredAdminEmail?.trim() ? normalizeEmail(configuredAdminEmail) : '';
+    if (admin && n === admin) return true;
+    return false;
+}
+
 /** Lowercase trim for comparing Net IDs (no @). */
 export function normalizeByuNetId(raw: string): string {
     return raw.trim().toLowerCase();

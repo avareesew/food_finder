@@ -37,16 +37,15 @@ export async function syncUserProfileFromIdToken(decoded: admin.auth.DecodedIdTo
         throw new Error('Your account must have an email address to use this app.');
     }
     const emailNorm = normalizeEmail(email);
-    if (!isByuEmail(emailNorm)) {
-        throw new Error('Only @byu.edu email addresses are allowed.');
+    const adminEmail = getConfiguredAdminEmail();
+    const isAdmin = adminEmail ? emailNorm === adminEmail : false;
+    if (!isByuEmail(emailNorm) && !isAdmin) {
+        throw new Error('Only @byu.edu email addresses are allowed (except the configured admin account).');
     }
 
     const uid = decoded.uid;
     const tokenName =
         typeof decoded.name === 'string' && decoded.name.trim().length > 0 ? decoded.name.trim() : null;
-
-    const adminEmail = getConfiguredAdminEmail();
-    const isAdmin = adminEmail ? emailNorm === adminEmail : false;
 
     const ref = db().collection(USER_PROFILES_COLLECTION).doc(uid);
     const snap = await ref.get();
@@ -99,8 +98,9 @@ export async function getProfileDoc(
 }
 
 export async function userMayUploadFlyer(uid: string, email: string): Promise<boolean> {
-    if (!email?.trim() || !isByuEmail(email)) return false;
-    if (isConfiguredAdminEmail(email)) return true;
+    const norm = normalizeEmail(email);
+    if (isConfiguredAdminEmail(norm)) return true;
+    if (!email?.trim() || !isByuEmail(norm)) return false;
     const profile = await getProfileDoc(uid);
     return profile?.canUpload === true;
 }
@@ -128,6 +128,10 @@ export async function listUserProfiles(): Promise<UserProfileRow[]> {
         });
     });
     return rows;
+}
+
+export async function deleteUserProfileDoc(uid: string): Promise<void> {
+    await db().collection(USER_PROFILES_COLLECTION).doc(uid).delete();
 }
 
 export async function setUserCanUpload(uid: string, canUpload: boolean): Promise<void> {

@@ -73,7 +73,22 @@ export function getSlackIngestWorkspaces(): SlackIngestWorkspace[] {
 
 export function slackIngestLookbackDays(): number {
   const raw = process.env.SLACK_LOOKBACK_DAYS?.trim();
-  const n = raw ? Number.parseInt(raw, 10) : 7;
-  if (!Number.isFinite(n) || n < 1) return 7;
+  const n = raw ? Number.parseInt(raw, 10) : 2;
+  if (!Number.isFinite(n) || n < 1) return 2;
   return Math.min(n, 30);
+}
+
+/** Slack `conversations.history` `oldest` (unix seconds with fractional part). Prefer `SLACK_LOOKBACK_HOURS` for frequent crons. */
+export function slackOldestUnixString(): string {
+  const hoursRaw = process.env.SLACK_LOOKBACK_HOURS?.trim();
+  if (hoursRaw) {
+    const h = Number.parseFloat(hoursRaw);
+    if (Number.isFinite(h) && h > 0) {
+      const sec = Math.floor(Date.now() / 1000 - h * 3600);
+      return `${sec}.000000`;
+    }
+  }
+  const lookbackDays = slackIngestLookbackDays();
+  const sec = Math.floor(Date.now() / 1000 - lookbackDays * 24 * 60 * 60);
+  return `${sec}.000000`;
 }
