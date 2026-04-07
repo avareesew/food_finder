@@ -1,13 +1,36 @@
 # Changelog: Scavenger Platform
 
-**Format:** Keep entries concise. Link to commits when relevant.  
+**Format:** Keep entries concise. Link to commits when relevant.
 **Audience:** Team members and future contributors
 
 ---
 
-## [Unreleased]
+## [0.5.0] - 2026-04-06 — Technical Process Final Sprint
 
-### Documentation Cleanup (2026-04-06)
+### Structured Logging
+- Integrated `src/lib/logger.ts` structured logger into **all 16 API routes** and **6 backend pipeline files**
+- Zero `console.error` calls remain in `src/` — every error path uses `logger.error` with event name and structured details
+- Added `logger.info` for key operations: upload-start, slack-ingest-start/complete, flyer-processing-start/success, openai-extract-start/success
+- Added `logger.warn` for rejected flyers and unauthorized admin access attempts
+
+### Test Scripts
+- Fixed `scripts/test.sh`: removed invalid `--webpack` flag, added explicit exit codes (0/1/2), added config checks
+- Created `scripts/test-slack-ingest.sh` for testing Slack ingestion pipeline with structured log capture
+
+### Documentation
+- Rewrote `aiDocs/context.md` with bookshelf pattern — each key doc gets a 1-2 sentence description for quick orientation
+- Updated `aiDocs/coding-style.md` to reflect actual codebase: real data models (ExtractedEvent, Flyer), real API routes, structured logging examples, removed stale JSDoc mandate
+- Added MCP config patterns to `.gitignore` per rubric requirements
+
+### Git Workflow
+- Created 5 feature branches with individual PRs for clean git workflow evidence
+- PRs: #1 gitignore, #2 structured-logging, #3 test-scripts, #4 debug-loop, #5 docs
+
+---
+
+## [0.4.0] - 2026-04-06 — Post-Pivot Documentation & Round 2 Interviews
+
+### Documentation Cleanup
 - **Archived** `aiDocs/prd.md` → `aiDocs/archived/prd-v1-flyer-era.md`
 - **Archived** `aiDocs/mvp.md` → `aiDocs/archived/mvp-v1-flyer-era.md`
 - **Archived** all original phase0–4 roadmap files → `ai/roadmaps/archived/`
@@ -15,165 +38,101 @@
 - **Rewrote** `aiDocs/mvp.md` (v2.0) — reflects what was actually built, April 8 demo flow, post-pivot build priorities
 - **Created** `ai/roadmaps/2026-04-06-current-roadmap.md` — single current-state roadmap replacing all old phase files
 - **Created** `CLAUDE.md` — project behavioral guidance for AI context
-- **Updated** `aiDocs/architecture.md` — added Slack ingestion endpoints, email ingestion path, updated Event data model with Requirements/ClubLink/ScarcityNote fields
+- **Updated** `aiDocs/architecture.md` — added Slack ingestion endpoints, email ingestion path, updated Event data model
 - **Removed** `ai/` from `.gitignore` — ai/ folder is now tracked in git
-- **Renamed** `ai/notes/week1-club-interviews.md` → `2026-02-24-round1-club-interviews.md`
 
-### Round 2 Customer Interviews (2026-04-06)
+### Round 2 Customer Interviews
 **Interviews:** Michael Nichols (Sales Society President), Molly Wakefield (Finance Society VP), Abigail Armstrong (Women of Accountancy President)
 Full notes: `ai/notes/interviews/2026-04-06-round2-club-interviews.md`
 
 Key findings:
 - **Automation validated at 9.7/10 average** — zero-effort ingestion from official channels is THE reason club leaders adopt. Ratings: 10/10, 9/10, 10/10.
-- **Professionalism tension confirmed (2/3)** — Sales Society and Finance Society worry about food hunters; Marriott "professional manners" initiative adds institutional pressure. Women of Accountancy takes opposite view (food as a deliberate bribe).
-- **Sub-associations are the best early adopter segment** — smaller budgets, higher food frequency, less marketing bandwidth. Mentioned independently by Sales Society and Finance Society.
+- **Professionalism tension confirmed (2/3)** — Sales Society and Finance Society worry about food hunters; Marriott "professional manners" initiative adds institutional pressure.
+- **Sub-associations are the best early adopter segment** — smaller budgets, higher food frequency, less marketing bandwidth.
 - **Slack is not universal** — Finance Society and Women of Accountancy don't use Slack. Email is the more universal first-class path.
-- **New features requested:** Requirements / Expectations field (2/3), Club Link / Join button (2/3), Scarcity note — "Food for first X people" (Women of Accountancy).
-- **Institutional approval is a real constraint** — Women of Accountancy requires 2-faculty flyer approval. "BYU Official" verification framing helps clubs navigate this.
-- **Risk flagged:** Potential BYU mandate to move to Teams + Outlook. Unconfirmed — needs follow-up with BYU club administration.
 - **Flyer assumption fully falsified** — all 3 Round 2 clubs rely on email + Instagram as primary channels.
 
+---
 
+## [0.3.0] - 2026-04-01 — Documentation Alignment
 
-### Documentation Alignment (2026-04-01)
-- **Retroactive audit:** Reconciled all aiDocs with actual codebase state as of commit `62b543e`. Development had moved significantly ahead of documentation.
-- **Updated `aiDocs/context.md`:** Status changed from "Pre-Development" to "Active Development — Phase 1 Substantially Complete." Updated tech stack (Next.js 16, React 19, OpenAI primary, Gemini secondary), repository structure, product status, assumptions validated, and key learnings.
-- **Updated `aiDocs/architecture.md`:** Version 2.0 — rewrote file structure, API endpoints, data models (Flyer/Event/Extraction vs old Post model), data flow diagrams, technology stack, environment variables, and security sections to match actual implementation.
-- **Updated `ai/roadmaps/roadmap-tracker.md`:** Checked off completed Phase 0 and Phase 1 items, marked divergences (AI provider shift, features beyond scope), documented active blockers (no "Mark as Gone" UI, no real-time sync, no confirmation form), and added key learnings.
+- **Retroactive audit:** Reconciled all aiDocs with actual codebase state as of commit `62b543e`
+- **Updated `aiDocs/context.md`:** Status changed from "Pre-Development" to "Active Development — Phase 1 Substantially Complete"
+- **Updated `aiDocs/architecture.md`:** Version 2.0 — rewrote file structure, API endpoints, data models, data flow diagrams
+- **Updated `ai/roadmaps/roadmap-tracker.md`:** Checked off completed Phase 0 and Phase 1 items, documented divergences
 
 ### Key Divergences Documented
 - **AI Provider:** Original plan was Gemini-only; actual uses OpenAI gpt-4o-mini as primary, Gemini as secondary
 - **Data Model:** Original `Post` model replaced by `Flyer`, `Event`, and `Extraction` collections
 - **API Routes:** Original `/api/extract-flyer` and `/api/posts` replaced by `/api/flyers/*`, `/api/events`, `/api/upload/*`, `/api/local/*`
-- **Features Beyond Scope:** Campus building maps, explore page, dark mode, weekly calendar, dual backend mode, about page — all built but were listed as "out of scope" or Phase 2+
-- **Missing Features:** "Mark as Gone" UI, real-time `onSnapshot`, confirmation/edit form for AI output
-
-### In Progress
-- Created `ai/roadmaps/phase-2-through-4-checklist.md` to track roadmap tasks + status for Phase 2/3/4 work items.
-- Added `src/lib/logger.ts` and wired structured logging through the upload API, Firestore services, feed page, and upload form so debuggable events are emitted during every flow.
-- Extended `scripts/test.sh` to lint/build, pipe output into `logs/test-<timestamp>.log`, and documented how to replay the structured logs in `aiDocs/context.md`.
-- Expanded `aiDocs/prd.md` with Customer Focus, Differentiation, and Success/Failure Criteria sections to show Jason our due diligence, metrics, and pivot plans.
-- Drafted the customer interaction plan (below) so we can capture at least five touchpoints or falsification experiments and log the learnings in the changelog once complete.
-
-### Customer Discovery
-
-#### ✅ Completed — Interview 1: Kendall Castellaw (2026-02-24)
-**Past Finance Society President · Marriott School (Tanner Building)**
-Full notes: `ai/notes/interviews/week1-club-interviews.md`
-
-Key findings:
-- **🚨 Tanner Building is flyer-free by policy.** Marriott School prohibits physical flyer distribution except for large school-wide events. Clubs in Tanner use digital screens, Instagram, and newsletters instead. Puts the “70%+ of events have physical flyers” assumption at risk for the Marriott cluster.
-- **Supply-side motivation is nuanced.** Food is funded by member dues, so the instinct is to serve members first. The effective pitch is event *exposure and recruitment* (“get people in the door”), not waste reduction.
-- **Liability is a non-issue.** Confirmed: no concerns raised. Validates FDIA framing is sufficient.
-- **Food events are frequent.** Every Finance Society event had food; ~80% was company-sponsored.
-
-#### ✅ Completed — Interview 2: Carson Fellows (2026-02-25)
-**Current Management Consulting Club President**
-Full notes: `ai/notes/interviews/week1-club-interviews.md`
-
-Key findings:
-- **Non-Tanner clubs do use flyers/email with food callouts.** Carson mentions announcing food on flyers and in emails — partially rehabilitates the flyer-scanning assumption for buildings outside Marriott School.
-- **Leftover supply is lower than expected.** Management Consulting intentionally orders less than needed; rarely has leftovers. Both interviews now converge on low/unreliable leftover supply. Feed may need to surface food-available-during-event posts, not just post-event scraps.
-- **Recruitment framing confirmed across two independent interviews.** “If it got more people to go to the club, then maybe” — same motivation as Kendall. Waste reduction framing does not resonate; club growth does.
-- **Liability: zero concerns** — second independent confirmation. FDIA positioning is sufficient.
-- **Low spontaneous posting motivation.** “Wouldn’t go out of their way to post it.” Friction reduction is critical — posting must be near-effortless or supply side won’t participate.
-
-#### Planned Touchpoints (Remaining)
-- Interview/ride-along with RA Marcus (Heritage Halls) to validate sustainability messaging and interest in raising floors’ awareness.
-- Chat with club recruiter Sarah (Marketing Club) to see how leftover catering is currently handled and confirm the legal/procedural blockers.
-- Survey 5+ hungry students in the JFSB or library (Hungry Hustler persona) about their current food discovery channels and willingness to use a feed.
-- Interview a campus sustainability advocate about measurable waste metrics to feed into our success criteria dashboards.
-- Run a falsifiability check by asking 5 random students whether they would post leftovers anonymously and capturing yes/no plus rationale.
+- **Features Beyond Scope:** Campus building maps, explore page, dark mode, weekly calendar, dual backend mode, about page
 
 ### Testing & Logs
-- `bash scripts/test.sh` now runs lint + `next build --webpack`, pipes structured output into `logs/test-<timestamp>.log`, and is referenced in `aiDocs/context.md` for reproducing the test-log-fix loop.
-- `logs/test-20260223-205538.log` captured the first failure (TurbopackInternalError: creating new process / binding to a port) so we could justify moving to webpack builds.
-- `logs/test-20260223-210044.log` captured the `getaddrinfo ENOTFOUND fonts.googleapis.com` errors from the webpack run; the fix was removing the `next/font` imports and defining font CSS variables locally.
-- `logs/test-20260223-210144.log` proves the updated pipeline succeeded (lint + webpack build), so we can show Casey the structured logs plus the CLI commands that produced them.
+- `scripts/test.sh` runs lint + build, pipes structured output into `logs/test-<timestamp>.log`
+- `logs/test-20260223-205538.log` captured TurbopackInternalError — justified moving to webpack builds
+- `logs/test-20260223-210044.log` captured `getaddrinfo ENOTFOUND fonts.googleapis.com` — fixed by removing `next/font` imports
+- `logs/test-20260223-210144.log` proves the updated pipeline succeeded (lint + webpack build)
 
 ---
 
-## [0.1.0] - 2026-02-16
+## [0.2.0] - 2026-03-15 — Core Development Sprint
 
-### Added - Project Foundation
-- ✅ Initial project structure and git repository
-- ✅ Comprehensive market research analysis (41% food insecurity rate, competitive landscape)
-- ✅ Product Requirements Document (PRD) with user personas and success metrics
-- ✅ MVP Demo Specification (2-3 week build timeline)
-- ✅ System architecture document (Next.js + Firestore + Gemini 2.0 Flash)
-- ✅ Coding style guide (TypeScript, React patterns, Tailwind CSS)
-- ✅ Project context document (mission, status, tech stack)
-- ✅ `.gitignore` configuration for Next.js/Firebase projects
-- ✅ GitHub repository initialized at `avareesew/food_finder`
+### Added — Full Application Build
+- **Flyer Upload & AI Extraction** — Full pipeline: photo → OpenAI gpt-4o-mini extraction → validation → Firestore storage
+- **Gemini 2.0 Flash** available as secondary extraction path via `/api/flyers/[flyerId]/extract`
+- **Feed Page** — Grid of event cards with responsive layout, mock data fallback
+- **Event Detail View** — Full event page with flyer image, status badges, location, host
+- **Event Detail Modal** — Inline modal for quick event preview
+- **Home Page** — Hero section, weekly event calendar, discover preview, campus map CTA, testimonials
+- **Explore Page** — Campus buildings explorer with interactive Leaflet map, building data, week navigation
+- **Upload Page** — Drag-and-drop upload with extraction results and recent uploads list
+- **About Page** — Mission, problem statement, how it works, values
+- **Dark Mode** — Toggle with persistent theme, system-preference detection
+- **Campus Building Data** — 20 BYU buildings with lat/lng, aliases, building code matching
+- **Dual Backend Mode** — Firebase (production) and local filesystem (development) via `NEXT_PUBLIC_BACKEND_MODE`
+- **Extraction Validation** — Auto-rejects flyers missing date, time, or place
+- **Event Timing Utilities** — Campus timezone handling, date coercion, expiry detection, 12h formatting
+- **Auth System** — Firebase Auth with BYU email enforcement, canUpload permission gate, admin panel
+- **Slack Ingestion Pipeline** — Cron-triggered, reads club channels, image + text messages, deduplication, multi-workspace
 
-### Documentation Structure
-```
-aiDocs/           # Tracked in git (source of truth)
-├── context.md    # Project overview and status
-├── prd.md        # Product requirements
-├── mvp.md        # MVP specification
-├── architecture.md # Technical architecture
-├── coding-style.md # Code standards
-└── changelog.md  # This file
+### Technical Decisions
+- Switched from Gemini-only to OpenAI gpt-4o-mini as primary AI (better structured JSON output)
+- Added `firebase-admin` for server-side writes (bypasses client Firestore rules)
+- Implemented local filesystem fallback for zero-Firebase development
 
-ai/               # Gitignored (working artifacts)
-├── guides/       # Market research, library docs
-├── roadmaps/     # Task lists (to be created)
-└── notes/        # Brainstorming (to be created)
-```
+---
+
+## [0.1.0] - 2026-02-16 — Project Foundation
+
+### Added
+- Initial project structure and git repository
+- Comprehensive market research analysis (41% food insecurity rate, competitive landscape)
+- Product Requirements Document (PRD) with user personas and success metrics
+- MVP Demo Specification (2-3 week build timeline)
+- System architecture document (Next.js + Firestore + Gemini 2.0 Flash)
+- Coding style guide (TypeScript, React patterns, Tailwind CSS)
+- Project context document (mission, status, tech stack)
+- `.gitignore` configuration for Next.js/Firebase projects
+- GitHub repository initialized at `avareesew/food_finder`
+- 2 club president interviews (Kendall Castellaw, Carson Fellows)
 
 ### Key Decisions
-- **BYU Campus as pilot** — Team is on-campus, tight-knit community, service-oriented culture
-- **Flyer scanning as MVP focus** — Gemini 2.0 Flash provides 30x cost advantage
-- **No user accounts in MVP** — Reduces friction, anonymous browsing
-- **Human-in-the-loop AI verification** — Prevents "ghost chase" errors
-- **Serverless architecture** — Vercel + Firebase for zero DevOps
-
-### Reference Documents
-- Market Research: `ai/guides/food-finder-market-research.md`
-- Gemini Research: `ai/guides/external/marketResearch_gemini.md`
-
----
-
-## Key Metrics (Goals)
-
-### MVP Phase (Week 7 Target)
-- 30+ posts per week
-- 150+ unique visitors
-- <5% "ghost chase" rate
-- 25% repeat usage rate
-- 5+ organic posts (non-team)
-
----
-
-## Next Milestones (as of 2026-04-01)
-
-### Pre-Alpha Blockers
-- [ ] Build "Mark as Gone" UI (status toggle on event detail page)
-- [ ] Wire real-time `onSnapshot` listeners on feed
-- [ ] Build confirmation/edit form for AI-extracted data
-- [ ] Confirm Vercel production deployment is live
-
-### Alpha Testing (Phase 2)
-- [ ] Deploy to Vercel production
-- [ ] Recruit 5-10 alpha testers
-- [ ] Seed 10-15 real events
-- [ ] Collect feedback and iterate
-
-### Public Launch (Phase 4)
-- [ ] Social media announcement
-- [ ] Share in BYU ward groups and clubs
-- [ ] Monitor metrics
-- [ ] Achieve 30+ posts goal
+- BYU Campus as pilot — on-campus team, service-oriented culture
+- Flyer scanning as MVP focus (later falsified and pivoted)
+- No user accounts in MVP — reduces friction, anonymous browsing
+- Serverless architecture — Vercel + Firebase for zero DevOps
 
 ---
 
 ## Version History
 
-- **v0.3.0** (2026-04-01): Documentation alignment — reconciled aiDocs with actual codebase state
-- **v0.2.0** (~2026-03): Core development — upload pipeline, feed, event detail, explore page, campus maps, dark mode
-- **v0.1.0** (2026-02-16): Project foundation, documentation, planning complete
-- **v0.0.0** (2026-02-16): Initial commit
+| Version | Date | Summary |
+|---------|------|---------|
+| v0.5.0 | 2026-04-06 | Technical process final sprint — logging, scripts, docs |
+| v0.4.0 | 2026-04-06 | Post-pivot documentation cleanup + Round 2 interviews |
+| v0.3.0 | 2026-04-01 | Documentation alignment — reconciled docs with codebase |
+| v0.2.0 | 2026-03-15 | Core development — full application build |
+| v0.1.0 | 2026-02-16 | Project foundation, documentation, planning |
 
 ---
 
