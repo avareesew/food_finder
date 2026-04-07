@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { appendEvent, saveUpload } from '@/backend/local/eventsStore';
 import { extractFlyerWithOpenAI } from '@/backend/openai/extractFlyer';
 import { validateOpenAIExtractionRequired } from '@/lib/validateFlyerExtraction';
+import { logger } from '@/lib/logger';
 
 /**
  * Local-first MVP endpoint (NOT for production/serverless persistence):
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, record });
   } catch (error) {
-    console.error('Local ingest error:', error);
+    logger.error('local-ingest-error', { message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Local ingest failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

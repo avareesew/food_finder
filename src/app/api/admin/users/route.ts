@@ -6,6 +6,7 @@ import {
     setUserCanUpload,
 } from '@/backend/auth/userProfiles';
 import { isByuEmail, normalizeEmail } from '@/lib/authShared';
+import { logger } from '@/lib/logger';
 
 async function requireAdmin(request: NextRequest) {
     const decoded = await verifyIdTokenFromAuthorizationHeader(request.headers.get('authorization'));
@@ -30,11 +31,13 @@ export async function GET(request: NextRequest) {
     } catch (error) {
         const code = error instanceof Error ? error.message : '';
         if (code === 'FORBIDDEN') {
+            logger.warn('admin-users-forbidden', { method: 'GET' });
             return NextResponse.json({ error: 'Admin access only.' }, { status: 403 });
         }
         if (code === 'NO_ADMIN_CONFIGURED') {
             return NextResponse.json({ error: 'ADMIN_EMAIL is not set on the server.' }, { status: 503 });
         }
+        logger.error('admin-users-error', { method: 'GET', message: code });
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 }
@@ -58,12 +61,14 @@ export async function PATCH(request: NextRequest) {
     } catch (error) {
         const code = error instanceof Error ? error.message : '';
         if (code === 'FORBIDDEN') {
+            logger.warn('admin-users-forbidden', { method: 'PATCH' });
             return NextResponse.json({ error: 'Admin access only.' }, { status: 403 });
         }
         if (code === 'NO_ADMIN_CONFIGURED') {
             return NextResponse.json({ error: 'ADMIN_EMAIL is not set on the server.' }, { status: 503 });
         }
         const msg = error instanceof Error ? error.message : 'Update failed';
+        logger.error('admin-users-patch-error', { message: msg });
         if (/Cannot remove upload access/.test(msg)) {
             return NextResponse.json({ error: msg }, { status: 403 });
         }

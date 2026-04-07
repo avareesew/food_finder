@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import * as admin from 'firebase-admin';
 import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
 import { flyerDocToClientJson } from '@/backend/flyers/flyerDocToJson';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/flyers/:flyerId — single flyer for event detail (Admin SDK).
@@ -24,7 +25,7 @@ export async function GET(
 
     return NextResponse.json({ flyer: flyerDocToClientJson(docRef.id, docRef.data()!) });
   } catch (error) {
-    console.error('GET /api/flyers/[flyerId]:', error);
+    logger.error('get-flyer-by-id-error', { flyerId: 'unknown', message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to load flyer', details: error instanceof Error ? error.message : 'Unknown' },
       { status: 500 }

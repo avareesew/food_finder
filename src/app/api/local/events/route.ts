@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getExtractionRecords } from '@/backend/local/eventsJsonStore';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -8,7 +9,7 @@ export async function GET() {
     records.sort((a, b) => (b.createdAtIso || '').localeCompare(a.createdAtIso || ''));
     return NextResponse.json({ success: true, records });
   } catch (error) {
-    console.error('Local events read error:', error);
+    logger.error('local-events-read-error', { message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { success: false, error: 'Failed to read local events' },
       { status: 500 }

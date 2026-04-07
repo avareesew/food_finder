@@ -5,6 +5,7 @@ import { extractEventFromFlyerWithOpenAI } from '@/backend/openai/extractEventFr
 import { appendExtractionRecord } from '@/backend/local/eventsJsonStore';
 import { saveFlyerToPublicUploads } from '@/backend/local/publicUploads';
 import { validateExtractedEventRequired } from '@/lib/validateFlyerExtraction';
+import { logger } from '@/lib/logger';
 
 /**
  * Extraction-only MVP endpoint (does NOT store anything):
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, event, rawModelOutput, saved: { id: record.id } });
   } catch (error) {
-    console.error('Local extract error:', error);
+    logger.error('local-extract-error', { message: error instanceof Error ? error.message : String(error) });
     const msg = error instanceof Error ? error.message : 'Unknown error';
     const isMissingEnv = msg.startsWith('Missing required environment variable:');
     return NextResponse.json(

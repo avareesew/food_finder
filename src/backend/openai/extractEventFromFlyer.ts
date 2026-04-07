@@ -1,5 +1,6 @@
 import { requireEnv } from '@/backend/env';
 import { coerceExtractedDateToYyyyMmDd } from '@/lib/eventTiming';
+import { logger } from '@/lib/logger';
 
 export type FoodCategory =
   | 'pizza'
@@ -121,6 +122,7 @@ export async function extractEventFromFlyerWithOpenAI(args: {
   const { imageBytes, mimeType, campusTimezone = 'America/Denver' } = args;
 
   const apiKey = requireEnv('OPENAI_API_KEY');
+  logger.info('openai-extract-start', { type: 'image', mimeType });
   const dataUrl = `data:${mimeType};base64,${Buffer.from(imageBytes).toString('base64')}`;
 
   const prompt = [
@@ -170,10 +172,12 @@ export async function extractEventFromFlyerWithOpenAI(args: {
 
   if (!res.ok) {
     const errText = await res.text().catch(() => '');
+    logger.error('openai-extract-failure', { status: res.status, error: errText || res.statusText });
     throw new Error(`OpenAI error (${res.status}): ${errText || res.statusText}`);
   }
 
   const payload: unknown = await res.json();
+  logger.info('openai-extract-success', { type: 'image' });
   const rawModelOutput = getRawModelOutput(payload);
 
   const jsonText = stripCodeFences(String(rawModelOutput || '').trim());

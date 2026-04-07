@@ -7,6 +7,7 @@ import {
     userMayUploadFlyer,
 } from '@/backend/auth/userProfiles';
 import { isByuEmail, normalizeEmail } from '@/lib/authShared';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
     try {
@@ -34,6 +35,7 @@ export async function GET(request: NextRequest) {
         });
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Unauthorized';
+        logger.error('auth-me-error', { message });
         return NextResponse.json({ error: message }, { status: 401 });
     }
 }

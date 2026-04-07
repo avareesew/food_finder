@@ -12,6 +12,7 @@ import {
   type FlyerRequiredMissing,
 } from '@/lib/validateFlyerExtraction';
 import { inferFoodEmoji } from '@/lib/foodEmoji';
+import { logger } from '@/lib/logger';
 
 async function fetchBytesFromDownloadUrl(downloadURL: string): Promise<Uint8Array> {
   const res = await fetch(downloadURL, { signal: AbortSignal.timeout(60_000) });
@@ -80,6 +81,7 @@ export type ProcessUploadedFlyerResult = {
  */
 export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Promise<ProcessUploadedFlyerResult> {
   const { downloadURL, storagePath, originalFilename, mimeType, imageBytes: providedBytes, slackSource } = args;
+  logger.info('flyer-processing-start', { originalFilename, hasProvidedBytes: Boolean(providedBytes?.length) });
 
   let imageBytes: Uint8Array;
   if (providedBytes && providedBytes.length > 0) {
@@ -133,6 +135,7 @@ export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Pro
       : validation.message;
 
   if (rejectedReason) {
+    logger.warn('flyer-rejected', { originalFilename, reason: rejectedReason, missingFields: validation.ok ? undefined : validation.missing });
     await deleteStorageObjectAtPath(storagePath).catch(() => {});
     return {
       flyerId: null,
@@ -150,6 +153,8 @@ export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Pro
     ...extractedEvent,
     foodEmoji: extractedEvent.foodEmoji ?? inferFoodEmoji(extractedEvent.food, extractedEvent.foodCategory),
   };
+
+  logger.info('flyer-extraction-success', { originalFilename, title: extractedEventWithEmoji.title });
 
   const flyerId = await createFlyerAdminDoc({
     originalFilename,
