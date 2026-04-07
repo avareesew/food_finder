@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { runGmailIngest } from '@/backend/gmail/runGmailIngest';
+import { logger } from '@/lib/logger';
 
 export const maxDuration = 60;
 
@@ -33,7 +34,7 @@ async function handle(request: NextRequest) {
     return NextResponse.json(summary);
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Gmail ingest failed';
-    console.error('[gmail-ingest]', e);
+    logger.error('gmail-ingest-failed', { error: msg });
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }
