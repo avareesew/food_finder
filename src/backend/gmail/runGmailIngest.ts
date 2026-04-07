@@ -7,6 +7,7 @@ import { processUploadedFlyer } from '@/backend/flyers/processUploadedFlyer';
 import { ensureFirebaseAdminInitialized, uploadBytesToStorage } from '@/backend/flyers/storageAdminUpload';
 import { extractEventsFromSlackMessageText } from '@/backend/openai/extractEventsFromSlackText';
 import { gmailInboxQuery, gmailListMaxResults } from '@/lib/gmailIngestEnv';
+import { logger } from '@/lib/logger';
 import { validateSlackTextExtractedEvent } from '@/lib/validateFlyerExtraction';
 
 const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
@@ -125,11 +126,13 @@ export async function runGmailIngest(): Promise<GmailIngestSummary> {
   if (!clientId || !clientSecret || !refreshToken) {
     summary.disabled = true;
     summary.message = 'Gmail ingest not configured (set GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN).';
+    logger.info('gmail-ingest-disabled', { reason: 'missing_oauth_config' });
     return summary;
   }
   if (!firebaseBucket) {
     summary.disabled = true;
     summary.message = 'Gmail ingest requires NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET.';
+    logger.info('gmail-ingest-disabled', { reason: 'missing_firebase_bucket' });
     return summary;
   }
 
@@ -139,6 +142,13 @@ export async function runGmailIngest(): Promise<GmailIngestSummary> {
 
   const q = gmailInboxQuery();
   const maxResults = gmailListMaxResults();
+  logger.info('gmail-ingest-list-start', { query: q, maxResults });
+
+  const recordMessageFailure = (messageId: string, stage: string, message: string) => {
+    summary.failed += 1;
+    summary.errors.push(`message ${messageId} ${stage}: ${message}`);
+    logger.error('gmail-ingest-message-failure', { messageId, stage, message });
+  };
 
   let listRes;
   try {
@@ -148,6 +158,7 @@ export async function runGmailIngest(): Promise<GmailIngestSummary> {
     summary.ok = false;
     summary.errors.push(`list: ${msg}`);
     summary.failed += 1;
+    logger.error('gmail-ingest-list-failure', { query: q, maxResults, message: msg });
     return summary;
   }
 
@@ -168,8 +179,7 @@ export async function runGmailIngest(): Promise<GmailIngestSummary> {
       full = await gmail.users.messages.get({ userId: 'me', id, format: 'full' });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      summary.errors.push(`get ${id}: ${msg}`);
-      summary.failed += 1;
+      recordMessageFailure(id, 'get', msg);
       continue;
     }
 
@@ -215,8 +225,7 @@ export async function runGmailIngest(): Promise<GmailIngestSummary> {
       }
 
       if (!picked || !bytes) {
-        summary.failed += 1;
-        summary.errors.push(`message ${id}: could not read image attachment`);
+        recordMessageFailure(id, 'image_read', 'could not read image attachment');
         await markGmailMessageHandled(id, 'image_read_failed').catch(() => {});
         continue;
       }
@@ -254,15 +263,13 @@ export async function runGmailIngest(): Promise<GmailIngestSummary> {
         });
 
         if (!result.flyerId) {
-          summary.failed += 1;
-          summary.errors.push(`message ${id} image: ${result.rejectedReason || 'rejected'}`);
+          recordMessageFailure(id, 'image_process', result.rejectedReason || 'rejected');
         } else {
           summary.imagesIngested += 1;
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        summary.failed += 1;
-        summary.errors.push(`message ${id} image: ${msg}`);
+        recordMessageFailure(id, 'image_process', msg);
       } finally {
         await markGmailMessageHandled(id, 'image_branch').catch(() => {});
       }
@@ -292,8 +299,7 @@ export async function runGmailIngest(): Promise<GmailIngestSummary> {
       rawModelOutput = ext.rawModelOutput;
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      summary.failed += 1;
-      summary.errors.push(`message ${id} text: ${msg}`);
+      recordMessageFailure(id, 'text_extract', msg);
       await markGmailMessageHandled(id, 'text_extract_failed').catch(() => {});
       continue;
     }
@@ -318,13 +324,24 @@ export async function runGmailIngest(): Promise<GmailIngestSummary> {
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        summary.failed += 1;
-        summary.errors.push(`message ${id} text evt ${i}: ${msg}`);
+        recordMessageFailure(id, `text_persist_${i}`, msg);
       }
     }
 
     await markGmailMessageHandled(id, 'text_branch').catch(() => {});
   }
+
+  logger.info('gmail-ingest-summary', {
+    ok: summary.ok,
+    disabled: summary.disabled === true,
+    messagesListed: summary.messagesListed,
+    skippedAlreadyProcessed: summary.skippedAlreadyProcessed,
+    imagesAttempted: summary.imagesAttempted,
+    imagesIngested: summary.imagesIngested,
+    textEventsIngested: summary.textEventsIngested,
+    failed: summary.failed,
+    errorCount: summary.errors.length,
+  });
 
   return summary;
 }
