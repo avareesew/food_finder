@@ -1,6 +1,6 @@
 # Scavenger: Campus Food Discovery Platform — Project Context
 
-**Last Updated:** April 6, 2026
+**Last Updated:** April 7, 2026
 **Project Status:** Active Development — Final Sprint (Presentations April 8, 13, 15)
 **Current Phase:** Demo Build + Presentation Prep
 
@@ -43,7 +43,8 @@ Scavenger is a mobile-first web platform that solves the information gap between
 ## Product Status (as of April 6, 2026)
 
 ### What's Built and Working
-- **Slack Ingestion Pipeline** — Cron-triggered, reads official club channels, image + text messages, deduplication, multi-workspace
+- **Gmail Ingestion Pipeline** — Cron-triggered (`/api/cron/gmail-ingest`), reads getscavenger@gmail.com inbox via OAuth2, extracts events from plain-text emails and image attachments, deduplication via `gmailIngestMarks` collection
+- **Slack Ingestion Pipeline** — Cron-triggered + real-time Events API (`/api/slack/events`), reads official club channels, image + text messages, deduplication, multi-workspace
 - **Manual Flyer Upload** — Drag-and-drop upload with OpenAI gpt-4o-mini vision extraction, Firebase Storage + Firestore write
 - **Feed Page** — Grid of event cards with responsive layout, Firebase + local modes
 - **Weekly Event Calendar** — 7-day week grid with event dots, day selector, week navigation
@@ -51,6 +52,8 @@ Scavenger is a mobile-first web platform that solves the information gap between
 - **Event Detail View** — Full event page with flyer image, status badges, location, host, food details
 - **Home Page** — Hero section, weekly calendar, discover preview, campus map CTA
 - **Auth System** — Firebase Auth with BYU email enforcement, canUpload permission gate, admin toggle
+- **Branded Password Reset** — Custom `/auth/action` page rewrites Firebase reset links to stay on app domain (`firebaseEmailActionLinks.ts`)
+- **Slack Events API** — Real-time message ingestion via `POST /api/slack/events` with signature verification
 - **Dark Mode** — System-preference detection, toggle with persistent theme
 - **Dual Backend Mode** — Firebase (production) and local filesystem (development) via `NEXT_PUBLIC_BACKEND_MODE`
 - **Structured Logging** — JSON-structured logger integrated into all API routes and backend pipeline
@@ -105,7 +108,8 @@ See `aiDocs/architecture.md` for complete technical architecture.
 
 - **Ava Williams** — Product Lead
 - **Ryan Tetro** — Technical Lead
-- **Brandi Mathison** — Design & Research
+- **Allie Marshall** — Design & Research
+- **Eddy Gonzales** — Engineering
 
 ---
 
