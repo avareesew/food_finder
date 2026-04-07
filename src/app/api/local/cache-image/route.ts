@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
 import path from 'path';
 import { promises as fs } from 'fs';
 
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, localUrl: `/uploads/${filename}`, cached: false });
   } catch (error) {
-    console.error('Local cache-image error:', error);
+    logger.error('local-cache-image-error', { message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { success: false, error: 'Failed to cache image' },
       { status: 500 }

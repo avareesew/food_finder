@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 import {
   addDoc,
   collection,
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, eventId: docRef.id });
   } catch (error) {
-    console.error('Create event error:', error);
+    logger.error('create-event-error', { message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Create event failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -119,7 +120,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, events });
   } catch (error) {
-    console.error('List events error:', error);
+    logger.error('list-events-error', { message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'List events failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

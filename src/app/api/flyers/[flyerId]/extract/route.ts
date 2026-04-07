@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { doc, getDoc, addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { extractFlyerFromImageBytes } from '@/backend/gemini/extractFlyer';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/flyers/:flyerId/extract
@@ -69,7 +70,7 @@ export async function POST(
       extraction,
     });
   } catch (error) {
-    console.error('Extraction error:', error);
+    logger.error('flyer-extraction-error', { message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Extraction failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

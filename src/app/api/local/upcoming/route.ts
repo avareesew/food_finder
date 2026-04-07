@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getExtractionRecords, type StoredExtractionRecord } from '@/backend/local/eventsJsonStore';
+import { logger } from '@/lib/logger';
 import {
   coerceExtractedDateToYyyyMmDd,
   isCampusEventEnded,
@@ -45,7 +46,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ success: true, records: upcoming });
   } catch (error) {
-    console.error('Local upcoming read error:', error);
+    logger.error('local-upcoming-read-error', { message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { success: false, error: 'Failed to read upcoming local events' },
       { status: 500 }

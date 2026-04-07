@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getSlackIngestWorkspaces } from '@/lib/slackIngestEnv';
 import { runSlackIngest } from '@/backend/slack/runSlackIngest';
+import { logger } from '@/lib/logger';
 
 /** Slack history + OpenAI can exceed default Vercel timeout; raise in the dashboard if you hit limits. */
 export const maxDuration = 60;
@@ -40,12 +41,14 @@ async function handle(request: NextRequest) {
     });
   }
 
+  logger.info('slack-ingest-start', { workspaceCount: workspaces.length });
   try {
     const summary = await runSlackIngest(workspaces);
+    logger.info('slack-ingest-complete', { summary });
     return NextResponse.json({ ok: true, ...summary });
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Slack ingest failed';
-    console.error('[slack-ingest]', e);
+    logger.error('slack-ingest-error', { message: msg });
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }

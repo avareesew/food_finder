@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import { processUploadedFlyer } from '@/backend/flyers/processUploadedFlyer';
 import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
 import { flyerDocToClientJson } from '@/backend/flyers/flyerDocToJson';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/flyers?limit=20
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     const flyers = snap.docs.map((d) => flyerDocToClientJson(d.id, d.data()));
     return NextResponse.json({ flyers });
   } catch (error) {
-    console.error('GET /api/flyers:', error);
+    logger.error('get-flyers-error', { message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to load flyers', details: error instanceof Error ? error.message : 'Unknown' },
       { status: 500 }
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
       message: 'Upload successful',
     });
   } catch (error) {
-    console.error('Flyer upload error:', error);
+    logger.error('flyer-upload-error', { message: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Upload failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

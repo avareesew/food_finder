@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processUploadedFlyer } from '@/backend/flyers/processUploadedFlyer';
+import { logger } from '@/lib/logger';
 
 function formatError(error: unknown): string {
   if (error instanceof Error) {
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
       message: 'Flyer stored in Firebase and extracted successfully.',
     });
   } catch (error) {
-    console.error('Upload process error:', error);
+    logger.error('upload-process-error', { message: formatError(error) });
     const msg = formatError(error);
     const isMissingEnv = msg.startsWith('Missing required environment variable:');
     const firebaseHint =

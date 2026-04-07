@@ -9,6 +9,7 @@ import { validateOpenAIExtractionRequired } from '@/lib/validateFlyerExtraction'
 import { verifyIdTokenFromAuthorizationHeader } from '@/backend/auth/verifyBearer';
 import { userMayUploadFlyer } from '@/backend/auth/userProfiles';
 import { isByuEmail, normalizeEmail } from '@/lib/authShared';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
     try {
@@ -24,8 +25,8 @@ export async function POST(request: NextRequest) {
 
         const arrayBuffer = await file.arrayBuffer();
         const bytes = new Uint8Array(arrayBuffer);
-
         const firebaseBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+        logger.info('upload-start', { filename: file.name, mode: firebaseBucket ? 'firebase' : 'local' });
 
         /**
          * Firebase: multipart to this API → Admin SDK uploads to Storage (no browser CORS),
@@ -147,8 +148,8 @@ export async function POST(request: NextRequest) {
             message: 'Flyer processed and saved to data/events.json',
         });
     } catch (error) {
-        console.error('Upload error:', error);
         const msg = formatUploadError(error);
+        logger.error('upload-error', { message: msg });
         const isMissingEnv = msg.startsWith('Missing required environment variable:') || msg.startsWith('Missing ');
         const firebaseHint =
             /permission-denied|Missing or insufficient permissions/i.test(msg)

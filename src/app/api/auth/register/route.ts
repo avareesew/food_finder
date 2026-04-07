@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
 import { getConfiguredAdminEmail, USER_PROFILES_COLLECTION } from '@/backend/auth/userProfiles';
 import { isByuEmail, isValidByuNetId, normalizeByuNetId, normalizeEmail } from '@/lib/authShared';
+import { logger } from '@/lib/logger';
 
 const MIN_PASSWORD = 6;
 
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
         if (code === 'auth/weak-password') {
             return NextResponse.json({ error: 'Password is too weak. Try a longer one.' }, { status: 400 });
         }
-        console.error('register error', error);
+        logger.error('register-error', { message: error instanceof Error ? error.message : String(error) });
         return NextResponse.json({ error: 'Could not create account.' }, { status: 500 });
     }
 }
