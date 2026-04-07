@@ -45,7 +45,7 @@ export default function UploadAuthGate({ hero, children }: UploadAuthGateProps) 
                 <div className="rounded-2xl border border-gray-100 bg-white p-8 sm:p-10 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-gray-50">Upload a Flyer</h2>
                     <p className="mt-3 text-sm text-gray-600 max-w-md mx-auto dark:text-gray-300">
-                        Sign in to upload and manage flyers. Use your <strong>@byu.edu</strong> email and password.
+                        Sign in to upload and manage flyers with the email and password for your account.
                     </p>
                     <Link
                         href="/login"

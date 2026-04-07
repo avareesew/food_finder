@@ -4,13 +4,8 @@ import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { isAllowedSignInEmail, normalizeEmail } from '@/lib/authShared';
+import { isValidEmailFormat, normalizeEmail } from '@/lib/authShared';
 import PrimaryButton from '@/components/ui/PrimaryButton';
-
-const publicAdminEmail =
-    typeof process.env.NEXT_PUBLIC_ADMIN_EMAIL === 'string'
-        ? process.env.NEXT_PUBLIC_ADMIN_EMAIL.trim()
-        : '';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -30,12 +25,8 @@ export default function LoginPage() {
 
     const validateEmail = (): boolean => {
         const norm = normalizeEmail(email);
-        if (!isAllowedSignInEmail(norm, publicAdminEmail || undefined)) {
-            setFormError(
-                publicAdminEmail
-                    ? `Use your @byu.edu email, or the admin Gmail configured for this site.`
-                    : 'Use your @byu.edu email address.'
-            );
+        if (!isValidEmailFormat(norm)) {
+            setFormError('Enter a valid email address.');
             return false;
         }
         return true;
@@ -59,10 +50,17 @@ export default function LoginPage() {
         <main className="max-w-md mx-auto px-4 py-12 pt-28 sm:pt-32 bg-brand-canvas min-h-screen dark:bg-gray-950">
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-8">
                 <h1 className="text-2xl font-serif font-bold text-gray-900 dark:text-gray-50">Sign in</h1>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    BYU students and faculty use <strong>@byu.edu</strong>. The site admin signs in with the Gmail
-                    address set in server configuration. New accounts are created by an admin, not from this page.
-                </p>
+                <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-gray-600 dark:text-gray-400">
+                    <li>
+                        <strong className="text-gray-800 dark:text-gray-200">Sign in:</strong> use the email and
+                        password for your account (any domain).
+                    </li>
+                    <li>
+                        <strong className="text-gray-800 dark:text-gray-200">New account:</strong> an administrator
+                        creates accounts from the admin console and sends you a password setup link — there is no
+                        self-registration on this page.
+                    </li>
+                </ul>
 
                 <form onSubmit={onSignIn} className="mt-6 space-y-4">
                     <div>

@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
 import { getOptionalEnv } from '@/backend/env';
-import { isByuEmail, normalizeEmail } from '@/lib/authShared';
+import { normalizeEmail } from '@/lib/authShared';
 
 export const USER_PROFILES_COLLECTION = 'userProfiles';
 
@@ -39,9 +39,6 @@ export async function syncUserProfileFromIdToken(decoded: admin.auth.DecodedIdTo
     const emailNorm = normalizeEmail(email);
     const adminEmail = getConfiguredAdminEmail();
     const isAdmin = adminEmail ? emailNorm === adminEmail : false;
-    if (!isByuEmail(emailNorm) && !isAdmin) {
-        throw new Error('Only @byu.edu email addresses are allowed (except the configured admin account).');
-    }
 
     const uid = decoded.uid;
     const tokenName =
@@ -100,7 +97,7 @@ export async function getProfileDoc(
 export async function userMayUploadFlyer(uid: string, email: string): Promise<boolean> {
     const norm = normalizeEmail(email);
     if (isConfiguredAdminEmail(norm)) return true;
-    if (!email?.trim() || !isByuEmail(norm)) return false;
+    if (!email?.trim()) return false;
     const profile = await getProfileDoc(uid);
     return profile?.canUpload === true;
 }

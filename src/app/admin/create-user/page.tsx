@@ -112,7 +112,13 @@ export default function AdminCreateUserPage() {
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
                 Creates a Firebase user with a random temporary password, then returns a one-time password reset link.
-                Copy the email and link into a message to the student so they can choose their own password.
+                Copy the email and link into a message so they can choose their own password. This form requires a{' '}
+                <strong className="text-gray-800 dark:text-gray-200">@byu.edu</strong> email and a{' '}
+                <strong className="text-gray-800 dark:text-gray-200">BYU Net ID</strong>. Sign-in on{' '}
+                <Link href="/login" className="font-semibold text-brand-orange hover:underline">
+                    /login
+                </Link>{' '}
+                is not restricted by domain—only this create step is.
             </p>
 
             {error && (
@@ -206,6 +212,7 @@ export default function AdminCreateUserPage() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        placeholder="name@byu.edu"
                         className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-gray-900 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-50"
                         required
                     />

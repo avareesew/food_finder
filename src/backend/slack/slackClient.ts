@@ -24,6 +24,8 @@ export type SlackMessage = {
   text?: string;
   subtype?: string;
   files?: SlackFile[];
+  /** Parent message ts when this message is in a thread; equals `ts` on the thread root. */
+  thread_ts?: string;
 };
 
 type HistoryOk = {

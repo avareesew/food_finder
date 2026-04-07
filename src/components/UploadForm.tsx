@@ -420,7 +420,7 @@ export default function UploadForm() {
                                 You&apos;re signed in as <span className="font-medium">{me.email}</span>. The server has
                                 no <code className="text-xs">ADMIN_EMAIL</code> set, so nobody is treated as the
                                 auto-admin. Add{' '}
-                                <code className="text-xs break-all">ADMIN_EMAIL=eddyog@byu.edu</code> (your exact
+                                <code className="text-xs break-all">ADMIN_EMAIL=you@example.com</code> (your exact
                                 sign-in email) to <code className="text-xs">.env</code>, restart{' '}
                                 <code className="text-xs">npm run dev</code>, and sign in again.
                             </p>

@@ -6,7 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminSession, respondAdminRouteError } from '@/backend/auth/requireAdmin';
 import { USER_PROFILES_COLLECTION } from '@/backend/auth/userProfiles';
 import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
-import { isByuEmail, isValidByuNetId, normalizeByuNetId, normalizeEmail } from '@/lib/authShared';
+import { rewritePasswordResetLinkToHostedApp } from '@/lib/firebaseEmailActionLinks';
+import { isByuEduEmail, isValidByuNetId, isValidEmailFormat, normalizeByuNetId, normalizeEmail } from '@/lib/authShared';
 
 export async function POST(request: NextRequest) {
     try {
@@ -24,16 +25,29 @@ export async function POST(request: NextRequest) {
         if (!firstName || !lastName) {
             return NextResponse.json({ error: 'First and last name are required.' }, { status: 400 });
         }
-        const netNorm = normalizeByuNetId(byuNetIdRaw);
-        if (!isValidByuNetId(netNorm)) {
-            return NextResponse.json({ error: 'Enter a valid BYU Net ID (letters and numbers only).' }, { status: 400 });
-        }
         const emailNorm = normalizeEmail(emailRaw);
-        if (!emailNorm || !isByuEmail(emailNorm)) {
-            return NextResponse.json({ error: 'Email must be a @byu.edu address.' }, { status: 400 });
+        if (!emailNorm || !isValidEmailFormat(emailNorm)) {
+            return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 });
+        }
+        if (!isByuEduEmail(emailNorm)) {
+            return NextResponse.json(
+                { error: 'New accounts must use a @byu.edu email address.' },
+                { status: 400 }
+            );
+        }
+        if (!byuNetIdRaw) {
+            return NextResponse.json({ error: 'BYU Net ID is required.' }, { status: 400 });
         }
 
         ensureFirebaseAdminInitialized();
+
+        const netNorm = normalizeByuNetId(byuNetIdRaw);
+        if (!isValidByuNetId(netNorm)) {
+            return NextResponse.json(
+                { error: 'BYU Net ID must be 2–32 letters or numbers only (no @).' },
+                { status: 400 }
+            );
+        }
         const netSnap = await admin
             .firestore()
             .collection(USER_PROFILES_COLLECTION)
@@ -41,10 +55,7 @@ export async function POST(request: NextRequest) {
             .limit(1)
             .get();
         if (!netSnap.empty) {
-            return NextResponse.json(
-                { error: 'This BYU Net ID is already used by another profile.' },
-                { status: 409 }
-            );
+            return NextResponse.json({ error: 'That BYU Net ID is already used by another profile.' }, { status: 409 });
         }
 
         try {
@@ -66,22 +77,21 @@ export async function POST(request: NextRequest) {
             emailVerified: false,
         });
 
-        const passwordResetLink = await admin.auth().generatePasswordResetLink(emailNorm);
+        const rawResetLink = await admin.auth().generatePasswordResetLink(emailNorm);
+        const passwordResetLink = rewritePasswordResetLinkToHostedApp(rawResetLink);
 
         const ref = admin.firestore().collection(USER_PROFILES_COLLECTION).doc(userRecord.uid);
-        await ref.set(
-            {
-                email: emailNorm,
-                displayName,
-                firstName,
-                lastName,
-                byuNetId: netNorm,
-                canUpload: false,
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                lastSeenAt: admin.firestore.FieldValue.serverTimestamp(),
-            },
-            { merge: true }
-        );
+        const profileDoc: Record<string, unknown> = {
+            email: emailNorm,
+            displayName,
+            firstName,
+            lastName,
+            byuNetId: netNorm,
+            canUpload: false,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastSeenAt: admin.firestore.FieldValue.serverTimestamp(),
+        };
+        await ref.set(profileDoc, { merge: true });
 
         return NextResponse.json({
             ok: true,

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Sync failed';
         logger.error('sync-profile-error', { message });
-        if (/byu\.edu|email address|Only @byu|admin account/i.test(message)) {
+        if (/must have an email|email address to use this app/i.test(message)) {
             return NextResponse.json({ error: message }, { status: 403 });
         }
         if (/Missing Authorization|verify/i.test(message)) {

@@ -136,7 +136,7 @@ export default function AdminPage() {
             <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 pt-28 sm:pt-32 bg-brand-canvas min-h-screen dark:bg-gray-950 space-y-6">
                 <h1 className="text-3xl font-serif font-bold text-brand-black dark:text-gray-50">Admin</h1>
                 <p className="text-gray-600 dark:text-gray-300">
-                    Sign in with your admin account (@byu.edu or the configured admin Gmail) to continue.
+                    Sign in with the admin account (the email that matches ADMIN_EMAIL) to continue.
                 </p>
                 <Link
                     href="/login"

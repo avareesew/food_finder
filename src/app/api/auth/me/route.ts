@@ -6,7 +6,7 @@ import {
     isConfiguredAdminEmail,
     userMayUploadFlyer,
 } from '@/backend/auth/userProfiles';
-import { isByuEmail, normalizeEmail } from '@/lib/authShared';
+import { isValidEmailFormat, normalizeEmail } from '@/lib/authShared';
 import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
@@ -17,11 +17,8 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Signed-in account has no email' }, { status: 403 });
         }
         const normalized = normalizeEmail(email);
-        if (!isByuEmail(normalized) && !isConfiguredAdminEmail(normalized)) {
-            return NextResponse.json(
-                { error: 'Only @byu.edu accounts (or the configured admin email) are allowed.' },
-                { status: 403 }
-            );
+        if (!isValidEmailFormat(normalized)) {
+            return NextResponse.json({ error: 'Invalid email on this account.' }, { status: 403 });
         }
         const isAdmin = isConfiguredAdminEmail(normalized);
         const mayUpload = await userMayUploadFlyer(decoded.uid, normalized);

@@ -7,8 +7,8 @@ import { processUploadedFlyer } from '@/backend/flyers/processUploadedFlyer';
 import { uploadBytesToStorage } from '@/backend/flyers/storageAdminUpload';
 import { validateOpenAIExtractionRequired } from '@/lib/validateFlyerExtraction';
 import { verifyIdTokenFromAuthorizationHeader } from '@/backend/auth/verifyBearer';
-import { isConfiguredAdminEmail, userMayUploadFlyer } from '@/backend/auth/userProfiles';
-import { isByuEmail, normalizeEmail } from '@/lib/authShared';
+import { userMayUploadFlyer } from '@/backend/auth/userProfiles';
+import { isValidEmailFormat, normalizeEmail } from '@/lib/authShared';
 import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
@@ -42,16 +42,13 @@ export async function POST(request: NextRequest) {
                 const email = decoded.email;
                 if (!email) {
                     return NextResponse.json(
-                        { error: 'Sign in with your @byu.edu account (or the admin account) to upload.' },
+                        { error: 'Sign in with an email-based account to upload.' },
                         { status: 403 }
                     );
                 }
                 const normalized = normalizeEmail(email);
-                if (!isByuEmail(normalized) && !isConfiguredAdminEmail(normalized)) {
-                    return NextResponse.json(
-                        { error: 'Sign in with your @byu.edu account (or the admin account) to upload.' },
-                        { status: 403 }
-                    );
+                if (!isValidEmailFormat(normalized)) {
+                    return NextResponse.json({ error: 'Invalid email on this account.' }, { status: 403 });
                 }
                 emailNorm = normalized;
                 uid = decoded.uid;
@@ -69,7 +66,7 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json(
                     {
                         error: 'Sign in required',
-                        hint: 'Sign in at /login with your @byu.edu account, then try again.',
+                        hint: 'Sign in at /login, then try again.',
                     },
                     { status: 401 }
                 );
