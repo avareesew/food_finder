@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 
 import { requireAdminSession, respondAdminRouteError } from '@/backend/auth/requireAdmin';
 import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
+import { logger } from '@/lib/logger';
 
 export type AdminFlyerListItem = {
     id: string;
@@ -24,6 +25,7 @@ export async function GET(request: NextRequest) {
         ensureFirebaseAdminInitialized();
         const limitRaw = new URL(request.url).searchParams.get('limit');
         const limit = Math.min(200, Math.max(1, Number.parseInt(limitRaw || '80', 10) || 80));
+        logger.info('admin-flyers-list-start', { limit });
         const snap = await admin
             .firestore()
             .collection('flyers')
@@ -57,8 +59,22 @@ export async function GET(request: NextRequest) {
             });
         });
 
+        logger.info('admin-flyers-list-success', { count: items.length, limit });
         return NextResponse.json({ flyers: items });
     } catch (error) {
-        return respondAdminRouteError(error);
+        const message = error instanceof Error ? error.message : 'Flyer list failed';
+        if (
+            message &&
+            message !== 'FORBIDDEN' &&
+            message !== 'NO_ADMIN_CONFIGURED' &&
+            !/Missing Authorization|bearer token/i.test(message)
+        ) {
+            logger.error('admin-flyers-list-failure', { message });
+        }
+        return respondAdminRouteError(error, {
+            route: 'admin-flyers',
+            method: 'GET',
+            skipUnexpectedErrorLog: true,
+        });
     }
 }

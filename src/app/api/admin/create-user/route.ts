@@ -8,10 +8,11 @@ import { USER_PROFILES_COLLECTION } from '@/backend/auth/userProfiles';
 import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
 import { rewritePasswordResetLinkToHostedApp } from '@/lib/firebaseEmailActionLinks';
 import { isByuEduEmail, isValidByuNetId, isValidEmailFormat, normalizeByuNetId, normalizeEmail } from '@/lib/authShared';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
     try {
-        await requireAdminSession(request);
+        const adminDecoded = await requireAdminSession(request);
         const body = (await request.json()) as {
             firstName?: unknown;
             lastName?: unknown;
@@ -22,10 +23,17 @@ export async function POST(request: NextRequest) {
         const lastName = typeof body.lastName === 'string' ? body.lastName.trim() : '';
         const byuNetIdRaw = typeof body.byuNetId === 'string' ? body.byuNetId.trim() : '';
         const emailRaw = typeof body.email === 'string' ? body.email.trim() : '';
+        const emailNorm = normalizeEmail(emailRaw);
+
+        logger.info('admin-create-user-start', {
+            adminUid: adminDecoded.uid,
+            email: emailNorm || emailRaw,
+            byuNetId: byuNetIdRaw,
+        });
+
         if (!firstName || !lastName) {
             return NextResponse.json({ error: 'First and last name are required.' }, { status: 400 });
         }
-        const emailNorm = normalizeEmail(emailRaw);
         if (!emailNorm || !isValidEmailFormat(emailNorm)) {
             return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 });
         }
@@ -93,6 +101,13 @@ export async function POST(request: NextRequest) {
         };
         await ref.set(profileDoc, { merge: true });
 
+        logger.info('admin-create-user-success', {
+            adminUid: adminDecoded.uid,
+            createdUid: userRecord.uid,
+            email: emailNorm,
+            byuNetId: netNorm,
+        });
+
         return NextResponse.json({
             ok: true,
             uid: userRecord.uid,
@@ -100,6 +115,19 @@ export async function POST(request: NextRequest) {
             passwordResetLink,
         });
     } catch (error) {
-        return respondAdminRouteError(error);
+        const message = error instanceof Error ? error.message : 'Create user failed';
+        if (
+            message &&
+            message !== 'FORBIDDEN' &&
+            message !== 'NO_ADMIN_CONFIGURED' &&
+            !/Missing Authorization|bearer token/i.test(message)
+        ) {
+            logger.error('admin-create-user-failure', { message });
+        }
+        return respondAdminRouteError(error, {
+            route: 'admin-create-user',
+            method: 'POST',
+            skipUnexpectedErrorLog: true,
+        });
     }
 }
