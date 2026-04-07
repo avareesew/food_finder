@@ -97,7 +97,7 @@ food_finder/
 - **[prd.md](aiDocs/prd.md)** — Product requirements (post-pivot)
 - **[architecture.md](aiDocs/architecture.md)** — API endpoints, data models, tech decisions
 - **[roadmap](ai/roadmaps/2026-04-06-current-roadmap.md)** — Where we are and what's next
-- **[Round 2 interviews](ai/notes/2026-04-06-round2-club-interviews.md)** — Most recent customer research
+- **[Round 2 interviews](ai/notes/interviews/2026-04-06-round2-club-interviews.md)** — Most recent customer research
 
 ---
 

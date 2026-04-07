@@ -28,7 +28,7 @@
 2. `aiDocs/prd.md` — product requirements (v2.0, post-pivot)
 3. `aiDocs/architecture.md` — tech stack, file structure, API endpoints, data models
 4. `ai/roadmaps/2026-04-06-current-roadmap.md` — where we are and what's next
-5. `ai/notes/2026-04-06-round2-club-interviews.md` — most recent customer research
+5. `ai/notes/interviews/2026-04-06-round2-club-interviews.md` — most recent customer research
 
 ---
 

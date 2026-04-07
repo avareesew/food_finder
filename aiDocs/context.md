@@ -158,7 +158,7 @@ See `aiDocs/architecture.md` for complete technical architecture.
 ### Phase 0: Setup & Validation (Week 1) — COMPLETE
 - Market research, PRD, MVP spec, architecture
 - Firebase + Next.js initialized
-- 2 club president interviews (Kendall Castellaw, Carson Fellows) — `ai/notes/2026-02-24-round1-club-interviews.md`
+- 2 club president interviews (Kendall Castellaw, Carson Fellows) — `ai/notes/interviews/2026-02-24-round1-club-interviews.md`
 - AI extraction validated (OpenAI gpt-4o-mini)
 
 ### Phase 1: Core Development (Weeks 2-4) — SUBSTANTIALLY COMPLETE
@@ -171,7 +171,7 @@ See `aiDocs/architecture.md` for complete technical architecture.
 - Confirmation/edit form: NOT DONE
 
 ### Final Sprint: Customer Validation (April 1–8) — IN PROGRESS
-- 2 Round 2 interviews complete (Michael Nichols, Sales Society; Molly Wakefield, Finance Society VP) — `ai/notes/2026-04-06-round2-club-interviews.md`
+- 2 Round 2 interviews complete (Michael Nichols, Sales Society; Molly Wakefield, Finance Society VP) — `ai/notes/interviews/2026-04-06-round2-club-interviews.md`
 - Key finding: automation rated 9.5/10 avg; professionalism tension confirmed; sub-associations as early adopters identified
 - Falsification tests and demo build in progress
 

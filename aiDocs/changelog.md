@@ -21,7 +21,7 @@
 
 ### Round 2 Customer Interviews (2026-04-06)
 **Interviews:** Michael Nichols (Sales Society President), Molly Wakefield (Finance Society VP), Abigail Armstrong (Women of Accountancy President)
-Full notes: `ai/notes/2026-04-06-round2-club-interviews.md`
+Full notes: `ai/notes/interviews/2026-04-06-round2-club-interviews.md`
 
 Key findings:
 - **Automation validated at 9.7/10 average** — zero-effort ingestion from official channels is THE reason club leaders adopt. Ratings: 10/10, 9/10, 10/10.
@@ -59,7 +59,7 @@ Key findings:
 
 #### ✅ Completed — Interview 1: Kendall Castellaw (2026-02-24)
 **Past Finance Society President · Marriott School (Tanner Building)**
-Full notes: `ai/notes/week1-club-interviews.md`
+Full notes: `ai/notes/interviews/week1-club-interviews.md`
 
 Key findings:
 - **🚨 Tanner Building is flyer-free by policy.** Marriott School prohibits physical flyer distribution except for large school-wide events. Clubs in Tanner use digital screens, Instagram, and newsletters instead. Puts the “70%+ of events have physical flyers” assumption at risk for the Marriott cluster.
@@ -69,7 +69,7 @@ Key findings:
 
 #### ✅ Completed — Interview 2: Carson Fellows (2026-02-25)
 **Current Management Consulting Club President**
-Full notes: `ai/notes/week1-club-interviews.md`
+Full notes: `ai/notes/interviews/week1-club-interviews.md`
 
 Key findings:
 - **Non-Tanner clubs do use flyers/email with food callouts.** Carson mentions announcing food on flyers and in emails — partially rehabilitates the flyer-scanning assumption for buildings outside Marriott School.

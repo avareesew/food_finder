@@ -58,7 +58,7 @@
 | Deliverable | Owner | Status | Notes |
 |-------------|-------|--------|-------|
 | Round 2 customer interviews (3 clubs) | Person 1 | ✅ | Michael Nichols, Molly Wakefield, Abigail Armstrong |
-| Falsification tests documented | Person 1 | ✅ | See `ai/notes/2026-04-06-round2-club-interviews.md` |
+| Falsification tests documented | Person 1 | ✅ | See `ai/notes/interviews/2026-04-06-round2-club-interviews.md` |
 | Club president submission form (paste text → extract → pin) | Person 2 | ⏸️ | Core demo feature |
 | Demo polish + mobile testing | Person 2 | ⏸️ | 2–3 real test inputs prepared |
 | CLAUDE.md created | Person 3 | ✅ | Done |
