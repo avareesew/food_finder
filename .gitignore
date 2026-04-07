@@ -41,6 +41,11 @@ service-account.json
 !.secrets/README.txt
 *-firebase-adminsdk-*.json
 
+# MCP configs (may contain API keys)
+.mcp.json
+.mcp/
+mcp*.json
+
 # Logs
 logs/
 *.log
