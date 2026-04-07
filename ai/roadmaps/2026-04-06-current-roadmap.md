@@ -1,116 +1,153 @@
-# Scavenger — Current Roadmap
+# Scavenger — Current Roadmap & Tracker
 **Date:** April 6, 2026
-**Status:** Final Sprint (April 1–8) → Post-Presentation Alpha
+**Last Updated:** April 6, 2026
+**Status:** 🔄 Final Sprint (April 1–8)
 
 > ⚠️ Avoid over-engineering, cruft, and legacy compatibility shims. This is a clean, fast-moving project. Build the minimum that works. Delete unused code.
 
 ---
 
-## Where We Are
+## Status Key
+- ✅ Complete
+- 🔄 In Progress
+- ⏸️ Not Started
+- 🔴 Blocked
+- ❌ Cancelled / Falsified
 
-### ✅ Done — Phase 0: Setup & Validation (Feb 2026)
-- Firebase + Next.js initialized
-- OpenAI gpt-4o-mini and Gemini 2.0 Flash integrated
-- 5 club president interviews across 2 rounds
-- **Flyer assumption falsified** — pivot to email/text ingestion confirmed
-- Core assumption validated: automation from official channels rated **9.7/10 avg**
+---
 
-### ✅ Done — Phase 1: Core Development (Feb–Mar 2026)
-- Flyer upload → OpenAI extraction → validation → Firestore → feed (full pipeline)
-- Feed page, event cards, event detail view, event detail modal
-- Home page (hero, weekly calendar, discover preview, campus map CTA)
-- Explore page (campus buildings grid + map)
-- About page
-- Dark mode
-- BYU campus building data (lat/lng, aliases, fuzzy matching)
-- Dual backend mode (Firebase + local filesystem)
-- Slack ingestion pipeline (backend complete: `src/backend/slack/`)
-- Auth system (login, register, user profiles, admin page)
-- Upload auth gate
+## Phase 0: Setup & Validation — ✅ Complete (Feb 2026)
 
-### 🔄 In Progress — Final Sprint (April 1–8)
-- [x] Round 2 customer interviews (Michael Nichols, Molly Wakefield, Abigail Armstrong)
-- [ ] Club president submission form (paste email/text → AI extract → feed pin)
-- [ ] Demo polish and mobile testing
-- [ ] Presentation slides + live demo script
-- [ ] Full team rehearsal (April 7)
-- [ ] All materials submitted (April 8)
+| Deliverable | Status | Notes |
+|-------------|--------|-------|
+| Firebase + Next.js initialized | ✅ | Next.js 16, React 19 |
+| OpenAI + Gemini API keys | ✅ | OpenAI primary, Gemini secondary |
+| 5 club president interviews | ✅ | Round 1: Feb 24–25 · Round 2: Apr 6 |
+| Flyer assumption validated | ❌ Falsified | Pivot to email/text ingestion confirmed |
+| Automation validated | ✅ | 9.7/10 avg across 3 Round 2 interviews |
+| Vercel deployment | ⏸️ | `vercel.json` exists; deploy not confirmed |
+
+---
+
+## Phase 1: Core Development — ✅ Substantially Complete (Feb–Mar 2026)
+
+| Deliverable | Status | Notes |
+|-------------|--------|-------|
+| Flyer upload → OpenAI extraction → Firestore pipeline | ✅ | Full end-to-end working |
+| Extraction validation (rejects missing date/time/place) | ✅ | `src/lib/validateFlyerExtraction.ts` |
+| Feed page + event cards | ✅ | `src/app/feed/page.tsx` |
+| Event detail view + modal | ✅ | `src/app/events/[id]/page.tsx` |
+| Home page (hero, calendar, discover preview, map CTA) | ✅ | Beyond original scope |
+| Explore page (campus buildings grid) | ✅ | Beyond original scope |
+| Campus map + building data + fuzzy matching | ✅ | Beyond original scope |
+| Dark mode | ✅ | Beyond original scope |
+| Dual backend mode (Firebase + local) | ✅ | `NEXT_PUBLIC_BACKEND_MODE` |
+| Slack ingestion pipeline (backend) | ✅ | `src/backend/slack/` — no frontend yet |
+| Auth system (login, register, profiles, admin) | ✅ | From April pull |
+| Upload auth gate | ✅ | `src/components/UploadAuthGate.tsx` |
+| "Mark as Gone" UI | 🔴 Blocked | Status field exists in DB; no UI toggle |
+| Real-time `onSnapshot` on feed | 🔴 Blocked | Using `getDocs` polling |
+| Confirmation/edit form for AI output | 🔴 Blocked | AI auto-accepts valid extractions |
+
+---
+
+## Final Sprint — 🔄 In Progress (April 1–8)
 
 **Presentations:** April 8, 13, 15
 
+| Deliverable | Owner | Status | Notes |
+|-------------|-------|--------|-------|
+| Round 2 customer interviews (3 clubs) | Person 1 | ✅ | Michael Nichols, Molly Wakefield, Abigail Armstrong |
+| Falsification tests documented | Person 1 | ✅ | See `ai/notes/2026-04-06-round2-club-interviews.md` |
+| Club president submission form (paste text → extract → pin) | Person 2 | ⏸️ | Core demo feature |
+| Demo polish + mobile testing | Person 2 | ⏸️ | 2–3 real test inputs prepared |
+| CLAUDE.md created | Person 3 | ✅ | Done |
+| Documentation cleanup (PRD, MVP, roadmaps) | Person 3 | ✅ | Done |
+| Presentation slides | Person 4 | ⏸️ | |
+| Live demo script + Q&A talking points | Person 4 | ⏸️ | |
+| Full team rehearsal | All | ⏸️ | April 7 |
+| All materials submitted | All | ⏸️ | April 8 deadline |
+
 ---
 
-## Pre-Alpha Blockers (Must Fix Before Alpha Testing)
+## Pre-Alpha Blockers
 
-| Item | File(s) | Priority |
-|------|---------|----------|
-| "Mark as Gone" UI | `src/app/events/[id]/page.tsx` | 🔴 Critical |
-| Real-time `onSnapshot` on feed | `src/app/feed/page.tsx` | 🔴 Critical |
-| Confirmation/edit form for AI output | `src/components/UploadForm.tsx` | 🟡 High |
-| Vercel production deployment | `vercel.json` exists, deploy not confirmed | 🔴 Critical |
+Must be resolved before recruiting alpha testers.
+
+| Blocker | File(s) | Priority | Status |
+|---------|---------|----------|--------|
+| "Mark as Gone" UI | `src/app/events/[id]/page.tsx` | 🔴 Critical | Open |
+| Vercel production deployment | `vercel.json` | 🔴 Critical | Open |
+| Real-time `onSnapshot` on feed | `src/app/feed/page.tsx` | 🔴 Critical | Open |
+| Confirmation/edit form for AI output | `src/components/UploadForm.tsx` | 🟡 High | Open |
 
 ---
 
-## Next Phase — Alpha Testing (Post-April 8)
+## Next Phase: Alpha Testing (Post-April 8)
 
-**Target:** 5–10 sub-association leaders as first users
+**Target segment:** Sub-association leaders (5–10)
+**Why:** Smaller budgets, higher food frequency, least marketing bandwidth — biggest beneficiaries of automation.
 
-**Why sub-associations first:**
-- Smaller budgets → automation is a bigger win relative to their capacity
-- Higher food frequency → more map pins → better student experience
-- Less marketing bandwidth → Scavenger does more of the work for them
-- Mentioned independently by both Sales Society and Finance Society
-
-### Alpha Deliverables
-- [ ] Deploy to Vercel (production URL live)
-- [ ] Build email ingestion UI (the #1 validated feature)
-- [ ] Add Requirements / Expectations field to event pins
-- [ ] Add Club Link field to event pins (signup URL)
-- [ ] Add Scarcity note field ("Food for first X people")
-- [ ] Fix pre-alpha blockers above
-- [ ] Recruit 5–10 sub-association leaders
-- [ ] Seed 10–15 real events
-- [ ] Collect feedback after 2 weeks
+| Deliverable | Status | Notes |
+|-------------|--------|-------|
+| Fix all pre-alpha blockers | ⏸️ | See above |
+| Deploy to Vercel (production URL) | ⏸️ | |
+| Email ingestion UI | ⏸️ | #1 validated feature (9.7/10 avg) |
+| Requirements / Expectations field on pins | ⏸️ | Requested by Sales Society + Finance Society |
+| Club Link field on pins | ⏸️ | Requested by Finance Society + Women of Accountancy |
+| Scarcity note field on pins | ⏸️ | Requested by Women of Accountancy |
+| Recruit 5–10 sub-association leaders | ⏸️ | |
+| Seed 10–15 real events | ⏸️ | |
+| Collect feedback (2-week window) | ⏸️ | |
 
 ### Alpha Success Metrics
-| Metric | Target |
-|--------|--------|
-| Club leaders posting | 3+ |
-| Events created (total) | 10–15 |
-| "Would use regularly" | 70%+ |
-| Pre-alpha blockers | 0 open |
+| Metric | Target | Actual | Status |
+|--------|--------|--------|--------|
+| Club leaders posting | 3+ | — | ⏸️ |
+| Events created | 10–15 | — | ⏸️ |
+| "Would use regularly" | 70%+ | — | ⏸️ |
+| Pre-alpha blockers open | 0 | — | ⏸️ |
 
 ---
 
-## Future Phases
+## Future: Beta + Launch
 
 ### Beta (30–50 Users)
-- Fix alpha issues
-- Expand to 3–5 design partner clubs
-- Real-time feed (`onSnapshot`)
-- Teams/Outlook integration (if BYU mandate confirmed)
-- Analytics (GA4)
-- Rate limiting on upload endpoints
+| Deliverable | Status |
+|-------------|--------|
+| Fix alpha issues | ⏸️ |
+| Expand to 3–5 design partner clubs | ⏸️ |
+| Real-time `onSnapshot` | ⏸️ |
+| Teams/Outlook integration (if BYU mandate confirmed) | ⏸️ |
+| Rate limiting on upload endpoints | ⏸️ |
 
-### Public Launch
-- Open to all BYU students
-- Social media announcement
-- Share in BYU ward groups and clubs
-
-**Launch Success Metrics:**
-- 30+ posts/week
-- 150+ unique visitors
-- <5% ghost chase rate
-- 25% repeat users
-- 5+ organic posts (non-team)
+### Launch Success Metrics
+| Metric | Target | Actual | Status |
+|--------|--------|--------|--------|
+| Posts per week | 30+ | — | ⏸️ |
+| Unique visitors | 150+ | — | ⏸️ |
+| Repeat users | 25%+ | — | ⏸️ |
+| Ghost chase rate | <5% | — | ⏸️ |
+| Organic posts (non-team) | 5+ | — | ⏸️ |
 
 ---
 
-## Open Questions / Risks
+## Open Risks
 
-| Risk | Status | Action |
-|------|--------|--------|
-| BYU Teams/Outlook mandate | Unconfirmed | Follow up with BYU club administration |
-| Slack not universal | Confirmed risk | Email path is first-class; Slack is additive |
-| Ghost chases from stale data | Open | "Mark as Gone" UI required before alpha |
-| Sub-association adoption | Untested | Alpha target segment |
+| Risk | Likelihood | Impact | Mitigation | Status |
+|------|-----------|--------|------------|--------|
+| Ghost chases from stale data | High | High | "Mark as Gone" UI before alpha | 🔴 Open |
+| Slack not universal | Confirmed | Medium | Email path is first-class; Slack is additive | Monitoring |
+| BYU Teams/Outlook mandate | Unknown | Medium | Follow up with BYU club admin; email covers Outlook | 🔴 Needs follow-up |
+| Sub-association adoption | Untested | High | Alpha target segment | ⏸️ |
+
+---
+
+## Update Log
+
+| Date | Update | By |
+|------|--------|----|
+| 2026-02-16 | Roadmap created (original 7-week flyer-era plan) | Team |
+| 2026-02-24 | Phase 0 complete — interviews started, Firebase + Next.js working | Team |
+| 2026-04-01 | Phase 1 substantially complete — retroactive alignment with codebase | Ava + Claude |
+| 2026-04-06 | Round 2 interviews complete · Documentation cleanup · Pivot confirmed · Roadmap rewritten post-pivot | Ava + Claude |
