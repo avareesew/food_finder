@@ -9,8 +9,8 @@ Scavenger turns club food events into a professional recruitment tool. Club lead
 ## Project Status
 
 **Phase:** Final Sprint — Presentations April 8, 13, 15, 2026
-**Built:** Core pipeline complete (upload → AI extraction → feed → map)
-**In Progress:** Demo polish, presentation slides, club president submission form
+**Built:** Core pipeline complete (upload → AI extraction → feed → map), plus Slack/Gmail ingestion backends and admin tooling
+**In Progress:** Demo polish, presentation slides, club president submission form, deployment handoff
 **Next:** Alpha testing with sub-association leaders (post-April 8)
 
 ---
@@ -47,7 +47,7 @@ curl -sS -X POST "http://localhost:3000/api/local/extract" \
 | AI (Secondary) | Gemini 2.0 Flash |
 | Maps | Leaflet |
 | Auth | Firebase Auth |
-| Hosting | Vercel |
+| Hosting | Vercel (deployment handoff in progress) |
 
 ---
 
@@ -66,6 +66,11 @@ curl -sS -X POST "http://localhost:3000/api/local/extract" \
 ```
 food_finder/
 ├── CLAUDE.md                  # AI behavioral guidance — start here
+├── ai/                        # Working artifacts (tracked in git)
+│   ├── context.md             # AI bookshelf entrypoint ⭐ START HERE FOR NEW SESSIONS
+│   ├── notes/                 # Customer interviews, sprint plans
+│   ├── roadmaps/              # Current roadmap + tracker
+│   └── guides/                # API docs, market research
 ├── aiDocs/                    # Product documentation (tracked in git)
 │   ├── context.md             # Project overview & status ⭐ START HERE
 │   ├── prd.md                 # Product requirements (v2.0 post-pivot)
@@ -74,10 +79,6 @@ food_finder/
 │   ├── coding-style.md        # Code standards
 │   ├── changelog.md           # Version history
 │   └── archived/              # Pre-pivot flyer-era docs
-├── ai/                        # Working artifacts (tracked in git)
-│   ├── notes/                 # Customer interviews, sprint plans
-│   ├── roadmaps/              # Current roadmap + tracker
-│   └── guides/                # API docs, market research
 ├── src/
 │   ├── app/                   # Next.js pages + API routes
 │   ├── backend/               # Server-side logic (OpenAI, Gemini, Slack, auth)
@@ -92,6 +93,7 @@ food_finder/
 
 ## Key Docs
 
+- **[ai/context.md](ai/context.md)** — AI bookshelf entrypoint and fastest orientation path
 - **[CLAUDE.md](CLAUDE.md)** — Project context and coding rules
 - **[context.md](aiDocs/context.md)** — Full project overview, current status, key learnings
 - **[prd.md](aiDocs/prd.md)** — Product requirements (post-pivot)

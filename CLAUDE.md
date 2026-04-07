@@ -4,7 +4,7 @@
 
 **Scavenger** is a BYU campus food discovery platform. Club leaders post food events to their official Slack or email channels; Scavenger automatically ingests those posts and pins them to a live campus map. Students find free food anonymously, no login required.
 
-**Current state (April 2026):** Final sprint. Presentations April 8, 13, 15. Phase 1 (core pipeline) complete. Building demo and alpha prep.
+**Current state (April 2026):** Final sprint. Presentations April 8, 13, 15. Phase 1 is complete enough for demo, admin + Gmail tooling are live in code, and teammate-owned deployment handoff is in progress.
 
 ---
 
@@ -12,23 +12,25 @@
 
 | Folder | Purpose | Tracked in Git? |
 |--------|---------|-----------------|
+| `ai/context.md` | AI bookshelf entrypoint that points new sessions to the right docs fast | ✅ Yes |
 | `aiDocs/` | Source of truth — architecture, PRD, MVP, changelog, coding style | ✅ Yes |
 | `ai/notes/` | Interview notes, sprint plans, brainstorming | ✅ Yes |
-| `ai/roadmaps/` | Current roadmap, roadmap tracker | ✅ Yes |
+| `ai/roadmaps/` | Current roadmap plus archived roadmap history | ✅ Yes |
 | `ai/roadmaps/archived/` | Old flyer-era phase plans (pre-pivot) | ✅ Yes |
 | `ai/guides/` | API docs, market research | ✅ Yes |
 
-**Always update `aiDocs/changelog.md` and `ai/roadmaps/roadmap-tracker.md` after significant changes.**
+**Always update `aiDocs/changelog.md` and `ai/roadmaps/2026-04-06-current-roadmap.md` after significant changes.**
 
 ---
 
 ## Key Docs to Read First
 
-1. `aiDocs/context.md` — project overview, current status, key learnings
-2. `aiDocs/prd.md` — product requirements (v2.0, post-pivot)
-3. `aiDocs/architecture.md` — tech stack, file structure, API endpoints, data models
-4. `ai/roadmaps/2026-04-06-current-roadmap.md` — where we are and what's next
-5. `ai/notes/interviews/2026-04-06-round2-club-interviews.md` — most recent customer research
+1. `ai/context.md` — AI bookshelf entrypoint for the fastest repo orientation
+2. `aiDocs/context.md` — project overview, current status, key learnings
+3. `aiDocs/prd.md` — product requirements (v2.0, post-pivot)
+4. `aiDocs/architecture.md` — tech stack, file structure, API endpoints, data models
+5. `ai/roadmaps/2026-04-06-current-roadmap.md` — where we are and what's next
+6. `ai/notes/interviews/2026-04-06-round2-club-interviews.md` — most recent customer research
 
 ---
 
@@ -50,14 +52,14 @@
 - **AI (Secondary):** Gemini 2.0 Flash (`@google/generative-ai`)
 - **Maps:** Leaflet (no API key needed)
 - **Auth:** Firebase Auth + Firestore user profiles
-- **Hosting:** Vercel
+- **Hosting:** Vercel (deployment handoff owned by teammate)
 
 ---
 
 ## Ingestion Paths (Priority Order)
 
 1. **Slack** — `src/backend/slack/` — cron-triggered, reads official club channels
-2. **Email/text paste** — manual entry form (not yet built as of April 6)
+2. **Email/Gmail + text paste** — Gmail cron ingest backend is shipped; manual paste UI is still pending
 3. **Flyer image upload** — `src/components/UploadForm.tsx` → OpenAI vision extraction
 
 ---
@@ -68,7 +70,7 @@ Before alpha testing, these must be built:
 - "Mark as Gone" UI (status toggle on event detail page)
 - Real-time `onSnapshot` on feed
 - Confirmation/edit form for AI-extracted data
-- Vercel production deployment
+- Vercel production deployment handoff (teammate-owned rollout)
 
 ---
 

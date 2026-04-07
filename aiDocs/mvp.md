@@ -68,7 +68,7 @@ The following is the actual state of the codebase as of April 6, 2026. This is n
 | Email ingestion UI | The #1 validated feature (9.7/10 avg) | High |
 | Real-time `onSnapshot` | Feed doesn't update without refresh | Pre-alpha blocker |
 | Confirmation/edit form for AI output | Users can't correct bad extractions | Pre-alpha blocker |
-| Vercel production deployment | Required for alpha testing | Pre-alpha blocker |
+| Vercel production deployment handoff | Required for alpha testing | Pre-alpha blocker (teammate-owned rollout) |
 | Requirements / Expectations field on pins | Requested by 2/3 Round 2 clubs | Next build |
 | Club Link field on pins | Requested by 2/3 Round 2 clubs | Next build |
 | Scarcity note on pins | Requested by Women of Accountancy | Next build |
@@ -131,5 +131,5 @@ The demo shows the **pivot story** — not the original flyer-scanning concept.
 2. Email ingestion UI (club leader connects email → events auto-ingest)
 3. Real-time `onSnapshot` on feed
 4. Requirements and Club Link fields on event pins
-5. Vercel production deployment + custom domain
+5. Complete teammate-owned Vercel rollout + custom domain
 6. Recruit 5–10 sub-association leaders for alpha testing
