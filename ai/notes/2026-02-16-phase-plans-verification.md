@@ -15,7 +15,7 @@
 - `ai/roadmaps/phase2-week5-alpha-testing.md`
 - `ai/roadmaps/phase3-week6-beta-polish.md`
 - `ai/roadmaps/phase4-week7-public-launch.md`
-- `ai/roadmaps/roadmap-tracker.md`
+- `ai/roadmaps/archived/roadmap-tracker-v1.md` (historical tracker later superseded by the current roadmap)
 
 **Results:**
 - Total issues found: 11

@@ -1,16 +1,16 @@
 # System Architecture: Food Finder Platform
 
-**Version:** 2.1
-**Last Updated:** April 6, 2026
+**Version:** 2.2
+**Last Updated:** April 7, 2026
 **Status:** Active Development — Final Sprint
 
 ---
 
 ## Overview
 
-Scavenger is a serverless, mobile-first web application that ingests club food event announcements from official Slack channels and emails, extracts structured event data via AI, and displays events on a live campus map and feed. The architecture prioritizes simplicity, speed, and zero-DevOps complexity for rapid MVP iteration.
+Scavenger is a serverless, mobile-first web application that ingests club food event announcements from official Slack channels, Gmail inboxes, and manual submissions, extracts structured event data via AI, and displays events on a live campus map and feed. The architecture prioritizes simplicity, speed, and zero-DevOps complexity for rapid MVP iteration.
 
-**Primary ingestion path:** Slack channel monitoring → AI text extraction → map pin
+**Primary ingestion path:** Slack + Gmail automation → AI extraction → map pin
 **Secondary path:** Manual text/email paste → AI extraction → map pin
 **Tertiary path:** Flyer image upload → OpenAI vision extraction → map pin
 
@@ -20,41 +20,39 @@ Scavenger is a serverless, mobile-first web application that ingests club food e
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Client (Browser)                        │
-│            Mobile-First React 19 + Tailwind 4               │
+│                    Club Channels + Users                    │
+│ Slack workspaces · Gmail inbox · admin browser · students   │
 └────────────────────────┬────────────────────────────────────┘
-                         │ HTTPS
+                         │ HTTPS / Cron
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Vercel / Local Dev                        │
-│           Next.js 16 (App Router + API Routes)              │
-└─────┬───────────────────┬───────────────────┬───────────────┘
-      │                   │                   │
-      │ Pages (SSR)       │ API Routes        │ Static Assets
-      ▼                   ▼                   ▼
-┌──────────────┐  ┌───────────────┐  ┌────────────────┐
-│ Home         │  │ /api/upload   │  │ Images/CSS     │
-│ Feed         │  │ /api/flyers   │  │ Leaflet tiles  │
-│ Explore      │  │ /api/events   │  │ Cached images  │
-│ Upload       │  │ /api/local/*  │  └────────────────┘
-│ Events/[id]  │  └──────┬────────┘
-│ About        │         │
-└──────────────┘         ├──────────────┬──────────────┐
-                         │              │              │
-                         ▼              ▼              ▼
-                 ┌──────────────┐ ┌──────────┐ ┌─────────────────┐
-                 │  OpenAI      │ │ Gemini   │ │   Firestore     │
-                 │  gpt-4o-mini │ │ 2.0 Flash│ │   (Database)    │
-                 │  (primary)   │ │ (backup) │ │  - flyers       │
-                 └──────────────┘ └──────────┘ │  - events       │
-                                               │  - extractions  │
-                                               └─────────────────┘
-                                                       │
-                                                       ▼
-                                               ┌─────────────────┐
-                                               │ Firebase Storage │
-                                               │ (Flyer Images)  │
-                                               └─────────────────┘
+│              Next.js 16 on Vercel / Local Dev               │
+│        App Router pages + 21 API routes + cron entrypoints  │
+└─────┬───────────────────┬──────────────────┬─────────────────┘
+      │                   │                  │
+      │ Pages + Admin UI  │ Ingestion Routes │ Static Assets
+      ▼                   ▼                  ▼
+┌──────────────┐   ┌────────────────┐  ┌────────────────┐
+│ Home / Feed  │   │ /api/cron/*    │  │ Images/CSS     │
+│ Explore      │   │ /api/upload/*  │  │ Leaflet tiles  │
+│ Upload       │   │ /api/admin/*   │  │ Cached images  │
+│ Events/[id]  │   │ /api/flyers/*  │  └────────────────┘
+│ Admin/*      │   │ /api/events    │
+└──────────────┘   └──────┬─────────┘
+                          ├──────────────┬───────────────┬────────────────┐
+                          │              │               │                │
+                          ▼              ▼               ▼                ▼
+                  ┌──────────────┐ ┌─────────────┐ ┌──────────────┐ ┌─────────────────┐
+                  │ OpenAI       │ │ Gemini      │ │ Firebase Auth│ │ Firestore       │
+                  │ gpt-4o-mini  │ │ 2.0 Flash   │ │ + Admin SDK  │ │ flyers/events   │
+                  │ (primary)    │ │ (secondary) │ │ admin checks │ │ extractions     │
+                  └──────────────┘ └─────────────┘ └──────────────┘ └────────┬────────┘
+                                                                               │
+                                                                               ▼
+                                                                       ┌─────────────────┐
+                                                                       │ Firebase Storage │
+                                                                       │ flyer images     │
+                                                                       └─────────────────┘
 ```
 
 ---
@@ -80,9 +78,14 @@ food_finder/
 │   │       ├── upload/route.ts               # POST multimodal upload (Firebase or local)
 │   │       ├── upload/process/route.ts       # POST process after browser upload
 │   │       ├── cron/slack-ingest/route.ts    # POST cron-triggered Slack channel ingestion
+│   │       ├── cron/gmail-ingest/route.ts    # POST cron-triggered Gmail inbox ingestion
+│   │       ├── slack/events/route.ts         # POST Slack Events API webhook
 │   │       ├── auth/me/route.ts              # GET current user profile
 │   │       ├── auth/register/route.ts        # POST register new user
 │   │       ├── auth/sync-profile/route.ts    # POST sync Firebase Auth → Firestore profile
+│   │       ├── admin/create-user/route.ts    # POST create a BYU-linked uploader account
+│   │       ├── admin/flyers/route.ts         # GET admin flyer audit list
+│   │       ├── admin/flyers/[flyerId]/route.ts # DELETE flyer + storage object
 │   │       ├── admin/users/route.ts          # GET/PATCH user management (admin only)
 │   │       ├── local/ingest/route.ts         # POST local extract + save
 │   │       ├── local/extract/route.ts        # POST local extract only
@@ -103,8 +106,11 @@ food_finder/
 │   │   │   ├── persistSlackTextFlyer.ts      # Persist Slack-sourced event text as flyer record
 │   │   │   ├── storageAdminUpload.ts         # Firebase Admin Storage operations
 │   │   │   └── flyerDocToJson.ts             # Firestore Timestamp → JSON conversion
+│   │   ├── gmail/
+│   │   │   └── runGmailIngest.ts             # Gmail inbox ingestion pipeline
 │   │   ├── auth/
 │   │   │   ├── userProfiles.ts               # Firestore user profile CRUD
+│   │   │   ├── requireAdmin.ts               # Admin session guard + centralized admin error logging
 │   │   │   └── verifyBearer.ts               # Bearer token verification middleware
 │   │   ├── slack/
 │   │   │   ├── runSlackIngest.ts             # Full Slack channel ingestion pipeline
@@ -259,7 +265,7 @@ food_finder/
 ---
 
 ### Hosting & Deployment
-- **Platform:** Vercel (planned, not yet confirmed live)
+- **Platform:** Vercel (deployment handoff owned by teammate; config committed in repo)
 - **CI/CD:** GitHub integration (auto-deploy on push to `main`)
 - **Domain:** TBD
 
@@ -495,6 +501,45 @@ interface StoredExtractionRecord {
 
 ---
 
+### Gmail Ingestion Endpoint
+
+#### POST `/api/cron/gmail-ingest`
+**Purpose:** Cron-triggered Gmail inbox ingestion. Reads the configured inbox, branches between image attachments and plain-text messages, extracts events, deduplicates by Gmail message markers, and stores results in Firestore.
+
+**Auth:** Bearer token (server-to-server, not user-facing)
+
+**Backend pipeline:**
+1. `runGmailIngest.ts` — list inbox messages, maintain dedupe marks, branch image vs text
+2. `processUploadedFlyer.ts` — process Gmail image attachments through the flyer pipeline
+3. `extractEventsFromSlackText.ts` — reuse structured text extraction for Gmail message bodies
+4. `persistSlackTextFlyer.ts` — store Gmail text events as flyer records
+
+**Config:** See `env.example` for `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, and `CRON_SECRET`
+
+---
+
+### Admin Endpoints
+
+#### POST `/api/admin/create-user`
+Create a Firebase user tied to a BYU email + BYU Net ID, then return a branded password reset link for admin handoff.
+
+#### GET `/api/admin/users`
+List uploader/admin profiles for the admin panel.
+
+#### PATCH `/api/admin/users`
+Toggle `canUpload` for a non-admin user.
+
+#### DELETE `/api/admin/users`
+Delete a user account and clean up its Firestore profile.
+
+#### GET `/api/admin/flyers`
+List recent flyer records for admin review and cleanup.
+
+#### DELETE `/api/admin/flyers/[flyerId]`
+Hard delete a flyer document and remove the backing storage object when present.
+
+---
+
 ### Local Mode Endpoints
 
 #### POST `/api/local/ingest`
@@ -681,7 +726,7 @@ Set `NEXT_PUBLIC_BACKEND_MODE=local` in `.env.local` to skip Firebase entirely. 
 | **OpenAI as primary AI** | gpt-4o-mini via Responses API works well for extraction | Gemini-only (original plan) | Implemented |
 | **Gemini as secondary AI** | Available for re-extraction; keeps optionality | — | Implemented |
 | **Dual backend mode** | Local mode speeds up dev without Firebase credentials | Firebase-only | Implemented |
-| **Vercel over AWS** | Zero config, free tier generous | AWS Amplify, Netlify | Planned (not yet deployed) |
+| **Vercel over AWS** | Zero config, fast handoff for student team delivery | AWS Amplify, Netlify | Deployment handoff in progress |
 | **BYU email auth for uploaders** | Anonymous browse + gated upload prevents spam | No auth at all, Open upload | Implemented (Firebase Auth + BYU email enforcement) |
 | **Firebase Admin SDK** | Server-side writes bypass client security rules | Client SDK writes | Implemented |
 | **Leaflet for maps** | Lightweight, open-source, no API key needed | Google Maps, Mapbox | Implemented |
@@ -694,7 +739,7 @@ Set `NEXT_PUBLIC_BACKEND_MODE=local` in `.env.local` to skip Firebase entirely. 
 - "Mark as Gone" UI + status update endpoint
 - Real-time `onSnapshot` listeners
 - User confirmation/edit form for AI extractions
-- Vercel production deployment
+- Vercel production deployment handoff (teammate-owned rollout)
 
 ### Phase 2 Features
 - Slack bot integration (shared Firestore DB)

@@ -1,8 +1,8 @@
 # Scavenger: Campus Food Discovery Platform — Project Context
 
 **Last Updated:** April 7, 2026
-**Project Status:** Active Development — Final Sprint (Presentations April 8, 13, 15)
-**Current Phase:** Demo Build + Presentation Prep
+**Project Status:** Active Development — Final Sprint Readiness (Presentations April 8, 13, 15)
+**Current Phase:** Demo Build + Technical Readiness Pass
 
 ---
 
@@ -40,11 +40,11 @@ Scavenger is a mobile-first web platform that solves the information gap between
 
 ---
 
-## Product Status (as of April 6, 2026)
+## Product Status (as of April 7, 2026)
 
 ### What's Built and Working
-- **Gmail Ingestion Pipeline** — Cron-triggered (`/api/cron/gmail-ingest`), reads getscavenger@gmail.com inbox via OAuth2, extracts events from plain-text emails and image attachments, deduplication via `gmailIngestMarks` collection
 - **Slack Ingestion Pipeline** — Cron-triggered + real-time Events API (`/api/slack/events`), reads official club channels, image + text messages, deduplication, multi-workspace
+- **Gmail Ingestion Pipeline** — Cron-triggered (`/api/cron/gmail-ingest`), reads getscavenger@gmail.com inbox via OAuth2, extracts events from plain-text emails and image attachments, deduplication via `gmailIngestMarks` collection
 - **Manual Flyer Upload** — Drag-and-drop upload with OpenAI gpt-4o-mini vision extraction, Firebase Storage + Firestore write
 - **Feed Page** — Grid of event cards with responsive layout, Firebase + local modes
 - **Weekly Event Calendar** — 7-day week grid with event dots, day selector, week navigation
@@ -52,12 +52,13 @@ Scavenger is a mobile-first web platform that solves the information gap between
 - **Event Detail View** — Full event page with flyer image, status badges, location, host, food details
 - **Home Page** — Hero section, weekly calendar, discover preview, campus map CTA
 - **Auth System** — Firebase Auth with BYU email enforcement, canUpload permission gate, admin toggle
+- **Admin Operations** — Admin user creation, upload access toggles, flyer cleanup, and branded password-reset handoff
 - **Branded Password Reset** — Custom `/auth/action` page rewrites Firebase reset links to stay on app domain (`firebaseEmailActionLinks.ts`)
 - **Slack Events API** — Real-time message ingestion via `POST /api/slack/events` with signature verification
 - **Dark Mode** — System-preference detection, toggle with persistent theme
 - **Dual Backend Mode** — Firebase (production) and local filesystem (development) via `NEXT_PUBLIC_BACKEND_MODE`
-- **Structured Logging** — JSON-structured logger integrated into all API routes and backend pipeline
-- **CLI Test Scripts** — `scripts/test.sh` (lint + build) and `scripts/test-slack-ingest.sh` (pipeline test)
+- **Structured Logging** — JSON-structured logger integrated across all 21 API routes plus key backend pipeline and admin helper flows
+- **CLI Verification Scripts** — `scripts/test.sh`, `scripts/test-slack-ingest.sh`, and `scripts/scan-secrets.sh`
 
 ### Pre-Alpha Blockers (Not Yet Built)
 - **"Mark as Gone" UI** — Status field exists in data model but no user-facing toggle
@@ -117,18 +118,20 @@ See `aiDocs/architecture.md` for complete technical architecture.
 
 - Run `scripts/test.sh` to lint and build while piping structured output into `logs/test-<timestamp>.log`.
 - Run `scripts/test-slack-ingest.sh` to test the Slack ingestion pipeline against local dev.
-- The logger helper in `src/lib/logger.ts` emits `[Scavenger][level] {JSON}` entries from all API routes and backend pipeline files.
+- Run `scripts/scan-secrets.sh` to scan tracked files and git history for likely committed secrets.
+- The logger helper in `src/lib/logger.ts` emits `[Scavenger][level] {JSON}` entries from all 21 API routes plus key backend pipeline and admin helper flows.
 - Store the log path and key observations in `aiDocs/changelog.md` for the test → log → fix cycle.
 
 ---
 
 ## Key Reference Documents (Bookshelf)
 
+- **`ai/context.md`** — AI bookshelf entrypoint. Tells a new session what to read first and which docs are current.
 - **`aiDocs/prd.md`** — Product Requirements Document (v2.0, post-pivot). Comprehensive: personas, competitive landscape, feature specs, assumption table, success metrics. The product anchor.
 - **`aiDocs/mvp.md`** — MVP Demo Specification (v2.0). Defines the concrete, scope-constrained deliverable for the April 8 demo. Includes step-by-step demo flow and prep checklist.
-- **`aiDocs/architecture.md`** — System Architecture (v2.1). Full tech stack, file structure, API endpoints with request/response shapes, all Firestore data models, data flow diagrams, environment variables.
+- **`aiDocs/architecture.md`** — System Architecture (v2.2). Full tech stack, file structure, API endpoints with request/response shapes, all Firestore data models, data flow diagrams, environment variables.
 - **`aiDocs/coding-style.md`** — Code Style Guide. TypeScript conventions, React patterns, Tailwind usage, error handling, commit message format. Aligned with CLAUDE.md code principles.
-- **`aiDocs/changelog.md`** — Change history from v0.1.0 (project foundation) through v0.4.0 (documentation cleanup + Round 2 interviews). Includes test-log-fix evidence.
+- **`aiDocs/changelog.md`** — Change history from v0.1.0 through the current readiness pass. Includes verification log paths and technical-process evidence.
 - **`ai/roadmaps/2026-04-06-current-roadmap.md`** — Single active roadmap with status indicators. Phase 0 complete, Phase 1 substantially complete, Final Sprint in progress.
 - **`ai/notes/interviews/2026-04-06-round2-club-interviews.md`** — Round 2 customer interviews (3 clubs). Key validation: automation 9.7/10, professionalism tension, sub-associations as early adopters.
 - **`ai/notes/interviews/2026-02-24-round1-club-interviews.md`** — Round 1 interviews (2 clubs). Flyer falsification, recruitment framing discovery.
