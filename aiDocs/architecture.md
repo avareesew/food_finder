@@ -682,7 +682,7 @@ Set `NEXT_PUBLIC_BACKEND_MODE=local` in `.env.local` to skip Firebase entirely. 
 | **Gemini as secondary AI** | Available for re-extraction; keeps optionality | — | Implemented |
 | **Dual backend mode** | Local mode speeds up dev without Firebase credentials | Firebase-only | Implemented |
 | **Vercel over AWS** | Zero config, free tier generous | AWS Amplify, Netlify | Planned (not yet deployed) |
-| **No auth in MVP** | Reduces friction, faster to ship | Firebase Auth, Clerk | Implemented |
+| **BYU email auth for uploaders** | Anonymous browse + gated upload prevents spam | No auth at all, Open upload | Implemented (Firebase Auth + BYU email enforcement) |
 | **Firebase Admin SDK** | Server-side writes bypass client security rules | Client SDK writes | Implemented |
 | **Leaflet for maps** | Lightweight, open-source, no API key needed | Google Maps, Mapbox | Implemented |
 
