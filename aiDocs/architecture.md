@@ -209,7 +209,7 @@ food_finder/
 ### Backend
 - **Runtime:** Node.js 18+ (Vercel serverless functions)
 - **API Framework:** Next.js API Routes
-- **Authentication:** None (MVP)
+- **Authentication:** Firebase Auth + Firestore user profiles (login, register, admin page, upload gate)
 - **File Upload:** Multipart form data via API route + browser-side Firebase Storage upload
 
 ---
@@ -285,6 +285,14 @@ interface Flyer {
   extractionError?: string | null;
   extractedAt?: Timestamp;
   lastExtractionId?: string;               // Reference to extractions collection
+  // Slack-sourced flyers (set when ingested via Slack pipeline):
+  sourceType?: "upload" | "slack";
+  slackTeamId?: string;
+  slackChannelId?: string;
+  slackMessageTs?: string;
+  slackFileId?: string;
+  slackWorkspaceName?: string;
+  slackWorkspaceLabel?: string;
 }
 ```
 
@@ -483,7 +491,7 @@ interface StoredExtractionRecord {
 3. `slackDedupe.ts` — skip already-ingested messages
 4. `persistSlackTextFlyer.ts` — store as flyer record in Firestore
 
-**Config:** See `src/lib/slackIngestEnv.ts` for required env vars (`SLACK_BOT_TOKEN`, `SLACK_CHANNEL_IDS`, `SLACK_INGEST_SECRET`)
+**Config:** See `src/lib/slackIngestEnv.ts` for required env vars (`SLACK_BOT_TOKEN`, `SLACK_CHANNEL_IDS`, `CRON_SECRET`)
 
 ---
 
@@ -544,7 +552,7 @@ Cache remote Unsplash images locally. Only allows `images.unsplash.com` and `sou
 ## Security Considerations
 
 ### Current (Phase 1)
-- No user accounts = no password leaks
+- **Auth is implemented** — Firebase Auth for upload/admin; browsing remains anonymous (no login required to view feed)
 - Server-side writes via Admin SDK (client can't write directly to Firestore)
 - Extraction validation rejects invalid uploads and cleans up Storage
 - Unsplash image caching only allows whitelisted hosts
