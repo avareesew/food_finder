@@ -1,6 +1,6 @@
 import { formatDistance } from 'date-fns';
 import type { Timestamp } from 'firebase/firestore';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
     coerceExtractedDateToYyyyMmDd,
     formatEventDateLabel,
@@ -114,10 +114,8 @@ export default function EventCard({
         return status === 'gone' || byTime;
     }, [hasReliableEventDate, status, eventDate, eventEndTime, eventStartTime]);
 
-    const [imgFailed, setImgFailed] = useState(false);
-    useEffect(() => {
-        setImgFailed(false);
-    }, [imageUrl]);
+    const [failedImgUrl, setFailedImgUrl] = useState<string | null>(null);
+    const imgFailed = failedImgUrl === imageUrl;
 
     return (
         <div
@@ -147,7 +145,7 @@ export default function EventCard({
                             className={`relative z-0 w-full h-full object-cover transition-transform duration-700 ease-out ${
                                 eventEnded ? 'brightness-[0.88]' : 'group-hover:scale-105'
                             }`}
-                            onError={() => setImgFailed(true)}
+                            onError={() => setFailedImgUrl(imageUrl ?? null)}
                         />
                     ) : (
                         <div className="relative z-0 flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-orange-50/90 to-amber-50/80 px-4 dark:from-gray-800 dark:to-gray-900">

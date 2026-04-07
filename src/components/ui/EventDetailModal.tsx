@@ -25,6 +25,7 @@ export default function EventDetailModal({ open, flyerId, onClose, initialFlyer 
     const [flyer, setFlyer] = useState<Flyer | null>(null);
     const [loading, setLoading] = useState(false);
 
+    /* eslint-disable react-hooks/set-state-in-effect -- data-fetching effect with cleanup */
     useEffect(() => {
         if (!open || !flyerId) {
             setFlyer(null);
@@ -50,6 +51,7 @@ export default function EventDetailModal({ open, flyerId, onClose, initialFlyer 
             cancelled = true;
         };
     }, [open, flyerId, initialFlyer]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     useEffect(() => {
         if (!open) return;

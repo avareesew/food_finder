@@ -40,13 +40,13 @@ async function writeLocalSeen(set: Set<string>) {
   );
 }
 
-function useFirestoreDedupe(): boolean {
+function shouldUseFirestoreDedupe(): boolean {
   return process.env.NEXT_PUBLIC_BACKEND_MODE === 'firebase';
 }
 
 export async function isSlackFileSeen(teamId: string, fileId: string): Promise<boolean> {
   const id = docId(teamId, fileId);
-  if (useFirestoreDedupe()) {
+  if (shouldUseFirestoreDedupe()) {
     try {
       ensureFirebaseAdminInitialized();
       const snap = await admin.firestore().collection(COLLECTION).doc(id).get();
@@ -89,7 +89,7 @@ export async function markSlackFileSeen(
 ): Promise<void> {
   const id = docId(teamId, fileId);
   const payload = withoutUndefined(meta);
-  if (useFirestoreDedupe()) {
+  if (shouldUseFirestoreDedupe()) {
     try {
       ensureFirebaseAdminInitialized();
       await admin
