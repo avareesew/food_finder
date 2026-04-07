@@ -1,12 +1,15 @@
 # Scripts
 
-Utility scripts for development, deployment, and maintenance tasks.
+Utility scripts for development, verification, and maintenance tasks.
 
-## Planned Scripts
+## Current Scripts
 
-- `setup.sh` - Initialize local development environment
-- `seed-data.sh` - Populate database with test data
-- `deploy.sh` - Deploy to production (if needed beyond Vercel auto-deploy)
-- `backup.sh` - Backup Firestore data
+- `dev.sh` - Start the local dev server with project defaults
+- `test.sh` - Run lint + build and save the output to `logs/test-<timestamp>.log`
+- `test-slack-ingest.sh` - Hit the local Slack ingest endpoint and save the response/log output
+- `scan-secrets.sh` - Scan tracked files and git history for likely committed secrets, excluding documented placeholders in `env.example`
 
-Scripts will be added as needed during development.
+## Notes
+
+- Verification logs are part of the repo evidence trail. Keep the newest useful paths referenced in `aiDocs/changelog.md`.
+- Live Vercel rollout is handled outside this repo's local scripts in the teammate-owned deployment workflow.
