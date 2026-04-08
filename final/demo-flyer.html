@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Cookies — IS590R Final Presentations</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #f0ebe3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .flyer {
+      background: #fffcf8;
+      width: 520px;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+    }
+
+    .top-bar {
+      background: #FF5A1F;
+      padding: 14px 36px;
+      text-align: center;
+    }
+
+    .top-bar span {
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .body {
+      padding: 44px 48px 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 64px;
+      font-weight: 900;
+      line-height: 1.05;
+      color: #FF5A1F;
+      margin-bottom: 6px;
+    }
+
+    .cookie-sub {
+      font-size: 14px;
+      font-weight: 500;
+      color: #aaa;
+      letter-spacing: 0.08em;
+      margin-bottom: 36px;
+    }
+
+    .divider {
+      height: 2px;
+      background: #f0ebe3;
+      margin-bottom: 32px;
+    }
+
+    .event-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+
+    .event-class {
+      font-size: 13px;
+      font-weight: 500;
+      color: #aaa;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .details {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 36px;
+      text-align: left;
+      background: #f9f5f0;
+      border-radius: 10px;
+      padding: 20px 24px;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .detail-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #bbb;
+      width: 60px;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .detail-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.4;
+    }
+
+    .welcome {
+      font-size: 13px;
+      color: #bbb;
+    }
+
+    @media print {
+      body { background: white; }
+      .flyer { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="flyer">
+    <div class="top-bar">
+      <span>BYU Marriott School of Business</span>
+    </div>
+    <div class="body">
+      <div style="margin-bottom: 12px;">
+        <svg width="150" height="100" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="cg1" cx="40%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#f2b97e"/>
+              <stop offset="60%" stop-color="#d98c52"/>
+              <stop offset="100%" stop-color="#b86e38"/>
+            </radialGradient>
+            <radialGradient id="cg2" cx="40%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#eaaa6a"/>
+              <stop offset="60%" stop-color="#cc8040"/>
+              <stop offset="100%" stop-color="#a85e28"/>
+            </radialGradient>
+            <radialGradient id="cg3" cx="38%" cy="32%" r="62%">
+              <stop offset="0%" stop-color="#f5c285"/>
+              <stop offset="55%" stop-color="#e09858"/>
+              <stop offset="100%" stop-color="#bf7535"/>
+            </radialGradient>
+            <radialGradient id="chip1" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#5c3010"/>
+              <stop offset="100%" stop-color="#1e0c02"/>
+            </radialGradient>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#00000033"/>
+            </filter>
+          </defs>
+
+          <!-- back-left cookie -->
+          <g transform="translate(-2, 10) rotate(-20, 32, 32)" filter="url(#shadow)">
+            <path d="M32 4 C37 2,43 3,48 7 C54 11,58 18,59 26 C60 34,57 43,51 49 C45 55,36 57,28 54 C20 51,13 44,11 36 C9 27,12 17,18 11 C24 5,27 6,32 4Z" fill="url(#cg2)"/>
+            <!-- surface texture -->
+            <path d="M20 15 Q28 12,35 16" stroke="#e09060" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <path d="M40 10 Q46 9,49 14" stroke="#e09060" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <!-- chips -->
+            <g fill="url(#chip1)">
+              <path d="M24 22 C22 20,22 17,25 17 C28 17,30 20,29 22 C28 24,25 24,24 22Z"/>
+              <path d="M40 18 C38 16,38 13,41 13 C44 13,46 16,44 18 C43 20,41 20,40 18Z"/>
+              <path d="M43 32 C41 30,41 27,44 27 C47 27,49 30,47 32 C46 34,44 34,43 32Z"/>
+              <path d="M25 36 C23 34,23 31,26 31 C29 31,31 34,29 36 C28 38,26 38,25 36Z"/>
+            </g>
+            <!-- chip highlights -->
+            <circle cx="25" cy="19" r="1" fill="#7a4520" opacity="0.7"/>
+            <circle cx="41" cy="15" r="0.9" fill="#7a4520" opacity="0.7"/>
+            <circle cx="44" cy="29" r="1" fill="#7a4520" opacity="0.7"/>
+          </g>
+
+          <!-- back-right cookie -->
+          <g transform="translate(82, 6) rotate(16, 30, 30)" filter="url(#shadow)">
+            <path d="M30 4 C36 2,43 4,48 9 C54 14,57 22,56 30 C55 39,50 47,42 51 C34 55,25 53,19 47 C12 41,10 31,13 22 C16 13,22 6,30 4Z" fill="url(#cg1)"/>
+            <path d="M18 14 Q25 11,31 15" stroke="#e8a060" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <path d="M38 8 Q44 7,47 12" stroke="#e8a060" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <g fill="url(#chip1)">
+              <path d="M22 20 C20 18,20 15,23 15 C26 15,28 18,26 20 C25 22,23 22,22 20Z"/>
+              <path d="M37 16 C35 14,35 11,38 11 C41 11,43 14,41 16 C40 18,38 18,37 16Z"/>
+              <path d="M40 30 C38 28,38 25,41 25 C44 25,46 28,44 30 C43 32,41 32,40 30Z"/>
+              <path d="M23 34 C21 32,21 29,24 29 C27 29,29 32,27 34 C26 36,24 36,23 34Z"/>
+            </g>
+            <circle cx="23" cy="17" r="1" fill="#7a4520" opacity="0.7"/>
+            <circle cx="38" cy="13" r="0.9" fill="#7a4520" opacity="0.7"/>
+            <circle cx="41" cy="27" r="1" fill="#7a4520" opacity="0.7"/>
+          </g>
+
+          <!-- front center cookie (larger) -->
+          <g transform="translate(30, 20)" filter="url(#shadow)">
+            <path d="M37 3 C44 1,53 4,59 10 C66 16,70 26,69 36 C68 47,62 56,53 61 C44 66,33 65,24 59 C15 53,10 42,11 31 C12 20,19 10,28 6 C32 3,34 5,37 3Z" fill="url(#cg3)"/>
+            <!-- golden ring near edge for baked look -->
+            <path d="M37 8 C43 6,51 9,56 15 C62 21,65 30,63 39 C61 48,55 55,47 58 C39 61,30 59,23 53 C16 47,13 38,15 28 C17 18,24 10,32 8 C34 6,35 10,37 8Z" fill="none" stroke="#c87830" stroke-width="1.5" opacity="0.3"/>
+            <!-- surface cracks/texture -->
+            <path d="M25 18 Q32 15,38 19" stroke="#f0b070" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <path d="M48 12 Q55 11,58 17" stroke="#f0b070" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <path d="M55 38 Q58 44,56 50" stroke="#f0b070" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <!-- chips -->
+            <g fill="url(#chip1)">
+              <path d="M30 26 C27 23,28 19,32 19 C36 19,38 23,36 26 C35 29,32 29,30 26Z"/>
+              <path d="M48 21 C45 18,46 14,50 14 C54 14,56 18,54 21 C52 24,49 24,48 21Z"/>
+              <path d="M54 40 C51 37,52 33,56 33 C60 33,62 37,60 40 C58 43,55 43,54 40Z"/>
+              <path d="M32 46 C29 43,30 39,34 39 C38 39,40 43,38 46 C36 49,33 49,32 46Z"/>
+              <path d="M42 33 C40 31,40 28,43 28 C46 28,47 31,46 33 C45 35,43 35,42 33Z"/>
+            </g>
+            <!-- chip highlights -->
+            <circle cx="31" cy="21" r="1.2" fill="#7a4520" opacity="0.8"/>
+            <circle cx="49" cy="16" r="1.1" fill="#7a4520" opacity="0.8"/>
+            <circle cx="55" cy="35" r="1.2" fill="#7a4520" opacity="0.8"/>
+            <circle cx="33" cy="41" r="1.1" fill="#7a4520" opacity="0.8"/>
+            <circle cx="43" cy="29" r="1" fill="#7a4520" opacity="0.8"/>
+          </g>
+        </svg>
+      </div>
+      <h1>Free Cookies!</h1>
+      <p class="cookie-sub">yes, actually free!</p>
+      <div class="divider"></div>
+      <p class="event-name">IS 590R Final Presentations</p>
+      <p class="event-class">Applied AI Projects</p>
+      <div class="details">
+        <div class="detail-row">
+          <span class="detail-label">Date</span>
+          <span class="detail-value">Monday, April 13, 2026</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Time</span>
+          <span class="detail-value">12:30 – 1:45 PM</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Location</span>
+          <span class="detail-value">Room 270, Tanner Building (TNRB)</span>
+        </div>
+      </div>
+      <p class="welcome">Everyone welcome — no RSVP needed</p>
+    </div>
+  </div>
+</body>
+</html>

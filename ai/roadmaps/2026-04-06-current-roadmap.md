@@ -80,7 +80,7 @@ Must be resolved before recruiting alpha testers.
 | Blocker | File(s) | Priority | Status |
 |---------|---------|----------|--------|
 | "Mark as Gone" UI | `src/app/events/[id]/page.tsx` | 🔴 Critical | Open |
-| Vercel production deployment handoff | `vercel.json` | ✅ Resolved | Live on Vercel |
+| Vercel production deployment | `vercel.json` | ✅ Resolved | Live on Vercel — Apr 7 |
 | Real-time `onSnapshot` on feed | `src/app/feed/page.tsx` | 🔴 Critical | Open |
 | Confirmation/edit form for AI output | `src/components/UploadForm.tsx` | 🟡 High | Open |
 
