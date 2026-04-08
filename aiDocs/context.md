@@ -77,7 +77,7 @@ Scavenger is a mobile-first web platform that solves the information gap between
 | **AI (Primary)** | OpenAI gpt-4o-mini | Responses API (raw fetch) |
 | **AI (Secondary)** | Gemini 2.0 Flash | @google/generative-ai 0.24.1 |
 | **Maps** | Leaflet | 1.9.4 |
-| **Hosting** | Vercel (planned) | — |
+| **Hosting** | Vercel | Live (food-finder-avareesew-5233s-projects.vercel.app) |
 
 See `aiDocs/architecture.md` for complete technical architecture.
 

@@ -5,6 +5,22 @@
 
 ---
 
+## [0.6.0] - 2026-04-07 — Vercel Deployment + UI Fixes
+
+### Deployment
+- Deployed to Vercel production: `food-finder-avareesew-5233s-projects.vercel.app`
+- Set cron schedules to daily (`0 9 * * *`) — free tier limit (was `*/5 * * * *`)
+- Disabled Vercel deployment protection so app is publicly accessible
+
+### UI Fixes
+- Fixed mobile search bar overflow on home page — button now stacks below input on mobile, inline on `sm:+`
+- Added campus expectations notice banner to home page (participation context for food events)
+
+### Presentation
+- Updated `final/final-presentation.html` — copy revisions, added live QR code pointing to Vercel URL
+
+---
+
 ## [0.5.0] - 2026-04-06 — Technical Process Final Sprint
 
 ### Structured Logging
@@ -128,6 +144,7 @@ Key findings:
 
 | Version | Date | Summary |
 |---------|------|---------|
+| v0.6.0 | 2026-04-07 | Vercel deployment, mobile UI fixes, presentation update |
 | v0.5.0 | 2026-04-06 | Technical process final sprint — logging, scripts, docs |
 | v0.4.0 | 2026-04-06 | Post-pivot documentation cleanup + Round 2 interviews |
 | v0.3.0 | 2026-04-01 | Documentation alignment — reconciled docs with codebase |
