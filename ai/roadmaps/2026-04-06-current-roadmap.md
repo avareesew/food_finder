@@ -96,8 +96,8 @@ Must be resolved before recruiting alpha testers.
 | Fix all pre-alpha blockers | ⏸️ | See above |
 | Complete Vercel production rollout (teammate-owned) | ⏸️ | |
 | Email ingestion UI | ⏸️ | #1 validated feature (9.7/10 avg) |
-| Requirements / Expectations field on pins | ⏸️ | Requested by Sales Society + Finance Society |
-| Club Link field on pins | ⏸️ | Requested by Finance Society + Women of Accountancy |
+| Requirements / Expectations field on pins | ✅ | Demo-ready on CPG Sales event; extraction + UI already wired |
+| Club Link field on pins | ✅ | Demo-ready on CPG Sales event; extraction + UI already wired |
 | Scarcity note field on pins | ⏸️ | Requested by Women of Accountancy |
 | Recruit 5–10 sub-association leaders | ⏸️ | |
 | Seed 10–15 real events | ⏸️ | |
@@ -155,3 +155,4 @@ Must be resolved before recruiting alpha testers.
 | 2026-04-01 | Phase 1 substantially complete — retroactive alignment with codebase | Ava + Claude |
 | 2026-04-06 | Round 2 interviews complete · Documentation cleanup · Pivot confirmed · Roadmap rewritten post-pivot | Ava + Claude |
 | 2026-04-07 | Final readiness pass complete — 100% structured logging coverage, ESLint no-console rule, AI bookshelf, secret scan, doc placeholder cleanup, old roadmaps archived | Ryan + Claude Code |
+| 2026-04-07 | Demo data seeded — club link + expectations fields live on CPG Sales event | Ryan + Claude Code |

@@ -366,29 +366,54 @@ export default function EventDetailPage() {
                                         : '';
                                 if (!signup && !expect) return null;
                                 return (
-                                    <div className="rounded-2xl border border-sky-100 bg-sky-50/90 p-4 dark:border-sky-900/50 dark:bg-sky-950/35">
-                                        <p className="text-[10px] font-bold uppercase tracking-wider text-sky-800 dark:text-sky-300">
-                                            Join &amp; participate
-                                        </p>
+                                    <div className="rounded-2xl border border-sky-200/80 bg-gradient-to-br from-sky-50 via-sky-50/80 to-indigo-50/40 p-4 dark:border-sky-800/40 dark:from-sky-950/50 dark:via-sky-950/30 dark:to-indigo-950/20">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400">
+                                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                                </svg>
+                                            </span>
+                                            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-700 dark:text-sky-300">
+                                                Join &amp; participate
+                                            </p>
+                                        </div>
                                         {expect ? (
-                                            <p className="mt-2 text-sm text-gray-800 dark:text-gray-100">{expect}</p>
+                                            <div className="mt-3 flex items-start gap-3">
+                                                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
+                                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M12 3l9.09 16.91H2.91L12 3z" />
+                                                    </svg>
+                                                </span>
+                                                <div>
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                                        What&apos;s expected
+                                                    </p>
+                                                    <p className="mt-1 text-sm leading-relaxed text-gray-800 dark:text-gray-200">{expect}</p>
+                                                </div>
+                                            </div>
                                         ) : null}
                                         {signup ? (
-                                            <div className={expect ? 'mt-3' : 'mt-2'}>
-                                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                                    Club / sign-up
-                                                </p>
+                                            <div className={`flex items-center gap-3 ${expect ? 'mt-3 border-t border-sky-200/60 pt-3 dark:border-sky-800/30' : 'mt-3'}`}>
+                                                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-500/10 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400">
+                                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.172 13.828a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.102 1.101" />
+                                                    </svg>
+                                                </span>
                                                 {signupTextLooksLikeUrl(signup) ? (
                                                     <a
                                                         href={signup}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="mt-1 inline-block break-all text-sm font-semibold text-sky-600 hover:underline dark:text-sky-400"
+                                                        className="inline-flex items-center gap-2 text-sm font-semibold text-sky-600 transition-colors hover:text-sky-500 dark:text-sky-400 dark:hover:text-sky-300"
                                                     >
-                                                        {signup}
+                                                        Visit club page
+                                                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                        </svg>
                                                     </a>
                                                 ) : (
-                                                    <p className="mt-1 text-sm text-gray-800 dark:text-gray-100">{signup}</p>
+                                                    <p className="text-sm text-gray-800 dark:text-gray-200">{signup}</p>
                                                 )}
                                             </div>
                                         ) : null}

@@ -5,6 +5,18 @@
 
 ---
 
+## [0.6.1] - 2026-04-07 — Demo Data: Club Link + Expectations
+
+### Demo Seeding
+- Created `scripts/seed-demo-fields.ts` — patches `clubSignupLink` and `participationExpectations` on the CPG Sales event in Firestore
+- CPG Sales event now shows "Join & participate" section with Sales Society link and attendance expectations
+- Both fields already supported end-to-end: type definition, AI extraction prompts, event detail UI
+
+### UI Polish
+- Enhanced "Join & participate" card in both EventDetailModal and event detail page — gradient card, inline icons for expectations and club link, "Visit club page" link with external-link icon
+
+---
+
 ## [0.6.0] - 2026-04-07 — Vercel Deployment + UI Fixes
 
 ### Deployment
@@ -166,6 +178,7 @@ Key findings:
 
 | Version | Date | Summary |
 |---------|------|---------|
+| v0.6.1 | 2026-04-07 | Demo data seeding — club link + expectations on CPG Sales event |
 | v0.6.0 | 2026-04-07 | Vercel deployment, mobile UI fixes, presentation update |
 | v0.5.1 | 2026-04-07 | Final readiness pass — logging coverage, AI bookshelf, verification |
 | v0.5.0 | 2026-04-06 | Technical process final sprint — logging, scripts, docs |
