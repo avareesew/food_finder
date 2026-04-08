@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { runGmailIngest } from '@/backend/gmail/runGmailIngest';
 import { logger } from '@/lib/logger';
 
+/** Vercel Cron: schedule in vercel.json (e.g. every minute). Set CRON_SECRET in production. */
 export const maxDuration = 60;
 
 function authorizeCron(request: NextRequest): boolean {

@@ -8,6 +8,7 @@ import {
     isCampusEventEnded,
     resolveCampusEventYyyyMmDd,
 } from '@/lib/eventTiming';
+import { isPdfFlyerUrl } from '@/lib/flyerAttachment';
 
 type CreatedAtLike = Timestamp | { seconds: number; nanoseconds?: number };
 
@@ -30,6 +31,8 @@ interface EventCardProps {
     foodCategory?: string | null;
     /** Shown when there is no flyer image (e.g. Slack text) */
     foodEmoji?: string | null;
+    /** One-line preview: expectations and/or sign-up (extracted from poster/email) */
+    engagementPreview?: string | null;
     startTime?: Timestamp;
     status: string;
     imageUrl?: string;
@@ -69,6 +72,7 @@ export default function EventCard({
     food,
     foodCategory,
     foodEmoji,
+    engagementPreview,
     startTime,
     status,
     imageUrl,
@@ -116,6 +120,7 @@ export default function EventCard({
 
     const [failedImgUrl, setFailedImgUrl] = useState<string | null>(null);
     const imgFailed = failedImgUrl === imageUrl;
+    const showPdfTile = Boolean(imageUrl && isPdfFlyerUrl(imageUrl));
 
     return (
         <div
@@ -137,7 +142,17 @@ export default function EventCard({
         >
             <div className="flex h-full flex-col">
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 dark:bg-gray-800">
-                    {imageUrl && !imgFailed ? (
+                    {imageUrl && !imgFailed && showPdfTile ? (
+                        <div className="relative z-0 flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-100 to-slate-200 px-4 dark:from-slate-800 dark:to-slate-900">
+                            <span className="text-6xl leading-none sm:text-7xl" aria-hidden>
+                                📄
+                            </span>
+                            <span className="text-center text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                                PDF · tap for details
+                            </span>
+                        </div>
+                    ) : imageUrl && !imgFailed ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- remote flyer URLs; host varies
                         <img
                             src={imageUrl}
                             alt={title}
@@ -257,6 +272,22 @@ export default function EventCard({
                                 </p>
                                 <p className="text-sm font-semibold text-gray-900 leading-snug dark:text-gray-100">
                                     {foodLine}
+                                </p>
+                            </div>
+                        </div>
+                    ) : null}
+
+                    {engagementPreview?.trim() ? (
+                        <div className="mt-3 flex items-start gap-2 rounded-xl border border-sky-100 bg-sky-50/90 px-3 py-2.5 dark:border-sky-900/50 dark:bg-sky-950/35">
+                            <span className="shrink-0 text-base leading-none" aria-hidden>
+                                🤝
+                            </span>
+                            <div className="min-w-0">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-sky-900/80 dark:text-sky-300/90">
+                                    Not just food — join in
+                                </p>
+                                <p className="text-xs font-medium leading-snug text-gray-800 line-clamp-2 dark:text-gray-200">
+                                    {engagementPreview.trim()}
                                 </p>
                             </div>
                         </div>

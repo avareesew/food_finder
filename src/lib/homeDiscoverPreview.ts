@@ -22,6 +22,8 @@ export type HomeDiscoverPreviewRecord = {
     food: string | null;
     foodCategory: string | null;
     details: string | null;
+    clubSignupLink?: string | null;
+    participationExpectations?: string | null;
     foodEmoji?: string | null;
   };
 };
@@ -55,6 +57,8 @@ export function homePreviewRecordToFlyer(r: HomeDiscoverPreviewRecord): Flyer {
     food: r.event.food,
     foodCategory: coerceFoodCategory(r.event.foodCategory),
     details: r.event.details,
+    clubSignupLink: r.event.clubSignupLink ?? null,
+    participationExpectations: r.event.participationExpectations ?? null,
     other: null,
     foodEmoji: r.event.foodEmoji ?? null,
   };
@@ -111,9 +115,32 @@ export function flyerToHomeDiscoverPreview(f: Flyer): HomeDiscoverPreviewRecord 
       food: typeof ev?.food === 'string' ? ev.food : null,
       foodCategory: ev?.foodCategory != null ? String(ev.foodCategory) : null,
       details: typeof ev?.details === 'string' ? ev.details : null,
+      clubSignupLink: typeof ev?.clubSignupLink === 'string' ? ev.clubSignupLink : null,
+      participationExpectations:
+        typeof ev?.participationExpectations === 'string' ? ev.participationExpectations : null,
       foodEmoji: typeof ev?.foodEmoji === 'string' ? ev.foodEmoji : null,
     },
   };
+}
+
+/** Short line for feed cards when hosts list expectations or sign-up (beyond food). */
+export function eventEngagementCardPreview(
+  ev: { participationExpectations?: string | null; clubSignupLink?: string | null } | null | undefined
+): string | null {
+  if (!ev) return null;
+  const part =
+    typeof ev.participationExpectations === 'string' ? ev.participationExpectations.trim() : '';
+  const link = typeof ev.clubSignupLink === 'string' ? ev.clubSignupLink.trim() : '';
+  if (part) {
+    return part.length > 100 ? `${part.slice(0, 99)}…` : part;
+  }
+  if (link) {
+    if (/^https?:\/\//i.test(link)) {
+      return 'Sign-up link in details →';
+    }
+    return link.length > 100 ? `${link.slice(0, 99)}…` : link;
+  }
+  return null;
 }
 
 /** Next `limit` events that are not ended yet, soonest first (by calendar date + start time). */

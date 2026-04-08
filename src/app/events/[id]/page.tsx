@@ -13,6 +13,10 @@ import {
     resolveCampusEventYyyyMmDd,
 } from '@/lib/eventTiming';
 
+function signupTextLooksLikeUrl(s: string): boolean {
+    return /^https?:\/\//i.test(s.trim());
+}
+
 function FoodUtensilsIcon({ className }: { className?: string }) {
     return (
         <svg
@@ -338,6 +342,53 @@ export default function EventDetailPage() {
                                 </p>
                             ) : null}
 
+                            <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                                Food is often a perk to welcome you — clubs may also expect you to stay for the program,
+                                dress a certain way, or sign up to join.
+                            </p>
+
+                            {(() => {
+                                const signup =
+                                    typeof ev?.clubSignupLink === 'string' && ev.clubSignupLink.trim()
+                                        ? ev.clubSignupLink.trim()
+                                        : '';
+                                const expect =
+                                    typeof ev?.participationExpectations === 'string' &&
+                                    ev.participationExpectations.trim()
+                                        ? ev.participationExpectations.trim()
+                                        : '';
+                                if (!signup && !expect) return null;
+                                return (
+                                    <div className="rounded-2xl border border-sky-100 bg-sky-50/90 p-4 dark:border-sky-900/50 dark:bg-sky-950/35">
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-sky-800 dark:text-sky-300">
+                                            Join &amp; participate
+                                        </p>
+                                        {expect ? (
+                                            <p className="mt-2 text-sm text-gray-800 dark:text-gray-100">{expect}</p>
+                                        ) : null}
+                                        {signup ? (
+                                            <div className={expect ? 'mt-3' : 'mt-2'}>
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                                    Club / sign-up
+                                                </p>
+                                                {signupTextLooksLikeUrl(signup) ? (
+                                                    <a
+                                                        href={signup}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="mt-1 inline-block break-all text-sm font-semibold text-sky-600 hover:underline dark:text-sky-400"
+                                                    >
+                                                        {signup}
+                                                    </a>
+                                                ) : (
+                                                    <p className="mt-1 text-sm text-gray-800 dark:text-gray-100">{signup}</p>
+                                                )}
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                );
+                            })()}
+
                             {hasFoodInfo ? (
                                 <div className="flex items-start gap-2 rounded-xl bg-orange-50/90 border border-orange-100/80 px-3 py-2.5 dark:bg-orange-950/40 dark:border-orange-900/50">
                                     <span className="text-[#FF5A1F] dark:text-orange-400 shrink-0 mt-0.5">
@@ -359,7 +410,7 @@ export default function EventDetailPage() {
                             {typeof ev?.details === 'string' && ev.details.trim() ? (
                                 <div className="rounded-2xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
                                     <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-                                        From the flyer
+                                        More details
                                     </p>
                                     <p className="text-sm text-gray-700 leading-relaxed dark:text-gray-300">
                                         {ev.details.trim()}

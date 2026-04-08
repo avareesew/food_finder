@@ -9,6 +9,11 @@ import {
     isCampusEventEnded,
     resolveCampusEventYyyyMmDd,
 } from '@/lib/eventTiming';
+import { isPdfFlyerUrl } from '@/lib/flyerAttachment';
+
+function signupTextLooksLikeUrl(s: string): boolean {
+  return /^https?:\/\//i.test(s.trim());
+}
 
 type Props = {
     open: boolean;
@@ -135,6 +140,22 @@ export default function EventDetailModal({ open, flyerId, onClose, initialFlyer 
                 <div className="relative flex min-h-[32vh] max-h-[42vh] w-full shrink-0 items-center justify-center overflow-hidden bg-gray-900 px-3 py-4 md:min-h-0 md:max-h-none md:h-auto md:w-[min(48%,560px)] md:max-w-[560px] md:self-stretch md:px-6 md:py-8">
                     {loading ? (
                         <div className="h-48 w-full max-w-md animate-pulse rounded-2xl bg-gray-800 md:h-96" />
+                    ) : flyer?.downloadURL && isPdfFlyerUrl(flyer.downloadURL) ? (
+                        <div className="flex h-full min-h-[min(40vh,360px)] w-full max-w-full flex-col items-stretch gap-3 md:max-h-[min(86vh,720px)]">
+                            <iframe
+                                title="Event PDF"
+                                src={flyer.downloadURL}
+                                className="min-h-[min(36vh,320px)] w-full flex-1 rounded-xl border border-gray-800 bg-gray-900"
+                            />
+                            <a
+                                href={flyer.downloadURL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-center text-sm font-semibold text-brand-orange hover:underline"
+                            >
+                                Open PDF in new tab
+                            </a>
+                        </div>
                     ) : flyer?.downloadURL ? (
                         // eslint-disable-next-line @next/next/no-img-element -- remote flyer URL
                         <img
@@ -248,13 +269,66 @@ export default function EventDetailModal({ open, flyerId, onClose, initialFlyer 
                                 </p>
                             ) : null}
 
+                            <p className="mt-5 text-xs leading-relaxed text-gray-500">
+                                Free food or snacks are often there to welcome you — many hosts also want you to stay for
+                                the program, meet people, or join the club. Check expectations and sign-up info when
+                                listed below.
+                            </p>
+
+                            {(() => {
+                                const signup =
+                                    typeof ev?.clubSignupLink === 'string' && ev.clubSignupLink.trim()
+                                        ? ev.clubSignupLink.trim()
+                                        : '';
+                                const expect =
+                                    typeof ev?.participationExpectations === 'string' &&
+                                    ev.participationExpectations.trim()
+                                        ? ev.participationExpectations.trim()
+                                        : '';
+                                if (!signup && !expect) return null;
+                                return (
+                                    <div className="mt-6 rounded-2xl border border-sky-900/60 bg-sky-950/35 p-5 sm:p-6">
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-300/90">
+                                            Join &amp; participate
+                                        </p>
+                                        {expect ? (
+                                            <div className="mt-3">
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                                                    Expectations
+                                                </p>
+                                                <p className="mt-1.5 text-sm leading-relaxed text-gray-100">{expect}</p>
+                                            </div>
+                                        ) : null}
+                                        {signup ? (
+                                            <div className={expect ? 'mt-4' : 'mt-1'}>
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                                                    Club / sign-up
+                                                </p>
+                                                {signupTextLooksLikeUrl(signup) ? (
+                                                    <a
+                                                        href={signup}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="mt-1.5 inline-block break-all text-sm font-semibold text-sky-400 hover:text-sky-300 hover:underline"
+                                                    >
+                                                        {signup}
+                                                    </a>
+                                                ) : (
+                                                    <p className="mt-1.5 text-sm text-gray-200">{signup}</p>
+                                                )}
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                );
+                            })()}
+
                             <div className="mt-8 rounded-[1.75rem] border border-gray-800 bg-gray-900/80 p-6 sm:p-7">
                                 <div className="mb-5 flex items-center justify-between gap-3">
                                     <h3 className="flex items-center gap-2.5 font-serif text-lg font-bold text-white sm:text-xl">
                                         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-orange text-sm text-white">
                                             ✦
                                         </span>
-                                        From the flyer
+                                        Food &amp; details
                                     </h3>
                                     <div className="flex items-center gap-2 rounded-full border border-gray-700 bg-gray-950 px-3 py-1">
                                         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
