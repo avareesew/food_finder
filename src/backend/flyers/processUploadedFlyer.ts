@@ -143,6 +143,8 @@ export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Pro
       food: null,
       foodCategory: null,
       details: extractionError,
+      clubSignupLink: null,
+      participationExpectations: null,
       other: null,
       foodEmoji: null,
     };
@@ -187,6 +189,10 @@ export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Pro
     .limit(1)
     .get();
   if (!dupSnap.empty) {
+    logger.info('flyer-skip-duplicate-event', {
+      source: 'upload_image',
+      dedupeKeyPrefix: dedupeKey.slice(0, 12),
+    });
     await deleteStorageObjectAtPath(storagePath).catch(() => {});
     return {
       flyerId: null,
@@ -195,7 +201,7 @@ export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Pro
       event: extractedEventWithEmoji,
       rawModelOutput,
       extractionError: null,
-      rejectedReason: 'This event is already on the calendar (duplicate).',
+      rejectedReason: 'This event is already on the calendar (same date, time, and place as an existing activity).',
       missingFields: undefined,
     };
   }

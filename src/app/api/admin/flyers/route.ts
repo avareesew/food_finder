@@ -14,6 +14,8 @@ export type AdminFlyerListItem = {
     title: string | null;
     date: string | null;
     createdAtMs: number | null;
+    /** Set for Slack / Gmail ingests so admin can verify automated sources. */
+    sourceType: string | null;
 };
 
 export async function GET(request: NextRequest) {
@@ -36,6 +38,7 @@ export async function GET(request: NextRequest) {
                 status?: string;
                 storagePath?: string;
                 downloadURL?: string;
+                sourceType?: string;
                 extractedEvent?: { title?: string | null; date?: string | null };
                 createdAt?: { toMillis?: () => number };
             };
@@ -50,6 +53,7 @@ export async function GET(request: NextRequest) {
                 title: typeof d.extractedEvent?.title === 'string' ? d.extractedEvent.title : null,
                 date: typeof d.extractedEvent?.date === 'string' ? d.extractedEvent.date : null,
                 createdAtMs: typeof createdAt === 'number' ? createdAt : null,
+                sourceType: typeof d.sourceType === 'string' && d.sourceType.trim() ? d.sourceType.trim() : null,
             });
         });
 

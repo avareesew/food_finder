@@ -36,7 +36,9 @@ export interface Flyer {
     slackWorkspaceLabel?: string;
     slackMessageTs?: string;
     /** No image — e.g. Slack text ingest */
-    sourceType?: 'flyer' | 'slack_text';
+    sourceType?: 'flyer' | 'slack_text' | 'gmail_text' | 'gmail_image' | string;
+    /** When set, downloadURL may be a PDF or other non-image attachment */
+    attachmentMimeType?: string;
 }
 
 const FLYERS_COLLECTION = 'flyers';

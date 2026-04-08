@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/gmail-ingest",
-      "schedule": "0 9 * * *"
+      "schedule": "*/1 * * * *"
     }
   ]
 }

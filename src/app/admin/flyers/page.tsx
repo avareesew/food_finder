@@ -14,7 +14,17 @@ type FlyerRow = {
     title: string | null;
     date: string | null;
     createdAtMs: number | null;
+    sourceType: string | null;
 };
+
+function sourceBadgeLabel(sourceType: string | null): string | null {
+    if (!sourceType) return null;
+    if (sourceType === 'gmail_text') return 'Gmail · text';
+    if (sourceType === 'gmail_image') return 'Gmail · image';
+    if (sourceType === 'slack_text') return 'Slack · text';
+    if (sourceType === 'slack_image') return 'Slack · image';
+    return sourceType;
+}
 
 function FlyerThumbnail({ downloadURL }: { downloadURL: string }) {
     const [failed, setFailed] = useState(false);
@@ -134,6 +144,10 @@ export default function AdminFlyersPage() {
 
     const deleteBusy = Boolean(pendingDelete && deleteBusyId === pendingDelete.id);
 
+    const gmailInList = flyers.filter(
+        (f) => f.sourceType === 'gmail_text' || f.sourceType === 'gmail_image'
+    ).length;
+
     return (
         <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 pt-28 sm:pt-32 bg-brand-canvas min-h-screen dark:bg-gray-950">
             <ConfirmModal
@@ -170,9 +184,28 @@ export default function AdminFlyersPage() {
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
                     Hard delete: removes the Firestore document and the Storage object when present. Thumbnails help
                     confirm which flyer you are removing. If a signed URL has expired, you will see “Preview
-                    unavailable” — the row is still correct.
+                    unavailable” — the row is still correct. Rows from email ingest show a Gmail tag below the title.
                 </p>
             </div>
+
+            {!listLoading && gmailInList > 0 ? (
+                <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-950 dark:border-green-900 dark:bg-green-950/35 dark:text-green-50">
+                    <p className="font-semibold">Gmail ingest is showing up</p>
+                    <p className="mt-1 text-green-900 dark:text-green-100">
+                        {gmailInList} event{gmailInList === 1 ? '' : 's'} in this list came from Gmail (text or image).
+                        Run <code className="rounded bg-green-100/80 px-1 dark:bg-green-900/60">/api/cron/gmail-ingest</code>{' '}
+                        again after new mail if you do not see them yet.
+                    </p>
+                </div>
+            ) : null}
+
+            {!listLoading && flyers.length > 0 && gmailInList === 0 ? (
+                <div className="mb-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-300">
+                    No Gmail-tagged rows in the latest 100 flyers yet. After a successful cron or ingest, new rows
+                    should show a <span className="font-semibold">Gmail · text</span> or{' '}
+                    <span className="font-semibold">Gmail · image</span> tag.
+                </div>
+            ) : null}
 
             {listError && (
                 <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900 dark:bg-red-950/40 dark:text-red-100">
@@ -209,6 +242,13 @@ export default function AdminFlyersPage() {
                                         <p className="font-semibold text-gray-900 dark:text-gray-50">
                                             {row.title?.trim() || row.originalFilename || 'Untitled'}
                                         </p>
+                                        {sourceBadgeLabel(row.sourceType) ? (
+                                            <p className="mt-1">
+                                                <span className="inline-flex items-center rounded-full bg-[#E8F5E9] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-[#1B5E20] dark:bg-green-950/80 dark:text-green-200">
+                                                    {sourceBadgeLabel(row.sourceType)}
+                                                </span>
+                                            </p>
+                                        ) : null}
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             {row.date ? `Date: ${row.date} · ` : ''}
                                             {when}

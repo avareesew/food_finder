@@ -39,6 +39,8 @@ export type ProcessSlackMessageResult = {
     textMessagesConsidered: number;
     textMessagesSkippedSeen: number;
     textEventsIngested: number;
+    /** Same date/time/place as an existing flyer (e.g. already ingested from Gmail). */
+    textEventsSkippedDuplicate: number;
     failed: number;
     errors: string[];
 };
@@ -52,6 +54,7 @@ const emptyResult = (): ProcessSlackMessageResult => ({
     textMessagesConsidered: 0,
     textMessagesSkippedSeen: 0,
     textEventsIngested: 0,
+    textEventsSkippedDuplicate: 0,
     failed: 0,
     errors: [],
 });
@@ -200,6 +203,12 @@ export async function processSlackChannelMessage(args: {
                 if (persisted.mode === 'firebase' && 'flyerId' in persisted) {
                     saved += 1;
                     r.textEventsIngested += 1;
+                } else if (
+                    persisted.mode === 'firebase' &&
+                    persisted.skippedDuplicate &&
+                    persisted.reason === 'event_already_exists'
+                ) {
+                    r.textEventsSkippedDuplicate += 1;
                 }
             }
 
@@ -230,6 +239,7 @@ export function mergeProcessResult(
         textMessagesConsidered: number;
         textMessagesSkippedSeen: number;
         textEventsIngested: number;
+        textEventsSkippedDuplicate: number;
         failed: number;
         errors: string[];
     },
@@ -243,6 +253,7 @@ export function mergeProcessResult(
     summary.textMessagesConsidered += part.textMessagesConsidered;
     summary.textMessagesSkippedSeen += part.textMessagesSkippedSeen;
     summary.textEventsIngested += part.textEventsIngested;
+    summary.textEventsSkippedDuplicate += part.textEventsSkippedDuplicate;
     summary.failed += part.failed;
     summary.errors.push(...part.errors);
 }
@@ -251,6 +262,7 @@ export function logSlackEventIngest(teamId: string, channelId: string, part: Pro
     if (
         part.ingested === 0 &&
         part.textEventsIngested === 0 &&
+        part.textEventsSkippedDuplicate === 0 &&
         part.failed === 0 &&
         part.skippedAlreadySeen === 0 &&
         part.textMessagesSkippedSeen === 0 &&
@@ -264,6 +276,7 @@ export function logSlackEventIngest(teamId: string, channelId: string, part: Pro
         channelId,
         ingested: part.ingested,
         textEventsIngested: part.textEventsIngested,
+        textEventsSkippedDuplicate: part.textEventsSkippedDuplicate,
         failed: part.failed,
         skippedAlreadySeen: part.skippedAlreadySeen,
         imageFilesConsidered: part.imageFilesConsidered,

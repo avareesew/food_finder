@@ -26,6 +26,7 @@ export type SlackIngestSummary = {
     textMessagesConsidered: number;
     textMessagesSkippedSeen: number;
     textEventsIngested: number;
+    textEventsSkippedDuplicate: number;
     failed: number;
     errors: string[];
 };
@@ -43,6 +44,7 @@ export async function runSlackIngest(workspaces: SlackIngestWorkspace[]): Promis
         textMessagesConsidered: 0,
         textMessagesSkippedSeen: 0,
         textEventsIngested: 0,
+        textEventsSkippedDuplicate: 0,
         failed: 0,
         errors: [],
     };
@@ -108,6 +110,7 @@ export async function runSlackIngest(workspaces: SlackIngestWorkspace[]): Promis
     logger.info('slack-ingest-summary', {
         ingested: summary.ingested,
         textEventsIngested: summary.textEventsIngested,
+        textEventsSkippedDuplicate: summary.textEventsSkippedDuplicate,
         failed: summary.failed,
         skippedAlreadySeen: summary.skippedAlreadySeen,
     });

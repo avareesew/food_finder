@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { getRecentFlyers, type Flyer } from '@/services/flyers';
-import { homePreviewRecordToFlyer } from '@/lib/homeDiscoverPreview';
+import { eventEngagementCardPreview, homePreviewRecordToFlyer } from '@/lib/homeDiscoverPreview';
 import EventCard from '@/components/ui/EventCard';
 import EventDetailModal from '@/components/ui/EventDetailModal';
 import EmptyState from '@/components/ui/EmptyState';
@@ -26,6 +26,8 @@ type LocalRecord = {
         food: string | null;
         foodCategory: string | null;
         details: string | null;
+        clubSignupLink?: string | null;
+        participationExpectations?: string | null;
     };
 };
 
@@ -178,6 +180,7 @@ export default function FeedPage() {
                                     food={r.event.food}
                                     foodCategory={r.event.foodCategory}
                                     details={r.event.details}
+                                    engagementPreview={eventEngagementCardPreview(r.event)}
                                 />
                             ))}
                         </div>
@@ -218,6 +221,7 @@ export default function FeedPage() {
                                     food={typeof ev?.food === 'string' ? ev.food : null}
                                     foodCategory={typeof ev?.foodCategory === 'string' ? ev.foodCategory : null}
                                     foodEmoji={typeof ev?.foodEmoji === 'string' ? ev.foodEmoji : null}
+                                    engagementPreview={eventEngagementCardPreview(ev)}
                                     status={cardStatus}
                                     imageUrl={flyer.downloadURL || undefined}
                                     createdAt={flyer.createdAt}

@@ -18,6 +18,8 @@ type ExtractedEvent = {
     food: string | null;
     foodCategory: string | null;
     details: string | null;
+    clubSignupLink?: string | null;
+    participationExpectations?: string | null;
     other: Record<string, unknown> | null;
     foodEmoji?: string | null;
 };
@@ -107,6 +109,18 @@ function ExtractedDetailsGrid({ event }: { event: ExtractedEvent }) {
             <div className="flex items-start justify-between gap-4">
                 <div className="text-gray-500 dark:text-gray-400">Category</div>
                 <div className="text-right font-semibold text-gray-900 dark:text-gray-50">{event.foodCategory ?? '—'}</div>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+                <div className="text-gray-500 dark:text-gray-400">Sign-up / club link</div>
+                <div className="text-right font-semibold text-gray-900 dark:text-gray-50 break-all">
+                    {event.clubSignupLink?.trim() || '—'}
+                </div>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+                <div className="text-gray-500 dark:text-gray-400">Participation expectations</div>
+                <div className="text-right font-semibold text-gray-900 dark:text-gray-50">
+                    {event.participationExpectations?.trim() || '—'}
+                </div>
             </div>
             <div className="flex items-start justify-between gap-4">
                 <div className="text-gray-500 dark:text-gray-400">Food emoji</div>

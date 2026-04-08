@@ -7,6 +7,7 @@ const tabs = [
     { href: '/admin', label: 'Upload access' },
     { href: '/admin/create-user', label: 'Create user' },
     { href: '/admin/flyers', label: 'Flyers' },
+    { href: '/admin/gmail', label: 'Gmail' },
 ] as const;
 
 export default function AdminNavTabs() {

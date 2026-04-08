@@ -97,6 +97,38 @@ export default function Home() {
         initialFlyer={detailInitialFlyer}
         onClose={closeDiscoverDetail}
       />
+
+      {/* Full-width notice: food draws people in; hosts want real engagement too */}
+      <div
+        className="w-full border-b border-sky-200/90 bg-gradient-to-r from-sky-100/95 via-white to-amber-50/80 shadow-[0_1px_0_rgba(0,0,0,0.04)] dark:border-sky-900/50 dark:from-sky-950/90 dark:via-gray-950 dark:to-gray-950 dark:shadow-none"
+        role="region"
+        aria-label="Campus event expectations"
+      >
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
+          <div
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-2xl shadow-sm ring-1 ring-sky-200/80 dark:bg-gray-900 dark:ring-sky-800/60"
+            aria-hidden
+          >
+            🤝
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-serif text-base font-bold leading-snug text-gray-900 sm:text-lg dark:text-gray-50">
+              Free food is the welcome —{' '}
+              <span className="text-sky-800 dark:text-sky-300">participation is the point.</span>
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+              Clubs use snacks and meals to bring students in, but many also want you to stay for the program, dress
+              appropriately, network, or sign up to join. On{' '}
+              <Link href="/feed" className="font-semibold text-brand-orange underline-offset-2 hover:underline">
+                Discover
+              </Link>
+              , open any event for <span className="font-semibold text-gray-900 dark:text-white">expectations</span> and{' '}
+              <span className="font-semibold text-gray-900 dark:text-white">club sign-up</span> when organizers share them.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* HERO */}
         <section className="text-center mb-16">

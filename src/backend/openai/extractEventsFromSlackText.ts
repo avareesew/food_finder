@@ -52,11 +52,13 @@ export async function extractEventsFromSlackMessageText(args: {
   const apiKey = requireEnv('OPENAI_API_KEY');
 
   const prompt = [
-    `You read announcements posted in a university Slack channel (plain text, sometimes with sections like "THIS WEEK" / "FUTURE EVENTS").`,
+    `You read announcements posted in a university Slack channel or forwarded email bodies (plain text; may include nested "From:/Sent:/Subject:" headers — read past those for the real invitation).`,
     `Extract every distinct upcoming food-related or social event mentioned. Skip pure admin notices with no event.`,
+    `For each event you MUST fill the four actionable fields whenever the source mentions them: (1) date — calendar day, (2) time — start and/or end, (3) place — building/room, (4) food or refreshments — what is served (if it says "free food", "pizza", "Zupas", "light refreshments", etc., put that in food).`,
+    `Food is often an incentive to attend, not the only point — whenever the post mentions how to join the org (signup URL, mailing list, Handshake, QR, Instagram link) put that in clubSignupLink (URL or short note). If it states expectations (stay for full event, business casual, networking required, first 100 students, etc.) put a concise summary in participationExpectations; otherwise null.`,
     `Return ONLY valid JSON (no markdown). Shape:`,
     `{"events":[{...}, ...]}`,
-    `Each object must use these keys exactly: title, host, campus, date, startTime, endTime, place, food, foodCategory, details, foodEmoji, other`,
+    `Each object must use these keys exactly: title, host, campus, date, startTime, endTime, place, food, foodCategory, details, clubSignupLink, participationExpectations, foodEmoji, other`,
     `- date: "YYYY-MM-DD" for the primary day of the event (if a range is given, use the first day people should show up, or the single day).`,
     `- startTime/endTime: "HH:MM" 24h local time. If only "7 PM" is given, set startTime to 19:00 and endTime null unless an end is stated.`,
     `- If the post gives a date range spanning multiple days with one time, set date to the first relevant day and describe the range in details.`,
@@ -64,7 +66,9 @@ export async function extractEventsFromSlackMessageText(args: {
     `- food: short phrase (e.g. "Popcorn", "Light refreshments"). If unknown say "TBD" or describe from context.`,
     `- foodCategory: one of pizza, dessert, snacks, refreshments, drinks, meal, other (or null).`,
     `- foodEmoji: exactly one Unicode emoji summarizing the food (e.g. pizza → 🍕). If food is unknown, use 🍽️.`,
-    `- details: extra lines (what to expect, sign-up notes).`,
+    `- details: extra lines (agenda, speaker, context).`,
+    `- clubSignupLink: https URL or short note (e.g. "QR on poster"); null if not mentioned.`,
+    `- participationExpectations: one line summarizing attendance/dress/networking/capacity rules; null if none.`,
     `- other: null or a small object for quirks.`,
     `Assume campus timezone America/Denver. Year hint for ambiguous dates: ${nowYearHint}.`,
     `If there are zero events, return {"events":[]}.`,
