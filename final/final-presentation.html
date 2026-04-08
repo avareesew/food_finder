@@ -32,16 +32,21 @@
   }
 
   /* ── Slideshow shell ─────────────────────────── */
-  #deck { width: 100%; height: 100%; position: relative; }
+  #deck {
+    width: 1440px; height: 810px;
+    position: absolute;
+    top: 0; left: 0;
+    transform-origin: top left;
+  }
 
   .slide {
     position: absolute; inset: 0;
     display: none;
     width: 100%; height: 100%;
     background: var(--bg);
-    padding: 52px 64px 44px;
+    padding: 44px 56px 36px;
     overflow: hidden;
-    font-size: 20px;
+    font-size: 22px;
   }
   .slide.active { display: flex; flex-direction: column; }
 
@@ -1111,6 +1116,21 @@
     else show(current - 1);
   });
 
+  function scaleDeck() {
+    const deck = document.getElementById('deck');
+    const scaleX = window.innerWidth / 1440;
+    const scaleY = window.innerHeight / 810;
+    const scale = Math.min(scaleX, scaleY);
+    const offsetX = (window.innerWidth - 1440 * scale) / 2;
+    const offsetY = (window.innerHeight - 810 * scale) / 2;
+    deck.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+    deck.style.top = '0';
+    deck.style.left = '0';
+    deck.style.margin = '0';
+  }
+
+  window.addEventListener('resize', scaleDeck);
+  scaleDeck();
   show(0);
 </script>
 </body>
