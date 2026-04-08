@@ -97,7 +97,7 @@ Existing solutions fail because:
 Club leaders connect their official email or Slack channel. Scavenger listens for event announcements and automatically extracts event details via AI.
 
 - **Slack backend:** Full ingestion pipeline built (`src/backend/slack/`) — cron-triggered, deduplication, OpenAI text extraction. No club-facing UI to connect a channel yet.
-- **Email:** Not yet implemented. Planned as forwarded or connected club email parsing.
+- **Email:** Backend ingestion pipeline built and deployed (`/api/cron/gmail-ingest`); club-facing UI to connect email not yet implemented.
 - **Verification:** Posts are only created from verified official channels — this is both a trust signal for students and a compliance argument for clubs navigating BYU red tape
 - **Future:** Teams/Outlook integration (potential BYU mandate — unconfirmed, needs follow-up)
 

@@ -16,6 +16,7 @@ import {
 import PinIcon from '@/components/ui/PinIcon';
 import EventDetailModal from '@/components/ui/EventDetailModal';
 import { getRecentFlyers, type Flyer } from '@/services/flyers';
+import { logger } from '@/lib/logger';
 
 const CampusBuildingMap = dynamic(() => import('@/components/CampusBuildingMap'), {
   ssr: false,
@@ -189,7 +190,9 @@ export default function CampusBuildingsExplorer() {
         setRows(flyersToRows(flyers));
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not load events');
+      const msg = e instanceof Error ? e.message : 'Could not load events';
+      logger.error('campus-explorer-load-failed', { message: msg });
+      setError(msg);
       setRows([]);
     } finally {
       setLoading(false);

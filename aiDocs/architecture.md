@@ -267,7 +267,7 @@ food_finder/
 ### Hosting & Deployment
 - **Platform:** Vercel (deployment handoff owned by teammate; config committed in repo)
 - **CI/CD:** GitHub integration (auto-deploy on push to `main`)
-- **Domain:** TBD
+- **Domain:** Vercel auto-domain (`food-finder-avareesew-5233s-projects.vercel.app`); custom domain pending
 
 ---
 

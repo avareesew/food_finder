@@ -11,6 +11,7 @@ import {
   resolveCampusEventYyyyMmDd,
 } from '@/lib/eventTiming';
 import PinIcon from '@/components/ui/PinIcon';
+import { logger } from '@/lib/logger';
 
 export type CalendarEventItem = {
   id: string;
@@ -128,7 +129,9 @@ export default function WeeklyEventCalendar() {
         setItems(flyerToItems(flyers));
       }
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : 'Could not load events');
+      const msg = e instanceof Error ? e.message : 'Could not load events';
+      logger.error('weekly-calendar-load-failed', { message: msg });
+      setLoadError(msg);
       setItems([]);
     } finally {
       setLoading(false);

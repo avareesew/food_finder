@@ -12,6 +12,7 @@ import {
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut as firebaseSignOut, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { normalizeEmail } from '@/lib/authShared';
+import { logger } from '@/lib/logger';
 
 export type AuthMe = {
     uid: string;
@@ -124,7 +125,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 await syncProfile(u);
                 await fetchMe(u);
             } catch (e) {
-                setSessionBanner(e instanceof Error ? e.message : 'Could not finish sign-in.');
+                const msg = e instanceof Error ? e.message : 'Could not finish sign-in.';
+                logger.error('auth-state-sync-failed', { message: msg });
+                setSessionBanner(msg);
                 await firebaseSignOut(auth);
                 setUser(null);
                 setMe(null);
@@ -144,7 +147,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             await signInWithEmailAndPassword(auth, normalizeEmail(email), password);
             return true;
         } catch (error: unknown) {
-            setSessionBanner(formatFirebaseAuthError(error));
+            const msg = formatFirebaseAuthError(error);
+            logger.warn('auth-sign-in-failed', { message: msg });
+            setSessionBanner(msg);
             return false;
         }
     }, []);

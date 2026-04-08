@@ -4,6 +4,7 @@ import type { gmail_v1 } from 'googleapis';
 import { createGmailClientFromEnv } from '@/backend/gmail/gmailOAuthClient';
 import { gmailInboxQuery, gmailListMaxResults } from '@/lib/gmailIngestEnv';
 import { ensureFirebaseAdminInitialized } from '@/backend/flyers/storageAdminUpload';
+import { logger } from '@/lib/logger';
 
 const GMAIL_MARKS = 'gmailIngestMarks';
 
@@ -38,6 +39,7 @@ export async function listGmailInboxPreviews(): Promise<GmailInboxPreviewResult>
     listRes = await gmail.users.messages.list({ userId: 'me', q, maxResults });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    logger.error('gmail-inbox-preview-list-failed', { message: msg });
     return { ok: false, reason: 'list_failed', message: msg };
   }
 

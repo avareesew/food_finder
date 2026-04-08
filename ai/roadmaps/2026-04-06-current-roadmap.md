@@ -25,7 +25,7 @@
 | 5 club president interviews | ✅ | Round 1: Feb 24–25 · Round 2: Apr 6 |
 | Flyer assumption validated | ❌ Falsified | Pivot to email/text ingestion confirmed |
 | Automation validated | ✅ | 9.7/10 avg across 3 Round 2 interviews |
-| Vercel deployment handoff | 🔄 | `vercel.json` exists; teammate owns live rollout |
+| Vercel deployment handoff | ✅ | Live at `food-finder-avareesew-5233s-projects.vercel.app` |
 
 ---
 
@@ -57,18 +57,19 @@
 
 | Deliverable | Owner | Status | Notes |
 |-------------|-------|--------|-------|
-| Round 2 customer interviews (3 clubs) | Person 1 | ✅ | Michael Nichols, Molly Wakefield, Abigail Armstrong |
-| Falsification tests documented | Person 1 | ✅ | See `ai/notes/interviews/2026-04-06-round2-club-interviews.md` |
-| Club president submission form (paste text → extract → pin) | Person 2 | ⏸️ | Core demo feature |
-| Demo polish + mobile testing | Person 2 | ⏸️ | 2–3 real test inputs prepared |
-| CLAUDE.md created | Person 3 | ✅ | Done |
-| Documentation cleanup (PRD, MVP, roadmaps) | Person 3 | ✅ | Done |
-| Readiness pass: admin/Gmail logging, AI bookshelf, secret scan | Person 3 | 🔄 | Branch `codex/final-readiness-pass` |
-| Deployment handoff + environment checklist | Person 4 | 🔄 | Teammate-owned Vercel rollout |
-| Presentation slides | Person 4 | ⏸️ | |
-| Live demo script + Q&A talking points | Person 4 | ⏸️ | |
-| Full team rehearsal | All | ⏸️ | April 7 |
-| All materials submitted | All | ⏸️ | April 8 deadline |
+| Round 2 customer interviews (3 clubs) | Ava | ✅ | Michael Nichols, Molly Wakefield, Abigail Armstrong |
+| Falsification tests documented | Ava | ✅ | See `ai/notes/interviews/2026-04-06-round2-club-interviews.md` |
+| Club president submission form (paste text → extract → pin) | Eddy | 🔄 | Core demo feature |
+| Demo polish + mobile testing | Eddy | 🔄 | 2–3 real test inputs prepared |
+| CLAUDE.md created | Ryan | ✅ | Done |
+| Documentation cleanup (PRD, MVP, roadmaps) | Ryan | ✅ | Done |
+| Readiness pass: admin/Gmail logging, AI bookshelf, secret scan | Ryan | ✅ | Merged to main |
+| Enforced code standards (ESLint no-console, CLAUDE.md rules) | Ryan | ✅ | All `console.*` replaced with structured logger |
+| Deployment to Vercel | Ryan | ✅ | Live at `food-finder-avareesew-5233s-projects.vercel.app` |
+| Presentation slides | Allie | 🔄 | |
+| Live demo script + Q&A talking points | Allie | 🔄 | |
+| Full team rehearsal | All | 🔄 | April 7 |
+| All materials submitted | All | 🔄 | April 7 deadline |
 
 ---
 
@@ -79,7 +80,7 @@ Must be resolved before recruiting alpha testers.
 | Blocker | File(s) | Priority | Status |
 |---------|---------|----------|--------|
 | "Mark as Gone" UI | `src/app/events/[id]/page.tsx` | 🔴 Critical | Open |
-| Vercel production deployment handoff | `vercel.json` | 🔴 Critical | Teammate-owned |
+| Vercel production deployment handoff | `vercel.json` | ✅ Resolved | Live on Vercel |
 | Real-time `onSnapshot` on feed | `src/app/feed/page.tsx` | 🔴 Critical | Open |
 | Confirmation/edit form for AI output | `src/components/UploadForm.tsx` | 🟡 High | Open |
 
@@ -153,4 +154,4 @@ Must be resolved before recruiting alpha testers.
 | 2026-02-24 | Phase 0 complete — interviews started, Firebase + Next.js working | Team |
 | 2026-04-01 | Phase 1 substantially complete — retroactive alignment with codebase | Ava + Claude |
 | 2026-04-06 | Round 2 interviews complete · Documentation cleanup · Pivot confirmed · Roadmap rewritten post-pivot | Ava + Claude |
-| 2026-04-07 | Final readiness pass started — logging coverage, AI bookshelf, secret scan, verification evidence | Ryan + Codex |
+| 2026-04-07 | Final readiness pass complete — 100% structured logging coverage, ESLint no-console rule, AI bookshelf, secret scan, doc placeholder cleanup, old roadmaps archived | Ryan + Claude Code |
