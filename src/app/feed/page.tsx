@@ -18,6 +18,7 @@ type LocalRecord = {
     event: {
         title: string | null;
         host: string | null;
+        society?: string | null;
         campus: string | null;
         date: string | null;
         startTime: string | null;
@@ -181,6 +182,9 @@ export default function FeedPage() {
                                     foodCategory={r.event.foodCategory}
                                     details={r.event.details}
                                     engagementPreview={eventEngagementCardPreview(r.event)}
+                                    society={
+                                        typeof r.event.society === 'string' ? r.event.society : null
+                                    }
                                 />
                             ))}
                         </div>
@@ -222,6 +226,7 @@ export default function FeedPage() {
                                     foodCategory={typeof ev?.foodCategory === 'string' ? ev.foodCategory : null}
                                     foodEmoji={typeof ev?.foodEmoji === 'string' ? ev.foodEmoji : null}
                                     engagementPreview={eventEngagementCardPreview(ev)}
+                                    society={typeof ev?.society === 'string' ? ev.society : null}
                                     status={cardStatus}
                                     imageUrl={flyer.downloadURL || undefined}
                                     createdAt={flyer.createdAt}

@@ -274,6 +274,11 @@ export default function Home() {
                       <h3 className="font-serif text-xl text-brand-black mb-1 group-hover:text-brand-orange transition-colors dark:text-gray-50 line-clamp-2">
                         {r.event.title ?? 'Upcoming Event'}
                       </h3>
+                      {typeof r.event.society === 'string' && r.event.society.trim() ? (
+                        <p className="text-xs font-semibold text-gray-700 mb-1 dark:text-gray-300">
+                          Society: {r.event.society.trim()}
+                        </p>
+                      ) : null}
                       <p className="text-sm text-gray-600 mb-3 dark:text-gray-400">
                         {r.event.place ?? 'Location TBD'} • {prettyStartLine(r)}
                       </p>

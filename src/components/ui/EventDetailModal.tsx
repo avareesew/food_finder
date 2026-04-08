@@ -269,6 +269,12 @@ export default function EventDetailModal({ open, flyerId, onClose, initialFlyer 
                                 </p>
                             ) : null}
 
+                            {typeof ev?.society === 'string' && ev.society.trim() ? (
+                                <p className="mt-2 text-sm text-gray-400">
+                                    <span className="font-semibold text-gray-200">Society:</span> {ev.society.trim()}
+                                </p>
+                            ) : null}
+
                             <p className="mt-5 text-xs leading-relaxed text-gray-500">
                                 Free food or snacks are often there to welcome you — many hosts also want you to stay for
                                 the program, meet people, or join the club. Check expectations and sign-up info when

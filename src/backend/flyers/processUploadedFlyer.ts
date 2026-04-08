@@ -135,6 +135,7 @@ export async function processUploadedFlyer(args: ProcessUploadedFlyerInput): Pro
     extractedEvent = {
       title: null,
       host: null,
+      society: null,
       campus: null,
       date: null,
       startTime: null,

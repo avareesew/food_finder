@@ -342,6 +342,13 @@ export default function EventDetailPage() {
                                 </p>
                             ) : null}
 
+                            {typeof ev?.society === 'string' && ev.society.trim() ? (
+                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                    <span className="font-semibold text-gray-900 dark:text-gray-100">Society:</span>{' '}
+                                    {ev.society.trim()}
+                                </p>
+                            ) : null}
+
                             <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
                                 Food is often a perk to welcome you — clubs may also expect you to stay for the program,
                                 dress a certain way, or sign up to join.

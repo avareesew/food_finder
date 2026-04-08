@@ -12,6 +12,7 @@ type LocalEventCardProps = {
   foodCategory?: string | null;
   details?: string | null;
   engagementPreview?: string | null;
+  society?: string | null;
 };
 
 function toLocalDate(date: string, time?: string | null): Date | null {
@@ -94,6 +95,12 @@ export default function LocalEventCard(props: LocalEventCardProps) {
             Flyer
           </span>
         </div>
+
+        {props.society?.trim() ? (
+          <p className="text-gray-600 text-xs font-semibold mb-2 dark:text-gray-300">
+            Society: {props.society.trim()}
+          </p>
+        ) : null}
 
         {(props.place || timeLine) && (
           <div className="text-gray-600 text-xs font-medium leading-relaxed space-y-1 dark:text-gray-400">

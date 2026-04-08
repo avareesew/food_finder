@@ -33,6 +33,8 @@ interface EventCardProps {
     foodEmoji?: string | null;
     /** One-line preview: expectations and/or sign-up (extracted from poster/email) */
     engagementPreview?: string | null;
+    /** Student club / society name from extraction */
+    society?: string | null;
     startTime?: Timestamp;
     status: string;
     imageUrl?: string;
@@ -73,6 +75,7 @@ export default function EventCard({
     foodCategory,
     foodEmoji,
     engagementPreview,
+    society,
     startTime,
     status,
     imageUrl,
@@ -237,6 +240,12 @@ export default function EventCard({
                     <h3 className="font-serif text-lg font-bold text-gray-900 leading-tight mb-2 group-hover:text-brand-orange transition-colors line-clamp-2 dark:text-gray-50">
                         {title}
                     </h3>
+
+                    {society?.trim() ? (
+                        <p className="text-gray-600 text-xs font-semibold mb-2 dark:text-gray-300">
+                            Society: {society.trim()}
+                        </p>
+                    ) : null}
 
                     <p className="text-gray-500 text-xs font-medium flex items-start gap-2 dark:text-gray-400">
                         <svg

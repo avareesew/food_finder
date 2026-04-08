@@ -14,6 +14,7 @@ export type HomeDiscoverPreviewRecord = {
   event: {
     title: string | null;
     host: string | null;
+    society?: string | null;
     campus: string | null;
     date: string | null;
     startTime: string | null;
@@ -49,6 +50,7 @@ export function homePreviewRecordToFlyer(r: HomeDiscoverPreviewRecord): Flyer {
   const ev: ExtractedEvent = {
     title: r.event.title,
     host: r.event.host,
+    society: r.event.society ?? null,
     campus: r.event.campus,
     date: r.event.date,
     startTime: r.event.startTime,
@@ -107,6 +109,7 @@ export function flyerToHomeDiscoverPreview(f: Flyer): HomeDiscoverPreviewRecord 
     event: {
       title: typeof ev?.title === 'string' ? ev.title : null,
       host: typeof ev?.host === 'string' ? ev.host : null,
+      society: typeof ev?.society === 'string' ? ev.society : null,
       campus: null,
       date,
       startTime: typeof ev?.startTime === 'string' ? ev.startTime : null,

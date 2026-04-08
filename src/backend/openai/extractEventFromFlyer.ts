@@ -18,6 +18,8 @@ export type FoodCategory =
 export type ExtractedEvent = {
   title: string | null;
   host: string | null; // organizer / club / department
+  /** Student club or society name when stated (plain text; optional). */
+  society: string | null;
   campus: string | null; // e.g. "BYU"
   date: string | null; // YYYY-MM-DD (local campus date)
   startTime: string | null; // HH:MM (24h) local campus time
@@ -78,9 +80,11 @@ export function normalizeExtractedEvent(input: unknown): ExtractedEvent {
   const linkRaw = typeof obj?.clubSignupLink === 'string' ? obj.clubSignupLink.trim().slice(0, 2048) : '';
   const partRaw =
     typeof obj?.participationExpectations === 'string' ? obj.participationExpectations.trim().slice(0, 2000) : '';
+  const societyRaw = typeof obj?.society === 'string' ? obj.society.trim().slice(0, 200) : '';
   return {
     title: typeof obj?.title === 'string' ? obj.title : null,
     host: typeof obj?.host === 'string' ? obj.host : null,
+    society: societyRaw.length > 0 ? societyRaw : null,
     campus: typeof obj?.campus === 'string' ? obj.campus : null,
     date,
     startTime: typeof obj?.startTime === 'string' ? obj.startTime : null,
@@ -144,7 +148,7 @@ export async function extractEventFromFlyerWithOpenAI(args: {
     `Use campus timezone: ${campusTimezone}.`,
     ``,
     `Return these keys EXACTLY:`,
-    `title, host, campus, date, startTime, endTime, place, food, foodCategory, details, clubSignupLink, participationExpectations, other, foodEmoji`,
+    `title, host, society, campus, date, startTime, endTime, place, food, foodCategory, details, clubSignupLink, participationExpectations, other, foodEmoji`,
     `- foodEmoji: one emoji for the food type (e.g. 🍕) or null if unclear.`,
     ``,
     `Formatting rules:`,
@@ -153,12 +157,13 @@ export async function extractEventFromFlyerWithOpenAI(args: {
     `- foodCategory must be one of: pizza, dessert, snacks, refreshments, drinks, meal, other (or null)`,
     `- If flyer says "treats" or "refreshments", put that in food and use foodCategory "refreshments".`,
     `- host: club/org/department hosting the event (if shown).`,
+    `- society: student club or society name only if clearly stated (e.g. "Women in AIS", "BYU ACM"); null if unknown or redundant with host alone.`,
     `- campus: campus name or abbreviation (e.g. "BYU") if obvious; else null.`,
     `- clubSignupLink: full https URL if shown; otherwise a short note like "QR code on flyer" or "link in Instagram bio"; null if absent.`,
     `- participationExpectations: one concise line or sentence combining dress code, stay-for-duration, networking, or capacity rules; null if absent.`,
     ``,
     `Example:`,
-    `{"title":"MIBS Community Service Night","host":"MIBS","campus":"BYU","date":"2026-02-11","startTime":"19:00","endTime":"20:30","place":"TNRB 170","food":"treats","foodCategory":"refreshments","details":"Treats will be provided. Come join MIBS and The Policy Project!","clubSignupLink":null,"participationExpectations":"Please stay for the full presentation.","other":null,"foodEmoji":"🍪"}`,
+    `{"title":"MIBS Community Service Night","host":"MIBS","society":"MIBS","campus":"BYU","date":"2026-02-11","startTime":"19:00","endTime":"20:30","place":"TNRB 170","food":"treats","foodCategory":"refreshments","details":"Treats will be provided. Come join MIBS and The Policy Project!","clubSignupLink":null,"participationExpectations":"Please stay for the full presentation.","other":null,"foodEmoji":"🍪"}`,
   ].join('\n');
 
   const res = await fetch('https://api.openai.com/v1/responses', {
@@ -201,6 +206,7 @@ export async function extractEventFromFlyerWithOpenAI(args: {
       event: {
         title: null,
         host: null,
+        society: null,
         campus: null,
         date: null,
         startTime: null,
